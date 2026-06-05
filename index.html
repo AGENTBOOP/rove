@@ -2387,7 +2387,7 @@ transition: all var(--tr);
     } else {
       $('timeline-bar').style.display = 'none';
       // Long-term: chronological timelines of all future tasks
-      filtered = filtered.filter(t => (t.scheduledDate || TODAY) > TODAY && !t.isEveryday);
+      filtered = filtered.filter(t => (t.scheduledDate || TODAY) > TODAY && !t.isEveryday && !t.done);
       filtered.sort((a, b) => {
         const dA = a.scheduledDate || TODAY;
         const dB = b.scheduledDate || TODAY;
@@ -2577,7 +2577,7 @@ transition: all var(--tr);
   function syncStart() {
     let visibleTasks;
     if (currentViewMode === 'long-term') {
-      visibleTasks = tasks.filter(t => (t.scheduledDate || TODAY) > TODAY && !t.isEveryday);
+      visibleTasks = tasks.filter(t => (t.scheduledDate || TODAY) > TODAY && !t.isEveryday && !t.done);
       if (startDayBtn) {
         startDayBtn.style.display = 'none';
       }
@@ -2646,7 +2646,11 @@ transition: all var(--tr);
 
     let scheduledDate = dateVal;
     if (!scheduledDate) {
-      if (activeTimelineFilter === 'tomorrow') {
+      if (currentViewMode === 'long-term') {
+        const tomorrowDateObj = new Date();
+        tomorrowDateObj.setDate(tomorrowDateObj.getDate() + 1);
+        scheduledDate = tomorrowDateObj.toISOString().slice(0, 10);
+      } else if (activeTimelineFilter === 'tomorrow') {
         const tomorrowDateObj = new Date();
         tomorrowDateObj.setDate(tomorrowDateObj.getDate() + 1);
         scheduledDate = tomorrowDateObj.toISOString().slice(0, 10);
@@ -2856,7 +2860,7 @@ transition: all var(--tr);
           isTimelineMatch = (sDate > lastDateOfWeek);
         }
       } else {
-        isTimelineMatch = ((t.scheduledDate || TODAY) > TODAY && !t.isEveryday);
+        isTimelineMatch = ((t.scheduledDate || TODAY) > TODAY && !t.isEveryday && !t.done);
       }
 
       if (isTimelineMatch) {
