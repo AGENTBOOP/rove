@@ -37,6 +37,15 @@ import {
 } from 'firebase/firestore';
 import { format, parseISO, isValid } from 'date-fns';
 import { db, auth } from './firebase';
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  updateProfile,
+  onAuthStateChanged,
+  signOut,
+  GoogleAuthProvider,
+  signInWithPopup
+} from 'firebase/auth';
 
 // ─── Utility helpers ──────────────────────────────────────────────────────────
 
@@ -483,6 +492,222 @@ const SpinnerIcon = () => (
   </svg>
 );
 
+const IntroScreen = ({ onGoogleLogin, onShowEmail, error }) => {
+  return (
+    <div className="min-h-screen bg-[#121214] text-white flex items-center justify-center px-4 font-sans antialiased">
+      <div className="w-full max-w-md bg-[#1C1C20] border border-white/8 rounded-2xl shadow-2xl p-6 space-y-8 text-center">
+        
+        {/* Header/Tagline */}
+        <div className="space-y-2">
+          <h1 className="text-4xl font-extrabold tracking-tight text-white font-sans">
+            ROVE
+          </h1>
+          <p className="text-white/50 text-xs sm:text-sm max-w-xs mx-auto leading-relaxed">
+            Track habits. Share chores. Build discipline.
+          </p>
+        </div>
+
+        {/* Feature Preview Card */}
+        <div className="bg-[#121214] border border-white/6 rounded-2xl p-5 shadow-inner space-y-4 text-left max-w-xs mx-auto relative overflow-hidden group">
+          {/* Subtle accent glow */}
+          <div className="absolute -top-10 -right-10 w-24 h-24 bg-[#3B82F6]/10 rounded-full blur-2xl group-hover:bg-[#3B82F6]/15 transition-all duration-500"></div>
+          
+          <div className="flex items-center justify-between border-b border-white/5 pb-2.5">
+            <span className="text-white/60 font-semibold text-[10px] tracking-wider uppercase">✦ Daily Checklist</span>
+            <span className="text-[9px] font-bold text-[#3B82F6] bg-[#3B82F6]/10 px-2 py-0.5 rounded-full uppercase tracking-wider">Today</span>
+          </div>
+          
+          <div className="space-y-3">
+            {/* Completed task */}
+            <div className="flex items-center gap-2.5 opacity-40">
+              <div className="w-4.5 h-4.5 rounded-full border border-emerald-500/50 bg-emerald-500/10 flex items-center justify-center text-emerald-400 text-[10px] font-bold">✓</div>
+              <div>
+                <p className="text-xs font-medium text-white/95 line-through">Hydrate &amp; Stretch</p>
+                <p className="text-[9px] text-white/30">Completed</p>
+              </div>
+            </div>
+            
+            {/* Pending task */}
+            <div className="flex items-center gap-2.5">
+              <div className="w-4.5 h-4.5 rounded-full border border-white/20"></div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-medium text-white">Read 10 Pages</p>
+                <p className="text-[9px] text-white/35">15 min • Priority High</p>
+              </div>
+              <span className="text-[9px] text-white/45 bg-white/5 border border-white/10 px-1.5 py-0.5 rounded-full whitespace-nowrap">4:00 PM</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Buttons / Actions */}
+        <div className="space-y-4">
+          <button
+            onClick={onGoogleLogin}
+            className="w-full flex items-center justify-center gap-3 py-3 rounded-xl bg-white text-black text-sm font-semibold hover:bg-white/90 active:scale-[0.98] transition-all shadow-lg focus:outline-none"
+          >
+            <svg className="w-4 h-4" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+            </svg>
+            Continue with Google
+          </button>
+
+          {error && (
+            <p className="text-red-400 text-xs bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2 text-left">
+              {error}
+            </p>
+          )}
+
+          <div className="pt-2">
+            <button
+              onClick={onShowEmail}
+              className="text-xs text-white/40 hover:text-white/80 transition-colors focus:outline-none underline decoration-white/20"
+            >
+              Or continue with Email address
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+};
+
+const Login = ({ onBack }) => {
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [displayName, setDisplayName] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    if (!email || !password) {
+      setError('Email and password are required.');
+      return;
+    }
+    if (isSignUp && !displayName.trim()) {
+      setError('Name is required.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      if (isSignUp) {
+        const credential = await createUserWithEmailAndPassword(auth, email, password);
+        await updateProfile(credential.user, {
+          displayName: displayName.trim(),
+        });
+      } else {
+        await signInWithEmailAndPassword(auth, email, password);
+      }
+    } catch (err) {
+      console.error(err);
+      setError(err.message.replace('Firebase: ', ''));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#121214] text-white flex items-center justify-center px-4 font-sans antialiased">
+      <div className="w-full max-w-md bg-[#1C1C20] border border-white/8 rounded-2xl shadow-2xl p-6 space-y-6">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold tracking-tight text-white">
+            {isSignUp ? 'Create your Rove account' : 'Sign in to Rove'}
+          </h2>
+          <p className="text-white/40 text-xs mt-1.5">
+            {isSignUp ? 'Start managing tasks with your family' : 'Welcome back! Enter your details to sign in'}
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {isSignUp && (
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold uppercase tracking-widest text-white/40">Name</label>
+              <input
+                type="text"
+                placeholder="Name"
+                value={displayName}
+                onChange={e => setDisplayName(e.target.value)}
+                className="w-full bg-[#121214] border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6]/40 transition-colors"
+              />
+            </div>
+          )}
+
+          <div className="space-y-1.5">
+            <label className="block text-xs font-semibold uppercase tracking-widest text-white/40">Email</label>
+            <input
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              className="w-full bg-[#121214] border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6]/40 transition-colors"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="block text-xs font-semibold uppercase tracking-widest text-white/40">Password</label>
+            <input
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              className="w-full bg-[#121214] border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6]/40 transition-colors"
+            />
+          </div>
+
+          {error && (
+            <p className="text-red-400 text-xs bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+              {error}
+            </p>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full py-3 rounded-xl bg-[#3B82F6] text-white text-sm font-semibold hover:bg-blue-500 active:scale-[0.98] transition-all focus:outline-none focus:ring-2 focus:ring-[#3B82F6]/50 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-500/20"
+          >
+            {loading ? (
+              <span className="flex items-center justify-center gap-2">
+                <SpinnerIcon />
+                {isSignUp ? 'Creating Account...' : 'Signing In...'}
+              </span>
+            ) : (
+              isSignUp ? 'Create Account' : 'Sign In'
+            )}
+          </button>
+        </form>
+
+        <div className="text-center pt-2 flex flex-col gap-2.5">
+          <button
+            type="button"
+            onClick={() => {
+              setIsSignUp(!isSignUp);
+              setError('');
+            }}
+            className="text-xs text-[#3B82F6] hover:underline focus:outline-none"
+          >
+            {isSignUp ? 'Already have an account? Sign In' : "Don't have an account? Create one"}
+          </button>
+
+          <button
+            type="button"
+            onClick={onBack}
+            className="text-xs text-white/40 hover:text-white/80 focus:outline-none"
+          >
+            ← Back to Intro
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // ─── Main component ───────────────────────────────────────────────────────────
 
 /**
@@ -501,7 +726,10 @@ const SpinnerIcon = () => (
  * other string (e.g. "member") for everyone else.
  */
 export default function TaskAssignment({ familyId }) {
-  const currentFirebaseUser = auth.currentUser;
+  const [currentUser, setCurrentUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [showEmailForm, setShowEmailForm] = useState(false);
+  const [authError, setAuthError] = useState('');
 
   // ── State ──────────────────────────────────────────────────────────────────
   const [members,       setMembers]       = useState([]);
@@ -511,6 +739,54 @@ export default function TaskAssignment({ familyId }) {
   const [loadingMembers,setLoadingMembers]= useState(true);
   const [loadingTasks,  setLoadingTasks]  = useState(true);
   const [filterStatus,  setFilterStatus]  = useState('all'); // 'all' | 'pending' | 'completed'
+
+  // ── Auth state listener ────────────────────────────────────────────────────
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, u => {
+      setCurrentUser(u);
+      setAuthLoading(false);
+    });
+    return unsubscribe;
+  }, []);
+
+  // ── Google login handler ───────────────────────────────────────────────────
+  const handleGoogleLogin = async () => {
+    setAuthError('');
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+    } catch (err) {
+      console.error('Google Sign In error:', err);
+      if (err.code !== 'auth/popup-closed-by-user') {
+        setAuthError(err.message.replace('Firebase: ', ''));
+      }
+    }
+  };
+
+  // ── Early returns for Auth ─────────────────────────────────────────────────
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-[#121214] flex items-center justify-center text-white font-sans">
+        <div className="flex flex-col items-center gap-3">
+          <SpinnerIcon />
+          <p className="text-white/40 text-sm font-medium">Checking authorization...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!currentUser) {
+    if (showEmailForm) {
+      return <Login onBack={() => { setShowEmailForm(false); setAuthError(''); }} />;
+    }
+    return (
+      <IntroScreen
+        onGoogleLogin={handleGoogleLogin}
+        onShowEmail={() => setShowEmailForm(true)}
+        error={authError}
+      />
+    );
+  }
 
   // ── Fetch family members (real-time) ───────────────────────────────────────
   useEffect(() => {
@@ -524,11 +800,11 @@ export default function TaskAssignment({ familyId }) {
         setMembers(list);
 
         // Identify current user within the family
-        if (currentFirebaseUser) {
-          const me = list.find(m => m.uid === currentFirebaseUser.uid) ?? {
-            uid:         currentFirebaseUser.uid,
-            displayName: currentFirebaseUser.displayName ?? 'You',
-            photoURL:    currentFirebaseUser.photoURL    ?? null,
+        if (currentUser) {
+          const me = list.find(m => m.uid === currentUser.uid) ?? {
+            uid:         currentUser.uid,
+            displayName: currentUser.displayName ?? 'You',
+            photoURL:    currentUser.photoURL    ?? null,
             role:        'member',
             familyId,
           };
@@ -543,7 +819,7 @@ export default function TaskAssignment({ familyId }) {
     );
 
     return unsubscribe;
-  }, [familyId, currentFirebaseUser]);
+  }, [familyId, currentUser]);
 
   // ── Fetch tasks (real-time, filtered by role) ──────────────────────────────
   useEffect(() => {
@@ -620,25 +896,38 @@ export default function TaskAssignment({ familyId }) {
             <h1 className="text-2xl font-bold tracking-tight">Tasks</h1>
             <p className="text-white/40 text-sm mt-0.5">
               {currentMember?.role === 'owner'
-                ? 'You're managing this group'
+                ? "You're managing this group"
                 : 'Your assigned tasks'}
             </p>
           </div>
 
-          {/* Only owners can assign tasks */}
-          {currentMember?.role === 'owner' && (
+          <div className="flex items-center gap-2.5">
             <button
               type="button"
-              onClick={() => setModalOpen(true)}
-              className="flex items-center gap-2 px-4 py-2.5 bg-[#3B82F6] text-white
-                         text-sm font-semibold rounded-xl hover:bg-blue-500
-                         transition-colors shadow-lg shadow-blue-500/25
-                         focus:outline-none focus:ring-2 focus:ring-blue-400/50"
+              onClick={() => signOut(auth)}
+              className="px-4 py-2.5 bg-white/5 border border-white/10 text-white/80
+                         text-sm font-semibold rounded-xl hover:bg-white/10
+                         hover:text-white transition-colors focus:outline-none focus:ring-2
+                         focus:ring-white/20"
             >
-              <span className="text-base leading-none">+</span>
-              Assign Task
+              Sign Out
             </button>
-          )}
+
+            {/* Only owners can assign tasks */}
+            {currentMember?.role === 'owner' && (
+              <button
+                type="button"
+                onClick={() => setModalOpen(true)}
+                className="flex items-center gap-2 px-4 py-2.5 bg-[#3B82F6] text-white
+                           text-sm font-semibold rounded-xl hover:bg-blue-500
+                           transition-colors shadow-lg shadow-blue-500/25
+                           focus:outline-none focus:ring-2 focus:ring-blue-400/50"
+              >
+                <span className="text-base leading-none">+</span>
+                Assign Task
+              </button>
+            )}
+          </div>
         </header>
 
         {/* ── Family member strip ── */}
@@ -754,7 +1043,7 @@ export default function TaskAssignment({ familyId }) {
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         members={members}
-        currentUser={currentMember ?? { uid: currentFirebaseUser?.uid, familyId }}
+        currentUser={currentMember ?? { uid: currentUser?.uid, familyId }}
       />
 
       {/*
