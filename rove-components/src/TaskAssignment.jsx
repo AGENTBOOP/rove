@@ -749,6 +749,33 @@ export default function TaskAssignment({ familyId }) {
     return unsubscribe;
   }, []);
 
+  // ── Streak Reset Effect ────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!familyId || !currentUser || !currentMember) return;
+
+    const todayStr = format(new Date(), 'yyyy-MM-dd');
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = format(yesterday, 'yyyy-MM-dd');
+
+    if (currentMember.lastCompletionDate &&
+        currentMember.lastCompletionDate !== todayStr &&
+        currentMember.lastCompletionDate !== yesterdayStr) {
+      const resetStreak = async () => {
+        try {
+          await updateDoc(doc(db, 'families', familyId, 'members', currentUser.uid), {
+            currentStreak: 0,
+            xpMultiplier: 1.0,
+            lastCompletionDate: null // Reset to prevent infinite loops
+          });
+        } catch (err) {
+          console.error('[TaskAssignment] Streak reset error:', err);
+        }
+      };
+      resetStreak();
+    }
+  }, [familyId, currentUser, currentMember?.lastCompletionDate]);
+
   // ── Google login handler ───────────────────────────────────────────────────
   const handleGoogleLogin = async () => {
     setAuthError('');
@@ -866,10 +893,71 @@ export default function TaskAssignment({ familyId }) {
     const newStatus = task.status === 'completed' ? 'pending' : 'completed';
     try {
       await updateDoc(doc(db, 'tasks', task.id), { status: newStatus });
+
+      if (task.assignedTo === currentUser?.uid) {
+        const today = new Date();
+        const todayStr = format(today, 'yyyy-MM-dd');
+
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayStr = format(yesterday, 'yyyy-MM-dd');
+
+        const baseXP = 10;
+        const currentMultiplier = currentMember?.xpMultiplier || 1.0;
+        let xpChange = 0;
+
+        if (newStatus === 'completed') {
+          xpChange = Math.round(baseXP * currentMultiplier);
+        } else {
+          xpChange = -Math.round(baseXP * currentMultiplier);
+        }
+
+        const newXP = Math.max(0, (currentMember?.currentXP || 0) + xpChange);
+        const newLevel = Math.max(1, Math.floor(newXP / 100) + 1);
+
+        const memberUpdates = {
+          currentXP: newXP,
+          level: newLevel,
+        };
+
+        if (newStatus === 'completed') {
+          // Check if all today's tasks are completed
+          const todayTasks = tasks.filter(t =>
+            t.assignedTo === currentUser.uid &&
+            t.dueDate?.toDate &&
+            format(t.dueDate.toDate(), 'yyyy-MM-dd') === todayStr
+          );
+
+          const allCompleted = todayTasks.every(t =>
+            t.id === task.id ? true : t.status === 'completed'
+          );
+
+          if (todayTasks.length > 0 && allCompleted && currentMember?.lastCompletionDate !== todayStr) {
+            const newStreak = (currentMember?.lastCompletionDate === yesterdayStr)
+              ? (currentMember?.currentStreak || 0) + 1
+              : 1;
+            const newMultiplier = Math.min(3.0, 1.0 + (newStreak * 0.1));
+
+            memberUpdates.currentStreak = newStreak;
+            memberUpdates.xpMultiplier = newMultiplier;
+            memberUpdates.lastCompletionDate = todayStr;
+          }
+        } else {
+          // Rollback streak status if a task is unchecked today
+          if (currentMember?.lastCompletionDate === todayStr) {
+            const prevStreak = Math.max(0, (currentMember?.currentStreak || 1) - 1);
+            memberUpdates.currentStreak = prevStreak;
+            memberUpdates.xpMultiplier = Math.max(1.0, 1.0 + (prevStreak * 0.1));
+            memberUpdates.lastCompletionDate = prevStreak > 0 ? yesterdayStr : null;
+          }
+        }
+
+        await updateDoc(doc(db, 'families', familyId, 'members', currentUser.uid), memberUpdates);
+      }
     } catch (err) {
-      console.error('Error updating task status:', err);
+      console.error('[TaskAssignment] Error updating task/RPG stats:', err);
     }
-  }, []);
+  }, [familyId, currentUser, currentMember, tasks]);
 
   // ── Member lookup map ──────────────────────────────────────────────────────
   const memberMap = Object.fromEntries(members.map(m => [m.uid, m]));
@@ -929,6 +1017,41 @@ export default function TaskAssignment({ familyId }) {
             )}
           </div>
         </header>
+
+        {/* ── RPG Level & XP Bar ── */}
+        <section className="bg-[#1C1C20] border border-white/8 rounded-2xl px-5 py-4 space-y-3 shadow-lg">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-xl">🏆</span>
+              <div>
+                <p className="text-sm font-bold text-white">Level {currentMember?.level || 1}</p>
+                <p className="text-[10px] text-white/40 uppercase tracking-wider font-semibold">Hero Level</p>
+              </div>
+            </div>
+            
+            <div className="text-right">
+              <p className="text-xs font-semibold text-[#3B82F6] flex items-center gap-1.5 justify-end">
+                <span>🔥 Streak: {currentMember?.currentStreak || 0} days</span>
+                <span className="text-[10px] bg-[#3B82F6]/10 px-2 py-0.5 rounded-full">{(currentMember?.xpMultiplier || 1.0).toFixed(1)}x XP</span>
+              </p>
+              <p className="text-[9px] text-white/30 mt-0.5">Multiplier active</p>
+            </div>
+          </div>
+          
+          {/* Progress Bar */}
+          <div className="space-y-1">
+            <div className="w-full bg-[#121214] h-2.5 rounded-full overflow-hidden border border-white/5 relative">
+              <div 
+                className="bg-gradient-to-r from-[#3B82F6] to-[#8B5CF6] h-full rounded-full transition-all duration-500 ease-out"
+                style={{ width: `${(currentMember?.currentXP || 0) % 100}%` }}
+              ></div>
+            </div>
+            <div className="flex justify-between text-[9px] text-white/40 font-medium tracking-wide">
+              <span>{(currentMember?.currentXP || 0) % 100} XP</span>
+              <span>100 XP to Level {((currentMember?.level || 1) + 1)}</span>
+            </div>
+          </div>
+        </section>
 
         {/* ── Family member strip ── */}
         <section
