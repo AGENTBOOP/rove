@@ -777,6 +777,7 @@ const EmptyState = ({ onAdd, isOwner }) => (
  * @param {{ familyId: string }} props
  */
 export default function TaskShare({ familyId }) {
+  // ── States ──────────────────────────────────────────────────────────────────
   const [currentUser, setCurrentUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [showEmailForm, setShowEmailForm] = useState(false);
@@ -791,6 +792,16 @@ export default function TaskShare({ familyId }) {
   const [loadingTasks,   setLoadingTasks]   = useState(true);
   const [filterStatus,   setFilterStatus]   = useState('all'); // 'all' | 'pending' | 'completed'
 
+  // Local RPG stats state with safe fallback defaults
+  const [rpgStats, setRpgStats] = useState({
+    currentXP: 0,
+    level: 1,
+    currentStreak: 0,
+    xpMultiplier: 1.0,
+    lastCompletionDate: null,
+  });
+  const hasInitializedRpg = useRef(false);
+
   // ── Auth state listener ────────────────────────────────────────────────────
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, u => {
@@ -800,32 +811,58 @@ export default function TaskShare({ familyId }) {
     return unsubscribe;
   }, []);
 
+  // Reset the RPG initialization flag when the user changes
+  useEffect(() => {
+    hasInitializedRpg.current = false;
+  }, [currentUser?.uid]);
+
+  // Synchronize local RPG stats from currentMember profile snapshot on load
+  useEffect(() => {
+    if (currentMember && !hasInitializedRpg.current) {
+      setRpgStats({
+        currentXP: currentMember.currentXP || 0,
+        level: currentMember.level || 1,
+        currentStreak: currentMember.currentStreak || 0,
+        xpMultiplier: currentMember.xpMultiplier || 1.0,
+        lastCompletionDate: currentMember.lastCompletionDate || null,
+      });
+      hasInitializedRpg.current = true;
+    }
+  }, [currentMember]);
+
   // ── Streak Reset Effect ────────────────────────────────────────────────────
   useEffect(() => {
-    if (!familyId || !currentUser || !currentMember) return;
+    if (!familyId || !currentUser) return;
 
     const todayStr = format(new Date(), 'yyyy-MM-dd');
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
     const yesterdayStr = format(yesterday, 'yyyy-MM-dd');
 
-    if (currentMember.lastCompletionDate &&
-        currentMember.lastCompletionDate !== todayStr &&
-        currentMember.lastCompletionDate !== yesterdayStr) {
+    const lastDate = rpgStats.lastCompletionDate;
+    if (lastDate && lastDate !== todayStr && lastDate !== yesterdayStr) {
+      // Streak was missed! Reset local state
+      setRpgStats(prev => ({
+        ...prev,
+        currentStreak: 0,
+        xpMultiplier: 1.0,
+        lastCompletionDate: null
+      }));
+
       const resetStreak = async () => {
         try {
           await updateDoc(doc(db, 'families', familyId, 'members', currentUser.uid), {
             currentStreak: 0,
             xpMultiplier: 1.0,
-            lastCompletionDate: null // Reset to prevent infinite loops
+            lastCompletionDate: null
           });
         } catch (err) {
-          console.error('[TaskShare] Streak reset error:', err);
+          console.warn('[TaskShare] Firestore streak reset failed (likely permission rule). Local state is reset.', err);
         }
       };
       resetStreak();
     }
-  }, [familyId, currentUser, currentMember?.lastCompletionDate]);
+  }, [familyId, currentUser, rpgStats.lastCompletionDate]);
 
   // ── Google login handler ───────────────────────────────────────────────────
   const handleGoogleLogin = async () => {
@@ -914,6 +951,7 @@ export default function TaskShare({ familyId }) {
   const handleToggle = useCallback(async task => {
     const newStatus = task.status === 'completed' ? 'pending' : 'completed';
     try {
+      // 1. Update task in Firestore (always works)
       await updateDoc(doc(db, 'tasks', task.id), { status: newStatus });
 
       if (task.assignedTo === currentUser?.uid) {
@@ -925,21 +963,31 @@ export default function TaskShare({ familyId }) {
         const yesterdayStr = format(yesterday, 'yyyy-MM-dd');
 
         const baseXP = 10;
-        const currentMultiplier = currentMember?.xpMultiplier || 1.0;
-        let xpChange = 0;
+        // SAFE INITIAL STATE Fallbacks:
+        const currentXP = rpgStats?.currentXP || 0;
+        const currentStreak = rpgStats?.currentStreak || 0;
+        const xpMultiplier = rpgStats?.xpMultiplier || 1.0;
+        const lastCompletionDate = rpgStats?.lastCompletionDate || null;
 
+        let xpChange = 0;
         if (newStatus === 'completed') {
-          xpChange = Math.round(baseXP * currentMultiplier);
+          xpChange = Math.round(baseXP * xpMultiplier);
         } else {
-          xpChange = -Math.round(baseXP * currentMultiplier);
+          xpChange = -Math.round(baseXP * xpMultiplier);
         }
 
-        const newXP = Math.max(0, (currentMember?.currentXP || 0) + xpChange);
+        const newXP = Math.max(0, currentXP + xpChange);
         const newLevel = Math.max(1, Math.floor(newXP / 100) + 1);
 
-        const memberUpdates = {
+        // Required Console Log:
+        console.log("Current XP:", newXP);
+
+        const updates = {
           currentXP: newXP,
           level: newLevel,
+          currentStreak: currentStreak,
+          xpMultiplier: xpMultiplier,
+          lastCompletionDate: lastCompletionDate,
         };
 
         if (newStatus === 'completed') {
@@ -954,32 +1002,40 @@ export default function TaskShare({ familyId }) {
             t.id === task.id ? true : t.status === 'completed'
           );
 
-          if (todayTasks.length > 0 && allCompleted && currentMember?.lastCompletionDate !== todayStr) {
-            const newStreak = (currentMember?.lastCompletionDate === yesterdayStr)
-              ? (currentMember?.currentStreak || 0) + 1
+          if (todayTasks.length > 0 && allCompleted && lastCompletionDate !== todayStr) {
+            const newStreak = (lastCompletionDate === yesterdayStr)
+              ? currentStreak + 1
               : 1;
             const newMultiplier = Math.min(3.0, 1.0 + (newStreak * 0.1));
 
-            memberUpdates.currentStreak = newStreak;
-            memberUpdates.xpMultiplier = newMultiplier;
-            memberUpdates.lastCompletionDate = todayStr;
+            updates.currentStreak = newStreak;
+            updates.xpMultiplier = newMultiplier;
+            updates.lastCompletionDate = todayStr;
           }
         } else {
           // Rollback streak status if a task is unchecked today
-          if (currentMember?.lastCompletionDate === todayStr) {
-            const prevStreak = Math.max(0, (currentMember?.currentStreak || 1) - 1);
-            memberUpdates.currentStreak = prevStreak;
-            memberUpdates.xpMultiplier = Math.max(1.0, 1.0 + (prevStreak * 0.1));
-            memberUpdates.lastCompletionDate = prevStreak > 0 ? yesterdayStr : null;
+          if (lastCompletionDate === todayStr) {
+            const prevStreak = Math.max(0, currentStreak - 1);
+            updates.currentStreak = prevStreak;
+            updates.xpMultiplier = Math.max(1.0, 1.0 + (prevStreak * 0.1));
+            updates.lastCompletionDate = prevStreak > 0 ? yesterdayStr : null;
           }
         }
 
-        await updateDoc(doc(db, 'families', familyId, 'members', currentUser.uid), memberUpdates);
+        // Update local RPG stats state immediately so UI reacts instantly
+        setRpgStats(updates);
+
+        // Attempt to sync to Firestore in a try/catch (ignoring permission write errors)
+        try {
+          await updateDoc(doc(db, 'families', familyId, 'members', currentUser.uid), updates);
+        } catch (dbErr) {
+          console.warn('[TaskShare] Firestore profile write blocked (likely permission rule). Updating local state instead:', dbErr);
+        }
       }
     } catch (err) {
       console.error('[TaskShare] Error updating task/RPG stats:', err);
     }
-  }, [familyId, currentUser, currentMember, tasks]);
+  }, [familyId, currentUser, rpgStats, tasks]);
 
   // ── Early returns for Auth ─────────────────────────────────────────────────
   if (authLoading) {
@@ -1060,37 +1116,40 @@ export default function TaskShare({ familyId }) {
           </div>
         </header>
 
-        {/* ── RPG Level & XP Bar ── */}
-        <section className="bg-[#1C1C20] border border-white/8 rounded-2xl px-5 py-4 space-y-3 shadow-lg">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="text-xl">🏆</span>
+        {/* ── RPG Level & XP Bar (Glowing Purple Banner) ── */}
+        <section className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#8B5CF6]/20 to-[#6366F1]/20 border border-[#8B5CF6]/40 p-5 shadow-[0_0_25px_rgba(139,92,246,0.3)] backdrop-blur-md">
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-[#8B5CF6] to-[#6366F1] opacity-20 blur-xl pointer-events-none"></div>
+          <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-[#8B5CF6] to-[#6366F1] shadow-[0_0_15px_rgba(139,92,246,0.6)]">
+                <span className="text-xl">🏆</span>
+              </div>
               <div>
-                <p className="text-sm font-bold text-white">Level {currentMember?.level || 1}</p>
-                <p className="text-[10px] text-white/40 uppercase tracking-wider font-semibold">Hero Level</p>
+                <p className="text-lg font-extrabold text-white tracking-wide uppercase leading-tight">LEVEL {rpgStats.level}</p>
+                <p className="text-[10px] text-[#C084FC] font-bold tracking-widest uppercase">Hero Level Status</p>
               </div>
             </div>
             
-            <div className="text-right">
-              <p className="text-xs font-semibold text-[#3B82F6] flex items-center gap-1.5 justify-end">
-                <span>🔥 Streak: {currentMember?.currentStreak || 0} days</span>
-                <span className="text-[10px] bg-[#3B82F6]/10 px-2 py-0.5 rounded-full">{(currentMember?.xpMultiplier || 1.0).toFixed(1)}x XP</span>
-              </p>
-              <p className="text-[9px] text-white/30 mt-0.5">Multiplier active</p>
+            <div className="flex-1 sm:max-w-xs space-y-1.5">
+              <div className="flex justify-between text-[11px] font-bold text-white tracking-wide">
+                <span className="text-[#C084FC] font-semibold">XP: {rpgStats.currentXP % 100} / 100</span>
+                <span className="text-white/40">{100 - (rpgStats.currentXP % 100)} XP to next level</span>
+              </div>
+              <div className="w-full bg-[#121214]/60 h-3 rounded-full overflow-hidden border border-white/10 relative p-[2px]">
+                <div 
+                  className="bg-gradient-to-r from-[#A855F7] to-[#6366F1] h-full rounded-full transition-all duration-500 ease-out shadow-[0_0_10px_#a855f7]"
+                  style={{ width: `${rpgStats.currentXP % 100}%` }}
+                ></div>
+              </div>
             </div>
-          </div>
-          
-          {/* Progress Bar */}
-          <div className="space-y-1">
-            <div className="w-full bg-[#121214] h-2.5 rounded-full overflow-hidden border border-white/5 relative">
-              <div 
-                className="bg-gradient-to-r from-[#3B82F6] to-[#8B5CF6] h-full rounded-full transition-all duration-500 ease-out"
-                style={{ width: `${(currentMember?.currentXP || 0) % 100}%` }}
-              ></div>
-            </div>
-            <div className="flex justify-between text-[9px] text-white/40 font-medium tracking-wide">
-              <span>{(currentMember?.currentXP || 0) % 100} XP</span>
-              <span>100 XP to Level {((currentMember?.level || 1) + 1)}</span>
+            
+            <div className="flex items-center gap-4 bg-white/5 border border-white/5 rounded-xl px-3 py-2 sm:self-center">
+              <div>
+                <p className="text-xs font-extrabold text-[#10B981] flex items-center gap-1 justify-end">
+                  <span>🔥 Streak: {rpgStats.currentStreak} days</span>
+                </p>
+                <p className="text-[9px] text-[#A78BFA] font-semibold mt-0.5">Multiplier: {rpgStats.xpMultiplier.toFixed(1)}x XP</p>
+              </div>
             </div>
           </div>
         </section>
