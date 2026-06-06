@@ -2381,13 +2381,10 @@ transition: all var(--tr);
       filtered = tasks.filter(t => focusOnMe ? t.assignedTo === 'You' : t.assignedTo !== 'You');
     }
     
-    if (currentViewMode === 'daily') {
+    if (currentViewMode === 'long-term') {
       $('timeline-bar').style.display = 'flex';
       filtered = filterTasksByTimeline(filtered, activeTimelineFilter);
-    } else {
-      $('timeline-bar').style.display = 'none';
-      // Long-term: chronological timelines of all future tasks
-      filtered = filtered.filter(t => (t.scheduledDate || TODAY) > TODAY && !t.isEveryday && !t.done);
+      filtered = filtered.filter(t => !t.done);
       filtered.sort((a, b) => {
         const dA = a.scheduledDate || TODAY;
         const dB = b.scheduledDate || TODAY;
@@ -2396,6 +2393,9 @@ transition: all var(--tr);
         const tB = b.startTime || '23:59';
         return tA.localeCompare(tB);
       });
+    } else {
+      $('timeline-bar').style.display = 'none';
+      filtered = filterTasksByTimeline(filtered, 'today');
     }
 
     filtered.forEach(t => mountTask(t, false));
@@ -2577,13 +2577,15 @@ transition: all var(--tr);
   function syncStart() {
     let visibleTasks;
     if (currentViewMode === 'long-term') {
-      visibleTasks = tasks.filter(t => (t.scheduledDate || TODAY) > TODAY && !t.isEveryday && !t.done);
+      visibleTasks = tasks.filter(t => focusOnMe ? t.assignedTo === 'You' : t.assignedTo !== 'You');
+      visibleTasks = filterTasksByTimeline(visibleTasks, activeTimelineFilter);
+      visibleTasks = visibleTasks.filter(t => !t.done);
       if (startDayBtn) {
         startDayBtn.style.display = 'none';
       }
     } else {
       visibleTasks = tasks.filter(t => focusOnMe ? t.assignedTo === 'You' : t.assignedTo !== 'You');
-      visibleTasks = filterTasksByTimeline(visibleTasks, activeTimelineFilter);
+      visibleTasks = filterTasksByTimeline(visibleTasks, 'today');
       if (startDayBtn) {
         startDayBtn.style.display = 'block';
         startDayBtn.disabled = visibleTasks.length === 0;
@@ -2738,10 +2740,11 @@ transition: all var(--tr);
 
   startDayBtn.addEventListener('click', () => {
     let visibleTasks = tasks.filter(t => focusOnMe ? t.assignedTo === 'You' : t.assignedTo !== 'You');
-    if (currentViewMode === 'daily') {
+    if (currentViewMode === 'long-term') {
       visibleTasks = filterTasksByTimeline(visibleTasks, activeTimelineFilter);
+      visibleTasks = visibleTasks.filter(t => !t.done);
     } else {
-      visibleTasks = visibleTasks.filter(t => (t.scheduledDate || TODAY) > TODAY && !t.isEveryday);
+      visibleTasks = filterTasksByTimeline(visibleTasks, 'today');
     }
     session = { currentIdx: 0, completed: [], skipped: [], taskIds: visibleTasks.map(t => t.id) };
     saveSession();
