@@ -237,6 +237,9 @@ const AssignTaskModal = ({ open, onClose, members, currentUser }) => {
   const [title,      setTitle]      = useState('');
   const [assignedTo, setAssignedTo] = useState('');
   const [dueDate,    setDueDate]    = useState('');
+  const [isWeekly,    setIsWeekly]    = useState(false);
+  const [isMonthly,   setIsMonthly]   = useState(false);
+  const [category,    setCategory]    = useState('General');
   const [submitting, setSubmitting] = useState(false);
   const [error,      setError]      = useState('');
   const titleRef = useRef(null);
@@ -245,6 +248,7 @@ const AssignTaskModal = ({ open, onClose, members, currentUser }) => {
   useEffect(() => {
     if (open) {
       setTitle(''); setAssignedTo(''); setDueDate(''); setError('');
+      setIsWeekly(false); setIsMonthly(false); setCategory('General');
       setTimeout(() => titleRef.current?.focus(), 80);
     }
   }, [open]);
@@ -278,6 +282,11 @@ const AssignTaskModal = ({ open, onClose, members, currentUser }) => {
         status:        'pending',
         dueDate:       Timestamp.fromDate(parsed),
         createdAt:     serverTimestamp(),
+        isWeekly,
+        isMonthly,
+        category,
+        weeklyDone:    false,
+        monthlyDone:   false,
       });
       onClose();
     } catch (err) {
@@ -407,6 +416,53 @@ const AssignTaskModal = ({ open, onClose, members, currentUser }) => {
             />
           </div>
 
+          {/* Recurrence & Category */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold uppercase tracking-widest text-white/40">
+                Category
+              </label>
+              <select
+                value={category}
+                onChange={e => setCategory(e.target.value)}
+                className="w-full bg-[#121214] border border-white/10 rounded-xl px-4 py-3
+                           text-white text-sm focus:outline-none focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6]/40
+                           transition-colors"
+              >
+                <option value="General">General</option>
+                <option value="Fitness">Fitness</option>
+                <option value="Education">Education</option>
+                <option value="Sports">Sports</option>
+              </select>
+            </div>
+
+            <div className="space-y-1.5 flex flex-col justify-end">
+              <label className="block text-xs font-semibold uppercase tracking-widest text-white/40 mb-1">
+                Recurrence
+              </label>
+              <div className="flex gap-4 items-center h-[46px]">
+                <label className="flex items-center gap-2 text-white text-xs cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={isWeekly}
+                    onChange={e => setIsWeekly(e.target.checked)}
+                    className="w-3.5 h-3.5 rounded border-white/10 bg-[#121214] accent-[#3B82F6] cursor-pointer"
+                  />
+                  Weekly
+                </label>
+                <label className="flex items-center gap-2 text-white text-xs cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={isMonthly}
+                    onChange={e => setIsMonthly(e.target.checked)}
+                    className="w-3.5 h-3.5 rounded border-white/10 bg-[#121214] accent-[#3B82F6] cursor-pointer"
+                  />
+                  Monthly
+                </label>
+              </div>
+            </div>
+          </div>
+
           {/* Error */}
           {error && (
             <p className="text-red-400 text-xs bg-red-500/10 border border-red-500/20
@@ -454,7 +510,7 @@ const AssignTaskModal = ({ open, onClose, members, currentUser }) => {
  * TaskCard
  * Single task row.
  */
-const TaskCard = ({ task, assignedMember, currentUser, onToggle }) => {
+const TaskCard = ({ task, assignedMember, currentUser, onToggle, onWeeklyToggle, onMonthlyToggle }) => {
   const isOverdue =
     task.status !== 'completed' &&
     task.dueDate?.toDate() < new Date();
@@ -488,13 +544,54 @@ const TaskCard = ({ task, assignedMember, currentUser, onToggle }) => {
         }
       />
 
+      {/* Weekly & Monthly Toggles */}
+      {(task.isWeekly || task.isMonthly) && (
+        <div className="flex gap-1.5 flex-shrink-0">
+          {task.isWeekly && (
+            <button
+              type="button"
+              onClick={(e) => onWeeklyToggle(task, e)}
+              className={[
+                'w-6 h-6 rounded-md flex items-center justify-center text-[10px] font-bold border transition-all duration-200',
+                task.weeklyDone
+                  ? 'bg-purple-600 border-purple-500 text-white'
+                  : 'bg-white/5 border-white/10 text-white/50 hover:border-white/20',
+              ].join(' ')}
+              title="Toggle Weekly"
+            >
+              W
+            </button>
+          )}
+          {task.isMonthly && (
+            <button
+              type="button"
+              onClick={(e) => onMonthlyToggle(task, e)}
+              className={[
+                'w-6 h-6 rounded-md flex items-center justify-center text-[10px] font-bold border transition-all duration-200',
+                task.monthlyDone
+                  ? 'bg-purple-600 border-purple-500 text-white'
+                  : 'bg-white/5 border-white/10 text-white/50 hover:border-white/20',
+              ].join(' ')}
+              title="Toggle Monthly"
+            >
+              M
+            </button>
+          )}
+        </div>
+      )}
+
       {/* Body */}
       <div className="flex-1 min-w-0">
         <p className={[
-          'text-sm font-medium truncate',
+          'text-sm font-medium truncate flex items-center gap-2',
           isCompleted ? 'line-through text-white/30' : 'text-white',
         ].join(' ')}>
-          {task.title}
+          <span>{task.title}</span>
+          {task.category && task.category !== 'General' && (
+            <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-purple-500/10 border border-purple-500/20 text-purple-400 uppercase tracking-wider">
+              {task.category}
+            </span>
+          )}
         </p>
         <p className="text-xs text-white/35 mt-0.5">Due {dueDateStr}</p>
       </div>
@@ -1061,6 +1158,160 @@ export default function TaskAssignment({ familyId }) {
     }
   }, [familyId, currentUser, rpgStats, tasks]);
 
+  const handleWeeklyToggle = useCallback(async (task, e) => {
+    const newWeeklyDone = !task.weeklyDone;
+    try {
+      await updateDoc(doc(db, 'tasks', task.id), { weeklyDone: newWeeklyDone });
+
+      if (task.assignedTo === currentUser?.uid) {
+        const baseXP = 10;
+        const currentXP = rpgStats?.currentXP || 0;
+        const streakCount = rpgStats?.streakCount || 0;
+        const lastCompletedDate = rpgStats?.lastCompletedDate || null;
+        const completedDates = Array.isArray(rpgStats?.completedDates) ? [...rpgStats.completedDates] : [];
+
+        let xpChange = newWeeklyDone ? baseXP : -baseXP;
+        const newXP = Math.max(0, currentXP + xpChange);
+        const details = getLevelDetails(newXP);
+        const newLevel = details.level;
+
+        console.log("Current XP:", newXP);
+
+        if (newWeeklyDone) {
+          setPulseProgress(true);
+          setTimeout(() => setPulseProgress(false), 400);
+
+          if (e && e.target) {
+            const rect = e.target.getBoundingClientRect();
+            const x = rect.left + rect.width / 2;
+            const y = rect.top + rect.height / 2;
+            const colors = ['#8B5CF6', '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#EC4899'];
+            for (let i = 0; i < 30; i++) {
+              const p = document.createElement('div');
+              p.style.position = 'fixed';
+              p.style.left = `${x}px`;
+              p.style.top = `${y}px`;
+              p.style.width = `${Math.random() * 6 + 4}px`;
+              p.style.height = `${Math.random() * 6 + 4}px`;
+              p.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+              p.style.borderRadius = '50%';
+              p.style.pointerEvents = 'none';
+              p.style.zIndex = '9999';
+              const angle = Math.random() * Math.PI * 2;
+              const velocity = Math.random() * 100 + 50;
+              const dx = Math.cos(angle) * velocity;
+              const dy = Math.sin(angle) * velocity;
+              document.body.appendChild(p);
+              const anim = p.animate([
+                { transform: 'translate(0, 0) scale(1)', opacity: 1 },
+                { transform: `translate(${dx}px, ${dy + 80}px) scale(0)`, opacity: 0 }
+              ], {
+                duration: Math.random() * 500 + 500,
+                easing: 'cubic-bezier(0.1, 0.8, 0.3, 1)'
+              });
+              anim.onfinish = () => p.remove();
+            }
+          }
+        }
+
+        const updates = {
+          currentXP: newXP,
+          level: newLevel,
+          streakCount: streakCount,
+          lastCompletedDate: lastCompletedDate,
+          completedDates: completedDates,
+        };
+
+        setRpgStats(updates);
+
+        try {
+          await updateDoc(doc(db, 'families', familyId, 'members', currentUser.uid), updates);
+        } catch (dbErr) {
+          console.warn('[TaskAssignment] Firestore profile write blocked:', dbErr);
+        }
+      }
+    } catch (err) {
+      console.error('[TaskAssignment] Error updating weeklyDone/RPG stats:', err);
+    }
+  }, [familyId, currentUser, rpgStats]);
+
+  const handleMonthlyToggle = useCallback(async (task, e) => {
+    const newMonthlyDone = !task.monthlyDone;
+    try {
+      await updateDoc(doc(db, 'tasks', task.id), { monthlyDone: newMonthlyDone });
+
+      if (task.assignedTo === currentUser?.uid) {
+        const baseXP = 10;
+        const currentXP = rpgStats?.currentXP || 0;
+        const streakCount = rpgStats?.streakCount || 0;
+        const lastCompletedDate = rpgStats?.lastCompletedDate || null;
+        const completedDates = Array.isArray(rpgStats?.completedDates) ? [...rpgStats.completedDates] : [];
+
+        let xpChange = newMonthlyDone ? baseXP : -baseXP;
+        const newXP = Math.max(0, currentXP + xpChange);
+        const details = getLevelDetails(newXP);
+        const newLevel = details.level;
+
+        console.log("Current XP:", newXP);
+
+        if (newMonthlyDone) {
+          setPulseProgress(true);
+          setTimeout(() => setPulseProgress(false), 400);
+
+          if (e && e.target) {
+            const rect = e.target.getBoundingClientRect();
+            const x = rect.left + rect.width / 2;
+            const y = rect.top + rect.height / 2;
+            const colors = ['#8B5CF6', '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#EC4899'];
+            for (let i = 0; i < 30; i++) {
+              const p = document.createElement('div');
+              p.style.position = 'fixed';
+              p.style.left = `${x}px`;
+              p.style.top = `${y}px`;
+              p.style.width = `${Math.random() * 6 + 4}px`;
+              p.style.height = `${Math.random() * 6 + 4}px`;
+              p.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+              p.style.borderRadius = '50%';
+              p.style.pointerEvents = 'none';
+              p.style.zIndex = '9999';
+              const angle = Math.random() * Math.PI * 2;
+              const velocity = Math.random() * 100 + 50;
+              const dx = Math.cos(angle) * velocity;
+              const dy = Math.sin(angle) * velocity;
+              document.body.appendChild(p);
+              const anim = p.animate([
+                { transform: 'translate(0, 0) scale(1)', opacity: 1 },
+                { transform: `translate(${dx}px, ${dy + 80}px) scale(0)`, opacity: 0 }
+              ], {
+                duration: Math.random() * 500 + 500,
+                easing: 'cubic-bezier(0.1, 0.8, 0.3, 1)'
+              });
+              anim.onfinish = () => p.remove();
+            }
+          }
+        }
+
+        const updates = {
+          currentXP: newXP,
+          level: newLevel,
+          streakCount: streakCount,
+          lastCompletedDate: lastCompletedDate,
+          completedDates: completedDates,
+        };
+
+        setRpgStats(updates);
+
+        try {
+          await updateDoc(doc(db, 'families', familyId, 'members', currentUser.uid), updates);
+        } catch (dbErr) {
+          console.warn('[TaskAssignment] Firestore profile write blocked:', dbErr);
+        }
+      }
+    } catch (err) {
+      console.error('[TaskAssignment] Error updating monthlyDone/RPG stats:', err);
+    }
+  }, [familyId, currentUser, rpgStats]);
+
   // ── Google login handler ───────────────────────────────────────────────────
   const handleGoogleLogin = async () => {
     setAuthError('');
@@ -1355,17 +1606,32 @@ export default function TaskAssignment({ familyId }) {
           ) : visibleTasks.length === 0 ? (
             <EmptyState onAdd={() => setModalOpen(true)} />
           ) : (
-            <ul className="space-y-2.5">
-              {visibleTasks.map(task => (
-                <TaskCard
-                  key={task.id}
-                  task={task}
-                  assignedMember={memberMap[task.assignedTo]}
-                  currentUser={currentMember}
-                  onToggle={handleToggle}
-                />
-              ))}
-            </ul>
+            <div className="space-y-6">
+              {['General', 'Fitness', 'Education', 'Sports'].map(cat => {
+                const catTasks = visibleTasks.filter(t => (t.category || 'General') === cat);
+                if (catTasks.length === 0) return null;
+                return (
+                  <div key={cat} className="space-y-2.5">
+                    <div className="flex items-center gap-2 text-[10px] font-bold text-[#8B5CF6] uppercase tracking-wider pl-1 pb-1 border-b border-white/5" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                      <span>✦</span> {cat}
+                    </div>
+                    <ul className="space-y-2.5">
+                      {catTasks.map(task => (
+                        <TaskCard
+                          key={task.id}
+                          task={task}
+                          assignedMember={memberMap[task.assignedTo]}
+                          currentUser={currentMember}
+                          onToggle={handleToggle}
+                          onWeeklyToggle={handleWeeklyToggle}
+                          onMonthlyToggle={handleMonthlyToggle}
+                        />
+                      ))}
+                    </ul>
+                  </div>
+                );
+              })}
+            </div>
           )}
         </section>
       </div>

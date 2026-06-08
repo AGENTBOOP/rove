@@ -1851,6 +1851,23 @@ transition: all var(--tr);
             <input type="checkbox" id="add-task-everyday" style="accent-color: var(--accent); cursor: pointer;" />
             <label for="add-task-everyday" style="font-size: 10.5px; color: var(--muted); font-weight: 600; text-transform: uppercase; cursor: pointer;">Everyday</label>
           </div>
+          <div class="add-option-field" style="display: flex; align-items: center; gap: 4px;">
+            <input type="checkbox" id="add-task-weekly" style="accent-color: var(--accent); cursor: pointer;" />
+            <label for="add-task-weekly" style="font-size: 10.5px; color: var(--muted); font-weight: 600; text-transform: uppercase; cursor: pointer;">Weekly</label>
+          </div>
+          <div class="add-option-field" style="display: flex; align-items: center; gap: 4px;">
+            <input type="checkbox" id="add-task-monthly" style="accent-color: var(--accent); cursor: pointer;" />
+            <label for="add-task-monthly" style="font-size: 10.5px; color: var(--muted); font-weight: 600; text-transform: uppercase; cursor: pointer;">Monthly</label>
+          </div>
+          <div class="add-option-field" style="display: flex; align-items: center; gap: 4px;">
+            <label for="add-task-category" style="font-size: 10.5px; color: var(--muted); font-weight: 600; text-transform: uppercase; cursor: pointer; margin-right: 4px;">Category</label>
+            <select id="add-task-category" class="add-option-input" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 6px; color: #fff; font-size: 11px; padding: 3px 6px; outline: none; font-family: 'Inter', sans-serif;">
+              <option value="General" style="background: #1C1C20; color: #fff;">General</option>
+              <option value="Fitness" style="background: #1C1C20; color: #fff;">Fitness</option>
+              <option value="Education" style="background: #1C1C20; color: #fff;">Education</option>
+              <option value="Sports" style="background: #1C1C20; color: #fff;">Sports</option>
+            </select>
+          </div>
         </div>
       </div>
     </div>
@@ -2326,6 +2343,12 @@ transition: all var(--tr);
   function checkNewDayReset() {
     const lastDate = localStorage.getItem('rove_last_date') || TODAY;
     if (lastDate !== TODAY) {
+      // Calculate if week or month changed
+      const lastMonday = getWeekDates(lastDate)[0];
+      const todayMonday = getWeekDates(TODAY)[0];
+      const isNewWeek = (lastMonday !== todayMonday);
+      const isNewMonth = (lastDate.slice(0, 7) !== TODAY.slice(0, 7));
+
       // Midnight / new day reset!
       tasks.forEach(t => {
         if (t.isEveryday) {
@@ -2337,6 +2360,16 @@ transition: all var(--tr);
               st.isCompleted = false;
             });
           }
+        }
+        if (t.isWeekly && isNewWeek) {
+          t.weeklyDone = false;
+          t.done = false;
+          t.completedDate = null;
+        }
+        if (t.isMonthly && isNewMonth) {
+          t.monthlyDone = false;
+          t.done = false;
+          t.completedDate = null;
         }
       });
       saveTasks();
@@ -2739,7 +2772,29 @@ transition: all var(--tr);
       filtered = filterTasksByTimeline(filtered, 'today');
     }
 
-    filtered.forEach(t => mountTask(t, false));
+    const shouldGroup = (currentViewMode === 'long-term' || focusOnMe);
+    if (shouldGroup) {
+      const categories = ['General', 'Fitness', 'Education', 'Sports'];
+      const grouped = {};
+      categories.forEach(cat => grouped[cat] = []);
+      filtered.forEach(t => {
+        const cat = t.category || 'General';
+        if (!grouped[cat]) grouped[cat] = [];
+        grouped[cat].push(t);
+      });
+      categories.forEach(cat => {
+        const catTasks = grouped[cat];
+        if (catTasks.length > 0) {
+          const headerLi = document.createElement('li');
+          headerLi.style.listStyle = 'none';
+          headerLi.innerHTML = `<div class="task-category-header" style="font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.1em; margin: 16px 0 8px 4px; padding-bottom: 4px; border-bottom: 1.5px dashed rgba(255,255,255,0.06); display: flex; align-items: center; gap: 6px;"><span>✦</span> ${cat}</div>`;
+          reviewList.appendChild(headerLi);
+          catTasks.forEach(t => mountTask(t, false));
+        }
+      });
+    } else {
+      filtered.forEach(t => mountTask(t, false));
+    }
     syncStart();
 
     // Update analytics score and graph
@@ -2778,6 +2833,16 @@ transition: all var(--tr);
       }
     }
 
+    let indicatorHtml = '<div class="ri-dot"></div>';
+    if (currentViewMode === 'long-term' || task.isWeekly || task.isMonthly) {
+      indicatorHtml = `
+        <div style="display: flex; gap: 4px; align-items: center; margin-right: 6px; flex-shrink: 0;">
+          <button class="weekly-ck-btn ${task.weeklyDone ? 'on' : ''}" data-id="${task.id}" style="width: 18px; height: 18px; border-radius: 4px; border: 1.2px solid ${task.weeklyDone ? 'var(--accent)' : 'rgba(255,255,255,0.18)'}; background: ${task.weeklyDone ? 'var(--accent-gradient)' : 'transparent'}; display: flex; align-items: center; justify-content: center; font-size: 8.5px; font-weight: 800; color: #fff; cursor: pointer; transition: all 0.2s; padding: 0;" type="button">W</button>
+          <button class="monthly-ck-btn ${task.monthlyDone ? 'on' : ''}" data-id="${task.id}" style="width: 18px; height: 18px; border-radius: 4px; border: 1.2px solid ${task.monthlyDone ? 'var(--accent)' : 'rgba(255,255,255,0.18)'}; background: ${task.monthlyDone ? 'var(--accent-gradient)' : 'transparent'}; display: flex; align-items: center; justify-content: center; font-size: 8.5px; font-weight: 800; color: #fff; cursor: pointer; transition: all 0.2s; padding: 0;" type="button">M</button>
+        </div>
+      `;
+    }
+
     return `
       <div class="ri ${isCompleted ? 'done-task' : ''}" data-id="${task.id}">
         <div class="dh" aria-label="Drag to reorder">
@@ -2790,11 +2855,13 @@ transition: all var(--tr);
             <circle cx="8" cy="13" r="1.5"/>
           </svg>
         </div>
-        <div class="ri-dot"></div>
+        ${indicatorHtml}
         <span class="ri-name">
           ${esc(task.name)}
           ${task.startTime ? `<span class="task-time-badge">🕒 ${formatTime(task.startTime)}</span>` : ''}
           ${task.isEveryday ? `<span class="task-time-badge" style="color: var(--accent); border-color: var(--accent-dim); background: var(--accent-dim);">🔁 Everyday</span>` : ''}
+          ${task.isWeekly ? `<span class="task-time-badge" style="color: var(--accent); border-color: var(--accent-dim); background: var(--accent-dim);">🔁 Weekly</span>` : ''}
+          ${task.isMonthly ? `<span class="task-time-badge" style="color: var(--accent); border-color: var(--accent-dim); background: var(--accent-dim);">🔁 Monthly</span>` : ''}
           ${dateBadge}
         </span>
         <button class="sub-toggle svg-action" title="Toggle subtasks" type="button">
@@ -2806,6 +2873,7 @@ transition: all var(--tr);
         <button class="del-btn svg-action" aria-label="Remove task" type="button">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
         </button>
+
       </div>
       <div class="sub-section" id="sub-${task.id}">
         <div class="sub-rows" id="subrows-${task.id}">${buildSubRows(task)}</div>
@@ -2841,6 +2909,60 @@ transition: all var(--tr);
     const delBtn = li.querySelector('.del-btn');
     const subInput = li.querySelector('.sub-input');
     const subAddBtn = li.querySelector('.sub-add-btn');
+
+    // Weekly/Monthly Checkboxes
+    const weeklyBtn = li.querySelector('.weekly-ck-btn');
+    const monthlyBtn = li.querySelector('.monthly-ck-btn');
+    
+    if (weeklyBtn) {
+      weeklyBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const t = tasks.find(x => x.id == taskId);
+        if (t) {
+          t.weeklyDone = !t.weeklyDone;
+          saveTasks();
+          weeklyBtn.classList.toggle('on', t.weeklyDone);
+          weeklyBtn.style.background = t.weeklyDone ? 'var(--accent-gradient)' : 'transparent';
+          weeklyBtn.style.borderColor = t.weeklyDone ? 'var(--accent)' : 'rgba(255,255,255,0.18)';
+          
+          if (t.weeklyDone) {
+            triggerConfetti(weeklyBtn);
+            loadRpgStats();
+            rpgStats.currentXP = (rpgStats.currentXP || 0) + 10;
+            rpgStats.level = getLevelDetails(rpgStats.currentXP).level;
+            saveRpgStats();
+            console.log("Current XP:", rpgStats.currentXP);
+            updateRpgUI();
+            pulseXPBar();
+          }
+        }
+      });
+    }
+    
+    if (monthlyBtn) {
+      monthlyBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const t = tasks.find(x => x.id == taskId);
+        if (t) {
+          t.monthlyDone = !t.monthlyDone;
+          saveTasks();
+          monthlyBtn.classList.toggle('on', t.monthlyDone);
+          monthlyBtn.style.background = t.monthlyDone ? 'var(--accent-gradient)' : 'transparent';
+          monthlyBtn.style.borderColor = t.monthlyDone ? 'var(--accent)' : 'rgba(255,255,255,0.18)';
+          
+          if (t.monthlyDone) {
+            triggerConfetti(monthlyBtn);
+            loadRpgStats();
+            rpgStats.currentXP = (rpgStats.currentXP || 0) + 10;
+            rpgStats.level = getLevelDetails(rpgStats.currentXP).level;
+            saveRpgStats();
+            console.log("Current XP:", rpgStats.currentXP);
+            updateRpgUI();
+            pulseXPBar();
+          }
+        }
+      });
+    }
 
     // Delete task
     delBtn.addEventListener('click', () => removeTask(taskId, li));
@@ -2933,8 +3055,17 @@ transition: all var(--tr);
       }
     }
     
+    const state = getCurrentState();
+    const addCard = document.querySelector('.add-card');
+    if (addCard) {
+      if (state === 'open') {
+        addCard.style.display = 'none';
+      } else {
+        addCard.style.display = 'block';
+      }
+    }
+    
     if (focusToggleBtn) {
-      const state = getCurrentState();
       if (state === 'focus') {
         focusToggleBtn.textContent = 'Focus';
         focusToggleBtn.classList.remove('active');
@@ -2986,6 +3117,9 @@ transition: all var(--tr);
     const timeVal = $('add-task-time').value;
     const durationVal = $('add-task-duration').value;
     const isEverydayVal = $('add-task-everyday').checked;
+    const isWeeklyVal = $('add-task-weekly').checked;
+    const isMonthlyVal = $('add-task-monthly').checked;
+    const categoryVal = $('add-task-category').value || 'General';
 
     let scheduledDate = dateVal;
     if (!scheduledDate) {
@@ -3010,7 +3144,10 @@ transition: all var(--tr);
       scheduledDate,
       startTime: timeVal || undefined,
       durationMinutes: durationVal ? parseInt(durationVal, 10) : undefined,
-      isEveryday: isEverydayVal
+      isEveryday: isEverydayVal,
+      isWeekly: isWeeklyVal,
+      isMonthly: isMonthlyVal,
+      category: categoryVal
     };
 
     tasks.push(task);
@@ -3046,7 +3183,11 @@ transition: all var(--tr);
     $('add-task-time').value = '';
     $('add-task-duration').value = '';
     $('add-task-everyday').checked = false;
+    $('add-task-weekly').checked = false;
+    $('add-task-monthly').checked = false;
+    $('add-task-category').value = 'General';
     $('add-options-tray').style.display = 'none';
+
 
     syncStart(); addInput.value = ''; addInput.focus();
   });
@@ -3426,7 +3567,7 @@ transition: all var(--tr);
           t.completedDate = TODAY;
         }
       });
-      tasks = tasks.filter(t => !completedIds.includes(t.id) || t.isEveryday);
+      tasks = tasks.filter(t => !completedIds.includes(t.id) || t.isEveryday || t.isWeekly || t.isMonthly || (t.scheduledDate && t.scheduledDate > TODAY));
       saveTasks();
       
       session = null; saveSession();
