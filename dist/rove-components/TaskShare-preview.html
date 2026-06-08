@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rove — TaskShare Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    :root {
+      --bg:        #0e0e10;
+      --surface:   #17171a;
+      --surface2:  #1e1e22;
+      --border:    rgba(255,255,255,0.06);
+      --border-hi: rgba(255,255,255,0.10);
+      --blue:      #3B82F6;
+      --blue-dim:  rgba(59,130,246,0.18);
+      --text:      #e8e8ed;
+      --muted:     rgba(255,255,255,0.32);
+      --dimmer:    rgba(255,255,255,0.16);
+      --ease:      cubic-bezier(0.16,1,0.3,1);
+    }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100dvh;
+      -webkit-font-smoothing: antialiased;
+      font-size: 13px;
+    }
+
+    ::-webkit-scrollbar { width: 3px; height: 3px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 99px; }
+
+    /* ── Layout ─────────────────────────────────────── */
+    .app {
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 28px 18px 60px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* ── Header ─────────────────────────────────────── */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 2px;
+    }
+    .header-title {
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: #fff;
+    }
+    .header-sub {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+      font-weight: 400;
+    }
+
+    .btn-primary {
+      display: flex; align-items: center; gap: 5px;
+      padding: 7px 13px;
+      background: var(--blue);
+      color: #fff;
+      border: none; border-radius: 8px;
+      font-family: inherit; font-size: 12px; font-weight: 600;
+      cursor: pointer;
+      letter-spacing: 0.01em;
+      transition: background 0.15s, opacity 0.15s;
+      white-space: nowrap;
+    }
+    .btn-primary:hover  { background: #5592f7; }
+    .btn-primary:active { opacity: 0.8; }
+
+    /* ── Member strip card ───────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 13px 14px;
+    }
+    .card-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--dimmer);
+      margin-bottom: 10px;
+    }
+    .member-strip {
+      display: flex; gap: 14px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+    .member-item {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 4px;
+      flex-shrink: 0;
+    }
+
+    /* Avatars — strip (32px) */
+    .avatar {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 600; font-size: 11px; color: #fff;
+      position: relative;
+      border: 1.5px solid rgba(255,255,255,0.08);
+      transition: transform 0.14s;
+      cursor: default;
+    }
+    .avatar.you {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 2px rgba(59,130,246,0.22);
+    }
+    .avatar .crown {
+      position: absolute; top: -2px; right: -2px;
+      width: 11px; height: 11px;
+      background: #F59E0B; border-radius: 50%;
+      font-size: 6px; font-weight: 800; color: #000;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .avatar-name {
+      font-size: 9px; font-weight: 500;
+      color: var(--dimmer); letter-spacing: 0.01em;
+    }
+    .avatar-name.you { color: var(--blue); }
+
+    /* ── Stats ───────────────────────────────────────── */
+    .stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 10px 9px;
+      text-align: center;
+    }
+    .stat-num {
+      font-size: 20px; font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+    }
+    .stat-lbl { font-size: 10px; color: var(--muted); margin-top: 3px; }
+
+    /* ── Filter tabs ─────────────────────────────────── */
+    .filters {
+      display: flex; gap: 2px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 3px;
+      width: fit-content;
+    }
+    .pill {
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 11px; font-weight: 500;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer; font-family: inherit;
+      transition: background 0.15s, color 0.15s;
+      text-transform: capitalize;
+      letter-spacing: 0.01em;
+    }
+    .pill.active {
+      background: var(--surface2);
+      color: #fff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+    .pill:hover:not(.active) { color: rgba(255,255,255,0.65); }
+
+    /* ── Task list ───────────────────────────────────── */
+    #task-list { display: flex; flex-direction: column; gap: 1px; }
+
+    .task-card {
+      display: flex; align-items: center; gap: 11px;
+      background: var(--surface);
+      border: none;
+      border-bottom: 1px solid var(--border);
+      border-radius: 0;
+      padding: 10px 12px;
+      transition: background 0.14s, opacity 0.2s;
+      animation: fadeUp 0.2s var(--ease) both;
+    }
+    #task-list .task-card:first-child { border-radius: 10px 10px 0 0; }
+    #task-list .task-card:last-child  { border-radius: 0 0 10px 10px; border-bottom: none; }
+    #task-list .task-card:only-child  { border-radius: 10px; border-bottom: none; }
+
+    .task-card:hover { background: var(--surface2); }
+    .task-card.done  { opacity: 0.48; }
+
+    @keyframes fadeUp {
+      from { opacity:0; transform: translateY(5px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+
+    .task-body { flex: 1; min-width: 0; }
+    .task-title {
+      font-size: 13px; font-weight: 450;
+      color: var(--text);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      letter-spacing: -0.01em;
+      transition: color 0.15s;
+    }
+    .task-card.done .task-title {
+      text-decoration: line-through;
+      color: var(--dimmer);
+      text-decoration-color: rgba(255,255,255,0.15);
+    }
+    .task-due {
+      font-size: 10px;
+      color: var(--dimmer);
+      margin-top: 1px;
+      font-weight: 400;
+    }
+
+    /* ── Toggle switch — compact flat ────────────────── */
+    .toggle {
+      position: relative;
+      width: 28px; height: 16px;
+      flex-shrink: 0;
+    }
+    .toggle input { opacity:0; width:0; height:0; position:absolute; }
+    .toggle-track {
+      position: absolute; inset: 0;
+      background: rgba(255,255,255,0.09);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 99px;
+      cursor: pointer;
+      transition: background 0.18s, border-color 0.18s;
+    }
+    .toggle input:checked + .toggle-track {
+      background: var(--blue);
+      border-color: var(--blue);
+    }
+    .toggle-thumb {
+      position: absolute;
+      top: 2px; left: 2px;
+      width: 10px; height: 10px;
+      background: rgba(255,255,255,0.55);
+      border-radius: 50%;
+      transition: transform 0.18s var(--ease), background 0.18s;
+      pointer-events: none;
+    }
+    .toggle input:checked ~ .toggle-thumb {
+      transform: translateX(12px);
+      background: #fff;
+    }
+
+    /* ── Status badge — tiny & flat ──────────────────── */
+    .badge {
+      font-size: 9px; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 2px 6px; border-radius: 4px;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .badge.pending   { background: rgba(245,158,11,0.10); color: rgba(252,211,77,0.75); }
+    .badge.completed { background: rgba(16,185,129,0.10); color: rgba(110,231,183,0.70); }
+    .badge.overdue   { background: rgba(239,68,68,0.10);  color: rgba(252,165,165,0.75); }
+
+    /* ── Small avatar — task row (24px) ──────────────── */
+    .avatar-sm {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 600; font-size: 9px; color: #fff;
+      flex-shrink: 0;
+      opacity: 0.85;
+    }
+
+    /* ── Empty state ─────────────────────────────────── */
+    .empty {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 40px 0; text-align: center; gap: 5px;
+    }
+    .empty-icon { font-size: 22px; margin-bottom: 6px; opacity: 0.5; }
+    .empty strong { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.55); }
+    .empty p      { font-size: 11px; color: var(--dimmer); }
+
+    /* ── Modal backdrop ──────────────────────────────── */
+    #modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.65);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 100;
+      display: flex; align-items: flex-end; justify-content: center;
+      padding: 0 12px;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.24s ease;
+    }
+    #modal-overlay.open { opacity: 1; pointer-events: auto; }
+
+    /* ── Modal panel ─────────────────────────────────── */
+    .modal {
+      width: 100%; max-width: 460px;
+      background: #1a1a1e;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px 16px 0 0;
+      padding: 0;
+      transform: translateY(30px);
+      transition: transform 0.28s var(--ease);
+      overflow: hidden;
+    }
+    #modal-overlay.open .modal { transform: translateY(0); }
+
+    .modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 18px 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .modal-title { font-size: 14px; font-weight: 600; letter-spacing: -0.02em; color: #fff; }
+    .modal-close {
+      width: 26px; height: 26px;
+      border-radius: 6px; border: none;
+      background: transparent; color: var(--muted);
+      font-size: 14px; cursor: pointer; font-family: inherit;
+      display: flex; align-items: center; justify-content: center;
+      transition: color 0.14s, background 0.14s;
+    }
+    .modal-close:hover { color: #fff; background: rgba(255,255,255,0.06); }
+
+    .modal-body { padding: 16px 18px 24px; display: flex; flex-direction: column; gap: 14px; }
+
+    .field-label {
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--dimmer); margin-bottom: 6px; display: block;
+    }
+    .field-input {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 9px 12px;
+      font-family: inherit; font-size: 13px;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.16s;
+    }
+    .field-input::placeholder { color: var(--dimmer); }
+    .field-input:focus {
+      border-color: rgba(59,130,246,0.45);
+      box-shadow: 0 0 0 2px rgba(59,130,246,0.12);
+    }
+    input[type="date"].field-input { color-scheme: dark; }
+
+    /* Avatar picker */
+    .avatar-row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .avatar-pick {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 4px;
+      cursor: pointer; background: none; border: none; padding: 0;
+    }
+    .avatar-pick .av {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 600; font-size: 13px; color: #fff;
+      border: 1.5px solid transparent;
+      transition: transform 0.14s, border-color 0.14s, box-shadow 0.14s;
+      opacity: 0.7;
+    }
+    .avatar-pick.selected .av {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 2px rgba(59,130,246,0.25);
+      transform: scale(1.08);
+      opacity: 1;
+    }
+    .avatar-pick .av-name { font-size: 9px; font-weight: 500; color: var(--dimmer); transition: color 0.14s; }
+    .avatar-pick.selected .av-name { color: var(--blue); }
+
+    .form-error {
+      background: rgba(239,68,68,0.08);
+      border: 1px solid rgba(239,68,68,0.18);
+      border-radius: 7px; padding: 8px 11px;
+      color: rgba(252,165,165,0.85); font-size: 11px;
+      display: none;
+    }
+    .form-error.show { display: block; }
+
+    .modal-actions { display: flex; gap: 8px; }
+    .btn-cancel {
+      border-radius: 12px; color: var(--muted);
+      font-family: inherit; font-size: 13px; font-weight: 500;
+      cursor: pointer;
+      transition: background 0.18s, color 0.18s;
+    }
+    .btn-cancel:hover { background: rgba(255,255,255,0.05); color: #fff; }
+    .btn-submit {
+      flex: 1; padding: 13px;
+      background: var(--blue); border: none;
+      border-radius: 12px; color: #fff;
+      font-family: inherit; font-size: 13px; font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 14px var(--blue-glow);
+      transition: background 0.18s, transform 0.15s;
+    }
+    .btn-submit:hover   { background: #5b9af8; }
+    .btn-submit:active  { transform: scale(0.97); }
+
+    /* ─── Toast ─── */
+    #toast {
+      position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(20px);
+      background: var(--surface2); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px; padding: 12px 20px;
+      font-size: 13px; font-weight: 500; color: #fff;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.22s ease, transform 0.22s var(--ease);
+      z-index: 999; white-space: nowrap;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+<!-- ── Main App ─────────────────────────────────────── -->
+<div class="app">
+
+  <!-- Header -->
+  <header class="header">
+    <div>
+      <h1 class="header-title">Tasks</h1>
+      <p class="header-sub" id="role-sub">You're managing this group</p>
+    </div>
+    <button class="btn-primary" id="assign-btn" onclick="openModal()">
+      <span>+</span> Assign Task
+    </button>
+  </header>
+
+  <!-- Family member strip -->
+  <div class="card">
+    <p class="card-label">Family Members</p>
+    <div class="member-strip" id="member-strip"></div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-num" id="stat-total" style="color:#fff">0</div>
+      <div class="stat-lbl">Total</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="stat-pending" style="color:#FCD34D">0</div>
+      <div class="stat-lbl">Pending</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="stat-done" style="color:#6EE7B7">0</div>
+      <div class="stat-lbl">Completed</div>
+    </div>
+  </div>
+
+  <!-- Filter pills -->
+  <div class="filters" role="group" aria-label="Filter">
+    <button class="pill active" data-filter="all"       onclick="setFilter(this)">All</button>
+    <button class="pill"        data-filter="pending"   onclick="setFilter(this)">Pending</button>
+    <button class="pill"        data-filter="completed" onclick="setFilter(this)">Completed</button>
+  </div>
+
+  <!-- Task list -->
+  <div id="task-list"></div>
+
+</div><!-- /app -->
+
+<!-- ── Assign Task Modal ──────────────────────────── -->
+<div id="modal-overlay" onclick="overlayClick(event)">
+  <div class="modal" role="dialog" aria-modal="true" aria-label="Assign Task">
+
+    <div class="modal-header">
+      <span class="modal-title">Assign Task</span>
+      <button class="modal-close" onclick="closeModal()" aria-label="Close">✕</button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- Title -->
+      <div>
+        <label class="field-label" for="f-title">Task Title</label>
+        <input class="field-input" id="f-title" type="text"
+               placeholder="e.g. Take out the trash" maxlength="120" />
+      </div>
+
+      <!-- Assign To -->
+      <div>
+        <label class="field-label">Assign To</label>
+        <div class="avatar-row" id="avatar-picker"></div>
+      </div>
+
+      <!-- Due Date -->
+      <div>
+        <label class="field-label" for="f-due">Due Date</label>
+        <input class="field-input" id="f-due" type="date" />
+      </div>
+
+      <!-- Error -->
+      <div class="form-error" id="form-error"></div>
+
+      <!-- Actions -->
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+        <button class="btn-submit" onclick="submitTask()">Assign Task ↗</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+  /* ── Sample data ──────────────────────────────────────── */
+  const PALETTE = ['#3B82F6','#8B5CF6','#06B6D4','#10B981','#F59E0B','#EC4899'];
+  const color = str => { let h=0; for(const c of str) h=(h*31+c.charCodeAt(0))>>>0; return PALETTE[h%PALETTE.length]; };
+
+  const MEMBERS = [
+    { uid:'u1', name:'Rithwik', role:'owner' },
+    { uid:'u2', name:'Mom',     role:'member' },
+    { uid:'u3', name:'Dad',     role:'member' },
+    { uid:'u4', name:'Priya',   role:'member' },
+  ];
+  const ME = MEMBERS[0]; // currently signed-in user
+
+  let tasks = [
+    { id:'t1', title:'Vacuum the living room', assignedTo:'u2', status:'pending',   due:'2026-06-02' },
+    { id:'t2', title:'Take out the trash',      assignedTo:'u3', status:'completed', due:'2026-05-30' },
+    { id:'t3', title:'Buy groceries',           assignedTo:'u4', status:'pending',   due:'2026-06-04' },
+    { id:'t4', title:'Water the plants',        assignedTo:'u2', status:'pending',   due:'2026-05-29' },
+  ];
+
+  let currentFilter = 'all';
+  let selectedMember = '';
+
+  /* ── Helpers ─────────────────────────────────────────── */
+  const $ = id => document.getElementById(id);
+
+  function initials(name) {
+    return name.split(' ').filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join('');
+  }
+  function fmtDate(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso + 'T12:00:00');
+    return d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+  }
+  function isOverdue(iso, status) {
+    return status !== 'completed' && new Date(iso + 'T23:59:59') < new Date();
+  }
+  function getStatus(task) {
+    if (task.status === 'completed') return 'completed';
+    if (isOverdue(task.due, task.status)) return 'overdue';
+    return 'pending';
+  }
+  function memberById(uid) { return MEMBERS.find(m => m.uid === uid); }
+
+  /* ── Toast ───────────────────────────────────────────── */
+  function showToast(msg) {
+    const t = $('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2400);
+  }
+
+  /* ── Render member strip ─────────────────────────────── */
+  function renderMembers() {
+    const el = $('member-strip');
+    el.innerHTML = MEMBERS.map(m => `
+      <div class="member-item">
+        <div class="avatar ${m.uid===ME.uid?'you':''}" style="background:${color(m.uid)}">
+          ${initials(m.name)}
+          ${m.role==='owner' ? '<span class="crown">★</span>' : ''}
+        </div>
+        <span class="avatar-name ${m.uid===ME.uid?'you':''}">${m.uid===ME.uid?'You':m.name.split(' ')[0]}</span>
+      </div>
+    `).join('');
+  }
+
+  /* ── Render avatar picker in modal ──────────────────── */
+  function renderAvatarPicker() {
+    const el = $('avatar-picker');
+    el.innerHTML = MEMBERS.map(m => `
+      <button class="avatar-pick ${selectedMember===m.uid?'selected':''}"
+              onclick="pickMember('${m.uid}')" type="button"
+              aria-pressed="${selectedMember===m.uid}">
+        <div class="av" style="background:${color(m.uid)}">${initials(m.name)}</div>
+        <span class="av-name">${m.name.split(' ')[0]}</span>
+      </button>
+    `).join('');
+  }
+
+  function pickMember(uid) {
+    selectedMember = uid;
+    renderAvatarPicker();
+  }
+
+  /* ── Stats ───────────────────────────────────────────── */
+  function updateStats() {
+    const total   = tasks.length;
+    const done    = tasks.filter(t=>t.status==='completed').length;
+    const pending = total - done;
+    $('stat-total').textContent   = total;
+    $('stat-pending').textContent = pending;
+    $('stat-done').textContent    = done;
+  }
+
+  /* ── Render task list ────────────────────────────────── */
+  function renderTasks() {
+    updateStats();
+    const list = $('task-list');
+
+    const filtered = tasks.filter(t => {
+      if (currentFilter==='pending')   return t.status !== 'completed';
+      if (currentFilter==='completed') return t.status === 'completed';
+      return true;
+    });
+
+    if (filtered.length === 0) {
+      list.innerHTML = `
+        <div class="empty">
+          <div class="empty-icon">📋</div>
+          <strong>No tasks here</strong>
+          <p>${currentFilter==='all' ? 'Assign a task to get started.' : 'Nothing in this filter.'}</p>
+        </div>`;
+      return;
+    }
+
+    list.innerHTML = filtered.map(task => {
+      const m   = memberById(task.assignedTo);
+      const st  = getStatus(task);
+      const isDone = task.status === 'completed';
+      return `
+        <div class="task-card ${isDone?'done':''}" id="card-${task.id}" style="animation-delay:${filtered.indexOf(task)*0.04}s">
+          <label class="toggle" aria-label="Mark complete">
+            <input type="checkbox" ${isDone?'checked':''} onchange="toggleTask('${task.id}',this)">
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+
+          <div class="task-body">
+            <div class="task-title">${task.title}</div>
+            <div class="task-due">Due ${fmtDate(task.due)}</div>
+          </div>
+
+          ${m ? `<div class="avatar-sm" style="background:${color(m.uid)}" title="${m.name}">${initials(m.name)}</div>` : ''}
+
+          <span class="badge ${st}">${st}</span>
+        </div>`;
+    }).join('');
+  }
+
+  /* ── Toggle task ─────────────────────────────────────── */
+  function toggleTask(id, cb) {
+    const task = tasks.find(t => t.id===id);
+    if (!task) return;
+    task.status = cb.checked ? 'completed' : 'pending';
+    showToast(cb.checked ? '✓ Task marked complete' : 'Task reopened');
+    renderTasks();
+  }
+
+  /* ── Filter ──────────────────────────────────────────── */
+  function setFilter(btn) {
+    currentFilter = btn.dataset.filter;
+    document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    renderTasks();
+  }
+
+  /* ── Modal ───────────────────────────────────────────── */
+  function openModal() {
+    selectedMember = '';
+    $('f-title').value = '';
+    $('f-due').value   = '';
+    hideError();
+    renderAvatarPicker();
+    $('modal-overlay').classList.add('open');
+    setTimeout(() => $('f-title').focus(), 60);
+  }
+  function closeModal() {
+    $('modal-overlay').classList.remove('open');
+  }
+  function overlayClick(e) {
+    if (e.target === $('modal-overlay')) closeModal();
+  }
+  document.addEventListener('keydown', e => {
+    if (e.key==='Escape') closeModal();
+  });
+
+  function showError(msg) {
+    const el = $('form-error');
+    el.textContent = msg;
+    el.classList.add('show');
+  }
+  function hideError() {
+    $('form-error').classList.remove('show');
+  }
+
+  /* ── Submit task ─────────────────────────────────────── */
+  function submitTask() {
+    hideError();
+    const title = $('f-title').value.trim();
+    const due   = $('f-due').value;
+
+    if (!title)          { showError('⚠ Task title is required.'); return; }
+    if (!selectedMember) { showError('⚠ Please select a family member.'); return; }
+    if (!due)            { showError('⚠ Please pick a due date.'); return; }
+
+    const newTask = {
+      id:         't' + Date.now(),
+      title,
+      assignedTo: selectedMember,
+      status:     'pending',
+      due,
+    };
+
+    tasks.unshift(newTask);
+    closeModal();
+    showToast('✓ Task assigned!');
+    renderTasks();
+  }
+
+  /* ── Set today as min date ───────────────────────────── */
+  $('f-due').min = new Date().toISOString().slice(0, 10);
+
+  /* ── Init ────────────────────────────────────────────── */
+  renderMembers();
+  renderTasks();
+</script>
+</body>
+</html>
