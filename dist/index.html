@@ -1632,7 +1632,7 @@ transition: all var(--tr);
     <button id="shop-btn" aria-label="Style Shop">🎨</button>
     <span class="header-title" id="header-title">Rove</span>
     <button id="account-btn" aria-label="Account & Family">
-      <span class="account-initial">R</span>
+      <span class="account-initial">—</span>
       <span class="star-wrap" id="profile-premium-badge" style="display: none;"><svg width="8" height="8" viewBox="0 0 24 24" fill="#000"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></polygon></svg></span>
     </button>
   </header>
@@ -1669,12 +1669,12 @@ transition: all var(--tr);
     <p class="sheet-cap">Your Account</p>
     <div class="acct-block">
       <div class="acct-av" style="position: relative;">
-        R
+        —
         <span class="star-wrap" id="acct-premium-badge" style="display: none;"><svg width="8" height="8" viewBox="0 0 24 24" fill="#000"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></polygon></svg></span>
       </div>
       <div>
-        <div class="acct-name">Rithwik Somayajula</div>
-        <div class="acct-email">rithwik@gmail.com</div>
+        <div class="acct-name">Loading account...</div>
+        <div class="acct-email">please sign in</div>
       </div>
     </div>
     <button class="acct-link" id="switch-acct-btn">Switch account →</button>
@@ -2029,6 +2029,7 @@ transition: all var(--tr);
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+  import { getFirestore, doc, getDoc, setDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey:            'AIzaSyDm-vZtrXWiLEDOjAG_O5RB5zbeUQDg0xg',
@@ -2041,6 +2042,7 @@ transition: all var(--tr);
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
+  const db = getFirestore(app);
 
   /* ══ Constants ═══════════════════════════════════════════════ */
   const RING_R  = 86;
@@ -2051,10 +2053,10 @@ transition: all var(--tr);
   const WEEKLY_KEY  = 'focus_weekly_scores';
 
   /* ══ Family data ═════════════════════════════════════════════ */
-  let FAMILY = [
-    { id:'You',     name:'Rithwik', init:'R', color:'#3B82F6', role:'organizer', tasks:[] },
-  ];
+  let FAMILY = [];
   let choreTarget = 'You';
+  let activeFamilyId = null;
+  let unsubscribeFamily = null;
 
   /* ══ State ═══════════════════════════════════════════════════ */
   let tasks   = [];
@@ -2470,14 +2472,15 @@ transition: all var(--tr);
   function renderFamilySheet() {
     const container = $('sheet-members');
     if (!container) return;
+    const currentUid = auth.currentUser ? auth.currentUser.uid : 'You';
     container.innerHTML = FAMILY.map(m => `
       <div class="sheet-member">
         <div class="sheet-member-av" style="background:${m.color};">
           ${m.init}
-          ${(m.role==='organizer' || (m.id==='You' && isPremium)) ? '<span class="star-wrap"><svg width="8" height="8" viewBox="0 0 24 24" fill="#000"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></polygon></svg></span>' : ''}
+          ${(m.role==='organizer' || (m.id === currentUid && isPremium)) ? '<span class="star-wrap"><svg width="8" height="8" viewBox="0 0 24 24" fill="#000"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></polygon></svg></span>' : ''}
         </div>
         <div>
-          <div class="sheet-member-name">${m.name}${m.id==='You' ? ' <span style="font-size:10px;color:#A0A0A0;font-weight:400">(You)</span>' : ''}</div>
+          <div class="sheet-member-name">${m.name}${m.id === currentUid ? ' <span style="font-size:10px;color:#A0A0A0;font-weight:400">(You)</span>' : ''}</div>
           <div class="sheet-member-role">${m.role==='organizer' ? 'Family Organizer' : 'Member'}</div>
         </div>
         ${m.role==='organizer' ? '<span class="owner-pill">Owner</span>' : ''}
@@ -3794,6 +3797,9 @@ transition: all var(--tr);
     });
 
     function invCode() {
+      if (activeFamilyId) {
+        return window.location.origin + '/?invite=' + activeFamilyId;
+      }
       const c='ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
       let s=''; for(let i=0;i<22;i++) s+=c[Math.floor(Math.random()*c.length)];
       return window.location.origin + '/?invite=' + s;
@@ -4060,35 +4066,124 @@ transition: all var(--tr);
     }, 15000);
   })();
 
+  // Parse invite link from query parameters immediately on page load
+  const urlParams = new URLSearchParams(window.location.search);
+  const inviteCode = urlParams.get('invite');
+  if (inviteCode) {
+    localStorage.setItem('pending_invite_family_id', inviteCode);
+    const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+    window.history.replaceState({}, document.title, cleanUrl);
+  }
+
   // Firebase Auth State listener
   onAuthStateChanged(auth, user => {
     const loader = $('auth-loading-overlay');
     if (user) {
       localStorage.setItem('rove_logged_in', 'true');
       
-      const name = user.displayName || 'Rithwik';
-      FAMILY[0] = {
-        id: 'You',
-        name: name.split(' ')[0],
-        init: name.charAt(0).toUpperCase(),
-        color: '#3B82F6',
-        role: 'organizer',
-        tasks: FAMILY[0]?.tasks || []
-      };
-      
+      const name = user.displayName || 'User';
+      const email = user.email || '';
       const acctNameEl = document.querySelector('.acct-name');
       const acctEmailEl = document.querySelector('.acct-email');
       const initialEl = document.querySelector('.account-initial');
       const acctAvEl = document.querySelector('.acct-av');
       
       if (acctNameEl) acctNameEl.textContent = name;
-      if (acctEmailEl) acctEmailEl.textContent = user.email || 'rithwik@gmail.com';
+      if (acctEmailEl) acctEmailEl.textContent = email;
       if (initialEl) initialEl.textContent = name.charAt(0).toUpperCase();
       if (acctAvEl) acctAvEl.textContent = name.charAt(0).toUpperCase();
 
+      // Dynamically fetch and sync Family Data from Firestore
+      const syncUserFamily = async () => {
+        try {
+          const userDocRef = doc(db, 'users', user.uid);
+          const userDoc = await getDoc(userDocRef);
+          
+          let familyId = null;
+          const pendingInvite = localStorage.getItem('pending_invite_family_id');
+          
+          if (pendingInvite) {
+            familyId = pendingInvite;
+            await setDoc(userDocRef, { familyId });
+            localStorage.removeItem('pending_invite_family_id');
+            
+            setTimeout(() => {
+              alert("Success! You've joined the family group.");
+            }, 500);
+          } else if (userDoc.exists()) {
+            familyId = userDoc.data().familyId;
+          }
+          
+          if (!familyId) {
+            familyId = 'family_' + user.uid;
+            await setDoc(userDocRef, { familyId });
+          }
+          
+          activeFamilyId = familyId;
+          
+          // Ensure member doc exists in the family
+          const memberDocRef = doc(db, 'families', familyId, 'members', user.uid);
+          const memberDoc = await getDoc(memberDocRef);
+          if (!memberDoc.exists()) {
+            await setDoc(memberDocRef, {
+              uid: user.uid,
+              displayName: name,
+              email: email,
+              role: 'organizer',
+              color: '#3B82F6',
+              currentXP: 0,
+              level: 1,
+              streakCount: 0
+            });
+          }
+          
+          // Setup snapshot listener for family members
+          const membersRef = collection(db, 'families', familyId, 'members');
+          if (unsubscribeFamily) unsubscribeFamily();
+          
+          unsubscribeFamily = onSnapshot(membersRef, snapshot => {
+            const list = [];
+            snapshot.forEach(docSnap => {
+              const m = docSnap.data();
+              list.push({
+                id: docSnap.id,
+                name: m.displayName || 'Member',
+                init: (m.displayName || 'M').charAt(0).toUpperCase(),
+                color: m.color || '#8B5CF6',
+                role: m.role || 'member',
+                email: m.email || '',
+                tasks: []
+              });
+            });
+            
+            // Sort organizer first
+            FAMILY = list.sort((a, b) => {
+              if (a.role === 'organizer') return -1;
+              if (b.role === 'organizer') return 1;
+              return a.name.localeCompare(b.name);
+            });
+            
+            renderFamilySheet();
+            syncFamilyTasks();
+          }, err => {
+            console.error("Members snapshot listener failed:", err);
+          });
+        } catch (err) {
+          console.error("Error during Firestore family sync:", err);
+        }
+      };
+      syncUserFamily();
       checkAuthStatus();
     } else {
       localStorage.removeItem('rove_logged_in');
+      if (unsubscribeFamily) {
+        unsubscribeFamily();
+        unsubscribeFamily = null;
+      }
+      activeFamilyId = null;
+      FAMILY = [];
+      renderFamilySheet();
+      syncFamilyTasks();
       checkAuthStatus();
     }
 
@@ -4112,32 +4207,6 @@ transition: all var(--tr);
 
   /* ══ Init ════════════════════════════════════════════════════ */
   loadStorage(); loadRpgStats(); syncFamilyTasks(); renderFamilySheet(); renderReview(); initParticles(); updatePremiumUI(); updateRpgUI();
-
-  // Parse invite link from query parameters
-  const urlParams = new URLSearchParams(window.location.search);
-  const inviteCode = urlParams.get('invite');
-  if (inviteCode) {
-    if (!FAMILY.some(m => m.id === 'Guest')) {
-      FAMILY.push({
-        id: 'Guest',
-        name: 'Family Guest',
-        init: 'G',
-        color: '#10B981',
-        role: 'member',
-        tasks: []
-      });
-      renderFamilySheet();
-      syncFamilyTasks();
-    }
-    // Clean up query param from URL bar
-    const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-    window.history.replaceState({}, document.title, cleanUrl);
-    
-    // Alert user that they joined the family group successfully
-    setTimeout(() => {
-      alert("Success! You've joined the family group.");
-    }, 500);
-  }
 </script>
 </body>
 </html>
