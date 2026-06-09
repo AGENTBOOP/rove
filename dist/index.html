@@ -2031,12 +2031,12 @@ transition: all var(--tr);
   import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
   const firebaseConfig = {
-    apiKey:            'YOUR_API_KEY',
-    authDomain:        'YOUR_PROJECT.firebaseapp.com',
-    projectId:         'YOUR_PROJECT_ID',
-    storageBucket:     'YOUR_PROJECT.appspot.com',
-    messagingSenderId: 'YOUR_SENDER_ID',
-    appId:             'YOUR_APP_ID',
+    apiKey:            'AIzaSyDm-vZtrXWiLEDOjAG_O5RB5zbeUQDg0xg',
+    authDomain:        'studio-6455201864-cf8cb.firebaseapp.com',
+    projectId:         'studio-6455201864-cf8cb',
+    storageBucket:     'studio-6455201864-cf8cb.firebasestorage.app',
+    messagingSenderId: '965652912843',
+    appId:             '1:965652912843:web:70c06397a1b7d250d6994e',
   };
 
   const app = initializeApp(firebaseConfig);
@@ -2422,9 +2422,6 @@ transition: all var(--tr);
     tasks = tasks.map(t => {
       let assigned = t.assignedTo || 'You';
       if (assigned === 'rithwik') assigned = 'You';
-      if (assigned === 'mom') assigned = 'Mom';
-      if (assigned === 'dad') assigned = 'Dad';
-      if (assigned === 'priya') assigned = 'Priya';
       return {
         ...t,
         assignedTo: assigned,

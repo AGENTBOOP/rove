@@ -7,12 +7,12 @@ import { getFirestore }                    from 'firebase/firestore';
 import { getAuth }                         from 'firebase/auth';
 
 const firebaseConfig = {
-  apiKey:            'YOUR_API_KEY',
-  authDomain:        'YOUR_PROJECT.firebaseapp.com',
-  projectId:         'YOUR_PROJECT_ID',
-  storageBucket:     'YOUR_PROJECT.appspot.com',
-  messagingSenderId: 'YOUR_SENDER_ID',
-  appId:             'YOUR_APP_ID',
+  apiKey:            'AIzaSyDm-vZtrXWiLEDOjAG_O5RB5zbeUQDg0xg',
+  authDomain:        'studio-6455201864-cf8cb.firebaseapp.com',
+  projectId:         'studio-6455201864-cf8cb',
+  storageBucket:     'studio-6455201864-cf8cb.firebasestorage.app',
+  messagingSenderId: '965652912843',
+  appId:             '1:965652912843:web:70c06397a1b7d250d6994e',
 };
 
 // Prevent re-initialization on hot-reload
