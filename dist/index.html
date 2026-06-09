@@ -2017,11 +2017,31 @@ transition: all var(--tr);
     </div>
   </div>
 
+  <!-- ══════════ LOADING SPINNER OVERLAY ══════════ -->
+  <div id="auth-loading-overlay" style="position: absolute; inset: 0; z-index: 10000; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; transition: opacity 0.35s ease;">
+    <div style="width: 24px; height: 24px; border: 2.5px solid rgba(255,255,255,0.08); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+    <span style="font-size: 11px; font-weight: 500; color: var(--muted); font-family: 'Inter', sans-serif;">Checking auth...</span>
+  </div>
+
   </div><!-- #phone-content -->
   </div><!-- #phone-wrapper -->
 
-<script>
-  'use strict';
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey:            'YOUR_API_KEY',
+    authDomain:        'YOUR_PROJECT.firebaseapp.com',
+    projectId:         'YOUR_PROJECT_ID',
+    storageBucket:     'YOUR_PROJECT.appspot.com',
+    messagingSenderId: 'YOUR_SENDER_ID',
+    appId:             'YOUR_APP_ID',
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
   /* ══ Constants ═══════════════════════════════════════════════ */
   const RING_R  = 86;
   const RING_C  = 2 * Math.PI * RING_R;
@@ -3763,11 +3783,16 @@ transition: all var(--tr);
     btn.addEventListener('click', open);
     overlay.addEventListener('click', close);
 
-    $('switch-acct-btn').addEventListener('click', () => {
+    $('switch-acct-btn').addEventListener('click', async () => {
       if (confirm('Sign out?')) {
-        localStorage.removeItem('rove_logged_in');
-        close();
-        checkAuthStatus();
+        try {
+          await signOut(auth);
+          close();
+        } catch (err) {
+          console.error("Sign out error:", err);
+          close();
+          checkAuthStatus();
+        }
       }
     });
 
@@ -4038,15 +4063,58 @@ transition: all var(--tr);
     }, 15000);
   })();
 
+  // Firebase Auth State listener
+  onAuthStateChanged(auth, user => {
+    const loader = $('auth-loading-overlay');
+    if (user) {
+      localStorage.setItem('rove_logged_in', 'true');
+      
+      const name = user.displayName || 'Rithwik';
+      FAMILY[0] = {
+        id: 'You',
+        name: name.split(' ')[0],
+        init: name.charAt(0).toUpperCase(),
+        color: '#3B82F6',
+        role: 'organizer',
+        tasks: FAMILY[0]?.tasks || []
+      };
+      
+      const acctNameEl = document.querySelector('.acct-name');
+      const acctEmailEl = document.querySelector('.acct-email');
+      const initialEl = document.querySelector('.account-initial');
+      const acctAvEl = document.querySelector('.acct-av');
+      
+      if (acctNameEl) acctNameEl.textContent = name;
+      if (acctEmailEl) acctEmailEl.textContent = user.email || 'rithwik@gmail.com';
+      if (initialEl) initialEl.textContent = name.charAt(0).toUpperCase();
+      if (acctAvEl) acctAvEl.textContent = name.charAt(0).toUpperCase();
+
+      checkAuthStatus();
+    } else {
+      localStorage.removeItem('rove_logged_in');
+      checkAuthStatus();
+    }
+
+    if (loader) {
+      loader.style.opacity = '0';
+      setTimeout(() => {
+        loader.style.display = 'none';
+      }, 350);
+    }
+  });
+
   // Onboarding listeners
-  $('intro-google-btn').addEventListener('click', () => {
-    localStorage.setItem('rove_logged_in', 'true');
-    checkAuthStatus();
+  $('intro-google-btn').addEventListener('click', async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+    } catch (err) {
+      console.error("Google sign in error:", err);
+    }
   });
 
   /* ══ Init ════════════════════════════════════════════════════ */
   loadStorage(); loadRpgStats(); syncFamilyTasks(); renderFamilySheet(); renderReview(); initParticles(); updatePremiumUI(); updateRpgUI();
-  checkAuthStatus();
 </script>
 </body>
 </html>
