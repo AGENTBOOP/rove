@@ -1580,7 +1580,7 @@ export default function TaskShare({ familyId }) {
                   type="button"
                   onClick={() => {
                     const inviteCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-                    const link = `rove-app://invite/${inviteCode}`;
+                    const link = `${window.location.origin}/?invite=${inviteCode}`;
                     navigator.clipboard.writeText(link);
                     alert(`Invite link copied to clipboard!\nShare this with your family: ${link}`);
                   }}

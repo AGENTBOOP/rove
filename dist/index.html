@@ -3796,7 +3796,7 @@ transition: all var(--tr);
     function invCode() {
       const c='ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
       let s=''; for(let i=0;i<22;i++) s+=c[Math.floor(Math.random()*c.length)];
-      return 'focus-app://invite/'+s;
+      return window.location.origin + '/?invite=' + s;
     }
     function openInv() { $('invite-link-text').textContent=invCode(); $('copy-btn').textContent='Copy'; $('copy-btn').classList.remove('copied'); invOv.classList.add('open'); }
     function closeInv(){ invOv.classList.remove('open'); }
@@ -4112,6 +4112,32 @@ transition: all var(--tr);
 
   /* ══ Init ════════════════════════════════════════════════════ */
   loadStorage(); loadRpgStats(); syncFamilyTasks(); renderFamilySheet(); renderReview(); initParticles(); updatePremiumUI(); updateRpgUI();
+
+  // Parse invite link from query parameters
+  const urlParams = new URLSearchParams(window.location.search);
+  const inviteCode = urlParams.get('invite');
+  if (inviteCode) {
+    if (!FAMILY.some(m => m.id === 'Guest')) {
+      FAMILY.push({
+        id: 'Guest',
+        name: 'Family Guest',
+        init: 'G',
+        color: '#10B981',
+        role: 'member',
+        tasks: []
+      });
+      renderFamilySheet();
+      syncFamilyTasks();
+    }
+    // Clean up query param from URL bar
+    const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+    window.history.replaceState({}, document.title, cleanUrl);
+    
+    // Alert user that they joined the family group successfully
+    setTimeout(() => {
+      alert("Success! You've joined the family group.");
+    }, 500);
+  }
 </script>
 </body>
 </html>
