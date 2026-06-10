@@ -1536,7 +1536,7 @@ export default function TaskAssignment({ familyId }) {
                 <button
                   type="button"
                   onClick={() => {
-                    const link = `${window.location.origin}/?invite=${familyId}`;
+                    const link = `${window.location.origin}/?inviteCode=${familyId}`;
                     navigator.clipboard.writeText(link);
                     alert(`Invite link copied to clipboard!\nShare this with your family: ${link}`);
                   }}

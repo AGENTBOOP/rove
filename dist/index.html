@@ -3798,11 +3798,11 @@ transition: all var(--tr);
 
     function invCode() {
       if (activeFamilyId) {
-        return window.location.origin + '/?invite=' + activeFamilyId;
+        return window.location.origin + '/?inviteCode=' + activeFamilyId;
       }
       const c='ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
       let s=''; for(let i=0;i<22;i++) s+=c[Math.floor(Math.random()*c.length)];
-      return window.location.origin + '/?invite=' + s;
+      return window.location.origin + '/?inviteCode=' + s;
     }
     function openInv() { $('invite-link-text').textContent=invCode(); $('copy-btn').textContent='Copy'; $('copy-btn').classList.remove('copied'); invOv.classList.add('open'); }
     function closeInv(){ invOv.classList.remove('open'); }
@@ -4068,9 +4068,9 @@ transition: all var(--tr);
 
   // Parse invite link from query parameters immediately on page load
   const urlParams = new URLSearchParams(window.location.search);
-  const inviteCode = urlParams.get('invite');
+  const inviteCode = urlParams.get('inviteCode');
   if (inviteCode) {
-    localStorage.setItem('pending_invite_family_id', inviteCode);
+    localStorage.setItem('pendingInvite', inviteCode);
     const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
     window.history.replaceState({}, document.title, cleanUrl);
   }
@@ -4100,12 +4100,12 @@ transition: all var(--tr);
           const userDoc = await getDoc(userDocRef);
           
           let familyId = null;
-          const pendingInvite = localStorage.getItem('pending_invite_family_id');
+          const pendingInvite = localStorage.getItem('pendingInvite');
           
           if (pendingInvite) {
             familyId = pendingInvite;
             await setDoc(userDocRef, { familyId });
-            localStorage.removeItem('pending_invite_family_id');
+            localStorage.removeItem('pendingInvite');
             
             setTimeout(() => {
               alert("Success! You've joined the family group.");
