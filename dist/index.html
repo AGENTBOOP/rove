@@ -4122,6 +4122,7 @@ transition: all var(--tr);
           activeFamilyId = familyId;
           
           // Ensure member doc exists in the family
+          const role = (familyId === 'family_' + user.uid) ? 'organizer' : 'member';
           const memberDocRef = doc(db, 'families', familyId, 'members', user.uid);
           const memberDoc = await getDoc(memberDocRef);
           if (!memberDoc.exists()) {
@@ -4129,7 +4130,7 @@ transition: all var(--tr);
               uid: user.uid,
               displayName: name,
               email: email,
-              role: 'organizer',
+              role: role,
               color: '#3B82F6',
               currentXP: 0,
               level: 1,
