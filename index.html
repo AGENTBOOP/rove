@@ -1835,9 +1835,27 @@ transition: all var(--tr);
       </div>
       <div id="add-options-tray">
         <div class="add-options-row">
-          <div class="add-option-field">
-            <label for="add-task-date">Date</label>
-            <input type="date" id="add-task-date" class="add-option-input" />
+          <div class="add-option-field" style="position: relative;">
+            <label>Date</label>
+            <button type="button" id="add-task-date-btn" class="add-option-input" style="text-align: left; min-width: 90px; height: 24px; font-size: 11px; padding: 3px 6px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 6px; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: space-between; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-family: 'Inter', sans-serif;">
+              <span id="add-task-date-text">Select Date</span>
+              <span style="font-size: 8px; color: var(--muted); margin-left: 4px;">▼</span>
+            </button>
+            <div id="calendar-popup" style="display: none; position: absolute; bottom: 28px; left: 0; z-index: 1000; width: 230px; background: #18181C; border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.5); padding: 12px; font-family: 'Inter', sans-serif;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <button type="button" id="cal-prev-btn" style="background:none; border:none; color:#fff; cursor:pointer; font-weight:bold; font-size:12px; padding:2px 6px;">&lt;</button>
+                <span id="cal-month-year" style="color:#fff; font-size:11px; font-weight:700;"></span>
+                <button type="button" id="cal-next-btn" style="background:none; border:none; color:#fff; cursor:pointer; font-weight:bold; font-size:12px; padding:2px 6px;">&gt;</button>
+              </div>
+              <div style="display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 9px; font-weight: 700; color: var(--muted); margin-bottom: 4px;">
+                <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+              </div>
+              <div id="cal-days-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center;"></div>
+              <div style="display: flex; justify-content: space-between; margin-top: 8px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 8px;">
+                <button type="button" id="cal-clear-btn" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; color:#fff; font-size:9px; padding:4px 8px; cursor:pointer; font-weight:600;">Clear</button>
+                <button type="button" id="cal-close-btn" style="background: var(--accent); border:none; border-radius:6px; color:#fff; font-size:9px; padding:4px 8px; cursor:pointer; font-weight:700;">Done</button>
+              </div>
+            </div>
           </div>
           <div class="add-option-field">
             <label for="add-task-time">Time</label>
@@ -1847,22 +1865,26 @@ transition: all var(--tr);
             <label for="add-task-duration">Min</label>
             <input type="number" id="add-task-duration" class="add-option-input" placeholder="Min" min="1" style="width: 54px;" />
           </div>
-          <div class="add-option-field" style="display: flex; align-items: center; gap: 4px;">
-            <input type="checkbox" id="add-task-everyday" style="accent-color: var(--accent); cursor: pointer;" />
-            <label for="add-task-everyday" style="font-size: 10.5px; color: var(--muted); font-weight: 600; text-transform: uppercase; cursor: pointer;">Everyday</label>
-          </div>
-          <div class="add-option-field" style="display: flex; align-items: center; gap: 4px;">
-            <input type="checkbox" id="add-task-weekly" style="accent-color: var(--accent); cursor: pointer;" />
-            <label for="add-task-weekly" style="font-size: 10.5px; color: var(--muted); font-weight: 600; text-transform: uppercase; cursor: pointer;">Weekly</label>
-          </div>
-          <div class="add-option-field" style="display: flex; align-items: center; gap: 4px;">
-            <input type="checkbox" id="add-task-monthly" style="accent-color: var(--accent); cursor: pointer;" />
-            <label for="add-task-monthly" style="font-size: 10.5px; color: var(--muted); font-weight: 600; text-transform: uppercase; cursor: pointer;">Monthly</label>
+          <div id="repeating-options-container" style="display: flex; align-items: center; gap: 8px;">
+            <div class="add-option-field" style="display: flex; align-items: center; gap: 4px;">
+              <input type="checkbox" id="add-task-everyday" style="accent-color: var(--accent); cursor: pointer;" />
+              <label for="add-task-everyday" style="font-size: 10.5px; color: var(--muted); font-weight: 600; text-transform: uppercase; cursor: pointer;">Everyday</label>
+            </div>
+            <div class="add-option-field" style="display: flex; align-items: center; gap: 4px;">
+              <input type="checkbox" id="add-task-weekly" style="accent-color: var(--accent); cursor: pointer;" />
+              <label for="add-task-weekly" style="font-size: 10.5px; color: var(--muted); font-weight: 600; text-transform: uppercase; cursor: pointer;">Weekly</label>
+            </div>
+            <div class="add-option-field" style="display: flex; align-items: center; gap: 4px;">
+              <input type="checkbox" id="add-task-monthly" style="accent-color: var(--accent); cursor: pointer;" />
+              <label for="add-task-monthly" style="font-size: 10.5px; color: var(--muted); font-weight: 600; text-transform: uppercase; cursor: pointer;">Monthly</label>
+            </div>
           </div>
           <div class="add-option-field" style="display: flex; align-items: center; gap: 4px;">
             <label for="add-task-category" style="font-size: 10.5px; color: var(--muted); font-weight: 600; text-transform: uppercase; cursor: pointer; margin-right: 4px;">Category</label>
             <select id="add-task-category" class="add-option-input" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 6px; color: #fff; font-size: 11px; padding: 3px 6px; outline: none; font-family: 'Inter', sans-serif;">
               <option value="General" style="background: #1C1C20; color: #fff;">General</option>
+              <option value="Health" style="background: #1C1C20; color: #fff;">Health</option>
+              <option value="Work" style="background: #1C1C20; color: #fff;">Work</option>
               <option value="Fitness" style="background: #1C1C20; color: #fff;">Fitness</option>
               <option value="Education" style="background: #1C1C20; color: #fff;">Education</option>
               <option value="Sports" style="background: #1C1C20; color: #fff;">Sports</option>
@@ -2074,6 +2096,8 @@ transition: all var(--tr);
   let activeStyle = null;
   let activeTimelineFilter = 'today';
   let currentViewMode = 'daily'; // daily vs long-term
+  let selectedDates = [];
+  let calCurrentDate = new Date();
 
   /* ══ RPG State ═══════════════════════════════════════════════ */
   let rpgStats = {
@@ -2741,18 +2765,18 @@ transition: all var(--tr);
         return false;
       }
 
-      const sDate = t.scheduledDate || TODAY;
+      const dates = t.scheduledDates || (t.scheduledDate ? [t.scheduledDate] : [TODAY]);
       if (filter === 'today') {
-        return sDate <= TODAY;
+        return dates.some(d => d <= TODAY);
       }
       if (filter === 'tomorrow') {
-        return sDate === TOMORROW;
+        return dates.some(d => d === TOMORROW);
       }
       if (filter === 'week') {
-        return datesOfWeek.includes(sDate) && sDate > TODAY;
+        return dates.some(d => datesOfWeek.includes(d) && d > TODAY);
       }
       if (filter === 'later') {
-        return sDate > lastDateOfWeek;
+        return dates.some(d => d > lastDateOfWeek);
       }
       return true;
     });
@@ -2768,33 +2792,26 @@ transition: all var(--tr);
       return;
     }
 
-    let filtered;
-    if (currentViewMode === 'long-term') {
-      filtered = tasks;
-    } else {
-      filtered = tasks.filter(t => focusOnMe ? t.assignedTo === 'You' : t.assignedTo !== 'You');
-    }
+    let filtered = tasks.filter(t => focusOnMe ? t.assignedTo === 'You' : true);
+    
+    $('timeline-bar').style.display = 'flex';
+    filtered = filterTasksByTimeline(filtered, activeTimelineFilter);
     
     if (currentViewMode === 'long-term') {
-      $('timeline-bar').style.display = 'flex';
-      filtered = filterTasksByTimeline(filtered, activeTimelineFilter);
       filtered = filtered.filter(t => !t.done);
       filtered.sort((a, b) => {
-        const dA = a.scheduledDate || TODAY;
-        const dB = b.scheduledDate || TODAY;
+        const dA = (a.scheduledDates && a.scheduledDates[0]) || a.scheduledDate || TODAY;
+        const dB = (b.scheduledDates && b.scheduledDates[0]) || b.scheduledDate || TODAY;
         if (dA !== dB) return dA.localeCompare(dB);
         const tA = a.startTime || '23:59';
         const tB = b.startTime || '23:59';
         return tA.localeCompare(tB);
       });
-    } else {
-      $('timeline-bar').style.display = 'none';
-      filtered = filterTasksByTimeline(filtered, 'today');
     }
 
     const shouldGroup = (currentViewMode === 'long-term' || focusOnMe);
     if (shouldGroup) {
-      const categories = ['General', 'Fitness', 'Education', 'Sports'];
+      const categories = ['General', 'Health', 'Work', 'Fitness', 'Education', 'Sports'];
       const grouped = {};
       categories.forEach(cat => grouped[cat] = []);
       filtered.forEach(t => {
@@ -2842,14 +2859,19 @@ transition: all var(--tr);
     const isCompleted = task.done && task.completedDate === TODAY;
 
     let dateBadge = '';
-    if (currentViewMode === 'long-term' && task.scheduledDate) {
-      try {
-        const parts = task.scheduledDate.split('-');
-        const dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
-        const formattedDate = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-        dateBadge = `<span class="task-date-badge">${formattedDate}</span>`;
-      } catch (_) {
-        dateBadge = `<span class="task-date-badge">${task.scheduledDate}</span>`;
+    if (currentViewMode === 'long-term') {
+      const dates = task.scheduledDates || (task.scheduledDate ? [task.scheduledDate] : []);
+      if (dates.length > 0) {
+        const formattedDates = dates.map(d => {
+          try {
+            const parts = d.split('-');
+            const dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
+            return dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+          } catch (_) {
+            return d;
+          }
+        });
+        dateBadge = `<span class="task-date-badge">${formattedDates.join(', ')}</span>`;
       }
     }
 
@@ -3058,24 +3080,28 @@ transition: all var(--tr);
   }
 
   function syncStart() {
-    let visibleTasks;
+    let visibleTasks = tasks.filter(t => focusOnMe ? t.assignedTo === 'You' : true);
+    visibleTasks = filterTasksByTimeline(visibleTasks, activeTimelineFilter);
+    
     if (currentViewMode === 'long-term') {
-      visibleTasks = tasks.filter(t => focusOnMe ? t.assignedTo === 'You' : t.assignedTo !== 'You');
-      visibleTasks = filterTasksByTimeline(visibleTasks, activeTimelineFilter);
       visibleTasks = visibleTasks.filter(t => !t.done);
       if (startDayBtn) {
         startDayBtn.style.display = 'none';
       }
     } else {
-      visibleTasks = tasks.filter(t => focusOnMe ? t.assignedTo === 'You' : t.assignedTo !== 'You');
-      visibleTasks = filterTasksByTimeline(visibleTasks, 'today');
       if (startDayBtn) {
         startDayBtn.style.display = 'block';
-        startDayBtn.disabled = visibleTasks.length === 0;
+        const uncompleted = visibleTasks.filter(t => !t.done);
+        startDayBtn.disabled = uncompleted.length === 0;
       }
     }
     
     const state = getCurrentState();
+    const repeatingContainer = $('repeating-options-container');
+    if (repeatingContainer) {
+      repeatingContainer.style.display = (state === 'focus') ? 'none' : 'flex';
+    }
+
     const addCard = document.querySelector('.add-card');
     if (addCard) {
       if (state === 'open') {
@@ -3133,27 +3159,26 @@ transition: all var(--tr);
     }
     const assignedTo = focusOnMe ? 'You' : 'Family';
     
-    const dateVal = $('add-task-date').value;
     const timeVal = $('add-task-time').value;
     const durationVal = $('add-task-duration').value;
-    const isEverydayVal = $('add-task-everyday').checked;
-    const isWeeklyVal = $('add-task-weekly').checked;
-    const isMonthlyVal = $('add-task-monthly').checked;
+    const isEverydayVal = focusOnMe ? true : $('add-task-everyday').checked;
+    const isWeeklyVal = focusOnMe ? false : $('add-task-weekly').checked;
+    const isMonthlyVal = focusOnMe ? false : $('add-task-monthly').checked;
     const categoryVal = $('add-task-category').value || 'General';
 
-    let scheduledDate = dateVal;
-    if (!scheduledDate) {
+    let finalScheduledDates = [...selectedDates];
+    if (finalScheduledDates.length === 0) {
+      let defDate = TODAY;
       if (currentViewMode === 'long-term') {
         const tomorrowDateObj = new Date();
         tomorrowDateObj.setDate(tomorrowDateObj.getDate() + 1);
-        scheduledDate = tomorrowDateObj.toISOString().slice(0, 10);
+        defDate = tomorrowDateObj.toISOString().slice(0, 10);
       } else if (activeTimelineFilter === 'tomorrow') {
         const tomorrowDateObj = new Date();
         tomorrowDateObj.setDate(tomorrowDateObj.getDate() + 1);
-        scheduledDate = tomorrowDateObj.toISOString().slice(0, 10);
-      } else {
-        scheduledDate = TODAY;
+        defDate = tomorrowDateObj.toISOString().slice(0, 10);
       }
+      finalScheduledDates = [defDate];
     }
 
     const task = {
@@ -3161,7 +3186,8 @@ transition: all var(--tr);
       name,
       assignedTo,
       subtasks: [],
-      scheduledDate,
+      scheduledDates: finalScheduledDates,
+      scheduledDate: finalScheduledDates[0],
       startTime: timeVal || undefined,
       durationMinutes: durationVal ? parseInt(durationVal, 10) : undefined,
       isEveryday: isEverydayVal,
@@ -3172,34 +3198,11 @@ transition: all var(--tr);
 
     tasks.push(task);
     saveTasks();
-
-    let isVisible = true;
-    if (currentViewMode === 'long-term') {
-      if (scheduledDate <= TODAY || isEverydayVal) isVisible = false;
-    } else {
-      if (activeTimelineFilter === 'today') {
-        if (scheduledDate > TODAY && !isEverydayVal) isVisible = false;
-      } else if (activeTimelineFilter === 'tomorrow') {
-        const tomorrowDateObj = new Date();
-        tomorrowDateObj.setDate(tomorrowDateObj.getDate() + 1);
-        const TOMORROW = tomorrowDateObj.toISOString().slice(0, 10);
-        if (scheduledDate !== TOMORROW || isEverydayVal) isVisible = false;
-      } else if (activeTimelineFilter === 'week') {
-        const datesOfWeek = getWeekDates(TODAY);
-        if (!datesOfWeek.includes(scheduledDate) || scheduledDate <= TODAY || isEverydayVal) isVisible = false;
-      } else if (activeTimelineFilter === 'later') {
-        const datesOfWeek = getWeekDates(TODAY);
-        const lastDateOfWeek = datesOfWeek[6];
-        if (scheduledDate <= lastDateOfWeek || isEverydayVal) isVisible = false;
-      }
-    }
-
-    if (isVisible) {
-      mountTask(task, true);
-    }
+    renderReview();
     
     // Clear inputs
-    $('add-task-date').value = '';
+    selectedDates = [];
+    updateDateText();
     $('add-task-time').value = '';
     $('add-task-duration').value = '';
     $('add-task-everyday').checked = false;
@@ -3207,7 +3210,6 @@ transition: all var(--tr);
     $('add-task-monthly').checked = false;
     $('add-task-category').value = 'General';
     $('add-options-tray').style.display = 'none';
-
 
     syncStart(); addInput.value = ''; addInput.focus();
   });
@@ -3241,13 +3243,10 @@ transition: all var(--tr);
   }
 
   startDayBtn.addEventListener('click', () => {
-    let visibleTasks = tasks.filter(t => focusOnMe ? t.assignedTo === 'You' : t.assignedTo !== 'You');
-    if (currentViewMode === 'long-term') {
-      visibleTasks = filterTasksByTimeline(visibleTasks, activeTimelineFilter);
-      visibleTasks = visibleTasks.filter(t => !t.done);
-    } else {
-      visibleTasks = filterTasksByTimeline(visibleTasks, 'today');
-    }
+    let visibleTasks = tasks.filter(t => focusOnMe ? t.assignedTo === 'You' : true);
+    visibleTasks = filterTasksByTimeline(visibleTasks, activeTimelineFilter);
+    visibleTasks = visibleTasks.filter(t => !t.done);
+    
     session = { currentIdx: 0, completed: [], skipped: [], taskIds: visibleTasks.map(t => t.id) };
     saveSession();
     setRing(0, true);
@@ -3587,7 +3586,6 @@ transition: all var(--tr);
           t.completedDate = TODAY;
         }
       });
-      tasks = tasks.filter(t => !completedIds.includes(t.id) || t.isEveryday || t.isWeekly || t.isMonthly || (t.scheduledDate && t.scheduledDate > TODAY));
       saveTasks();
       
       session = null; saveSession();
@@ -4043,6 +4041,140 @@ transition: all var(--tr);
     });
   })();
 
+  function initCalendarPicker() {
+    const btn = $('add-task-date-btn');
+    const popup = $('calendar-popup');
+    if (!btn || !popup) return;
+
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isHidden = popup.style.display === 'none' || !popup.style.display;
+      if (isHidden) {
+        popup.style.display = 'block';
+        renderCalendar();
+      } else {
+        popup.style.display = 'none';
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!popup.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
+        popup.style.display = 'none';
+      }
+    });
+
+    $('cal-prev-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      calCurrentDate.setMonth(calCurrentDate.getMonth() - 1);
+      renderCalendar();
+    });
+
+    $('cal-next-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      calCurrentDate.setMonth(calCurrentDate.getMonth() + 1);
+      renderCalendar();
+    });
+
+    $('cal-clear-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      selectedDates = [];
+      updateDateText();
+      renderCalendar();
+    });
+
+    $('cal-close-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      popup.style.display = 'none';
+    });
+  }
+
+  function updateDateText() {
+    const textEl = $('add-task-date-text');
+    if (!textEl) return;
+    if (selectedDates.length === 0) {
+      textEl.textContent = 'Select Date';
+    } else if (selectedDates.length === 1) {
+      textEl.textContent = formatDateString(selectedDates[0]);
+    } else {
+      textEl.textContent = `${selectedDates.length} Dates`;
+    }
+  }
+
+  function formatDateString(dateStr) {
+    try {
+      const parts = dateStr.split('-');
+      const d = new Date(parts[0], parts[1] - 1, parts[2]);
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    } catch (_) {
+      return dateStr;
+    }
+  }
+
+  function renderCalendar() {
+    const year = calCurrentDate.getFullYear();
+    const month = calCurrentDate.getMonth();
+    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    
+    $('cal-month-year').textContent = `${months[month]} ${year}`;
+    
+    const firstDayIndex = new Date(year, month, 1).getDay();
+    const totalDays = new Date(year, month + 1, 0).getDate();
+    const prevTotalDays = new Date(year, month, 0).getDate();
+    
+    const daysGrid = $('cal-days-grid');
+    daysGrid.innerHTML = '';
+    
+    // Previous month's trailing days
+    for (let i = firstDayIndex - 1; i >= 0; i--) {
+      const dayNum = prevTotalDays - i;
+      const cell = document.createElement('div');
+      cell.style.cssText = "font-size: 10px; color: rgba(255,255,255,0.15); padding: 4px; text-align: center; pointer-events: none;";
+      cell.textContent = dayNum;
+      daysGrid.appendChild(cell);
+    }
+    
+    // Current month's days
+    for (let day = 1; day <= totalDays; day++) {
+      const cell = document.createElement('button');
+      cell.type = 'button';
+      const mStr = String(month + 1).padStart(2, '0');
+      const dStr = String(day).padStart(2, '0');
+      const dateKey = `${year}-${mStr}-${dStr}`;
+      
+      const isSelected = selectedDates.includes(dateKey);
+      const isToday = dateKey === TODAY;
+      
+      let bg = 'transparent';
+      let color = '#fff';
+      let border = 'none';
+      
+      if (isSelected) {
+        bg = 'var(--accent)';
+        color = '#fff';
+      } else if (isToday) {
+        border = '1px solid var(--accent)';
+        color = 'var(--accent)';
+      }
+      
+      cell.style.cssText = `font-family: 'Inter', sans-serif; font-size: 10px; color: ${color}; background: ${bg}; border: ${border}; border-radius: 4px; padding: 4px; text-align: center; cursor: pointer; transition: all 0.2s;`;
+      cell.textContent = day;
+      
+      cell.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const idx = selectedDates.indexOf(dateKey);
+        if (idx > -1) {
+          selectedDates.splice(idx, 1);
+        } else {
+          selectedDates.push(dateKey);
+        }
+        updateDateText();
+        renderCalendar();
+      });
+      
+      daysGrid.appendChild(cell);
+    }
+  }
+
   (function initTimeline() {
     const pills = document.querySelectorAll('.timeline-pill');
     pills.forEach(pill => {
@@ -4207,7 +4339,7 @@ transition: all var(--tr);
   });
 
   /* ══ Init ════════════════════════════════════════════════════ */
-  loadStorage(); loadRpgStats(); syncFamilyTasks(); renderFamilySheet(); renderReview(); initParticles(); updatePremiumUI(); updateRpgUI();
+  loadStorage(); loadRpgStats(); syncFamilyTasks(); renderFamilySheet(); renderReview(); initParticles(); updatePremiumUI(); updateRpgUI(); initCalendarPicker();
 </script>
 </body>
 </html>

@@ -548,6 +548,8 @@ const AssignTaskModal = ({ open, onClose, members, currentUser }) => {
         familyGroupId: currentUser.familyId,
         status:        'pending',
         dueDate:       Timestamp.fromDate(parsed),
+        scheduledDates: [dueDate],
+        scheduledDate: dueDate,
         createdAt:     serverTimestamp(),
         isWeekly,
         isMonthly,
@@ -707,6 +709,8 @@ const AssignTaskModal = ({ open, onClose, members, currentUser }) => {
                            focus:ring-1 focus:ring-[#3B82F6]/40 transition-colors"
               >
                 <option value="General">General</option>
+                <option value="Health">Health</option>
+                <option value="Work">Work</option>
                 <option value="Fitness">Fitness</option>
                 <option value="Education">Education</option>
                 <option value="Sports">Sports</option>
@@ -1650,7 +1654,7 @@ export default function TaskShare({ familyId }) {
             <EmptyState onAdd={() => setModalOpen(true)} isOwner={isOwner} />
           ) : (
             <div className="space-y-6">
-              {['General', 'Fitness', 'Education', 'Sports'].map(cat => {
+              {['General', 'Health', 'Work', 'Fitness', 'Education', 'Sports'].map(cat => {
                 const catTasks = visibleTasks.filter(t => (t.category || 'General') === cat);
                 if (catTasks.length === 0) return null;
                 return (
