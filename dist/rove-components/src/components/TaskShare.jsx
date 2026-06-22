@@ -541,7 +541,7 @@ const AssignTaskModal = ({ open, onClose, members, currentUser }) => {
 
     setSubmitting(true);
     try {
-      await addDoc(collection(db, 'tasks'), {
+      await addDoc(collection(db, 'users', assignedTo, 'tasks'), {
         title:         title.trim(),
         assignedTo,
         createdBy:     currentUser.uid,
@@ -1070,43 +1070,71 @@ export default function TaskShare({ familyId }) {
   useEffect(() => {
     if (!familyId || !currentMember) return;
 
-    const ref = collection(db, 'tasks');
+    const unsubscribes = [];
+    const tasksMap = {};
     const isOwner = currentMember.role === 'owner';
 
-    /*
-     * Index required in Firestore (create via console or auto-prompted):
-     *   Owner  query → familyGroupId ASC, createdBy ASC, createdAt DESC
-     *   Member query → familyGroupId ASC, assignedTo ASC, createdAt DESC
-     */
-    const q = isOwner
-      ? query(ref,
-          where('familyGroupId', '==', familyId),
-          where('createdBy',     '==', currentMember.uid),
-          orderBy('createdAt',   'desc'))
-      : query(ref,
-          where('familyGroupId', '==', familyId),
-          where('assignedTo',    '==', currentMember.uid),
-          orderBy('createdAt',   'desc'));
-
-    const unsub = onSnapshot(
-      q,
-      snap => {
-        setTasks(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    if (isOwner) {
+      if (members.length === 0) {
+        setTasks([]);
         setLoadingTasks(false);
-      },
-      err => {
-        console.error('[TaskShare] tasks listener:', err);
-        setLoadingTasks(false);
+        return;
       }
-    );
+      members.forEach(m => {
+        const q = query(collection(db, 'users', m.uid, 'tasks'), orderBy('createdAt', 'desc'));
+        const unsub = onSnapshot(
+          q,
+          snapshot => {
+            tasksMap[m.uid] = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+            const allTasks = [];
+            members.forEach(member => {
+              if (tasksMap[member.uid]) {
+                allTasks.push(...tasksMap[member.uid]);
+              }
+            });
+            allTasks.sort((a, b) => {
+              const tA = a.createdAt?.seconds || 0;
+              const tB = b.createdAt?.seconds || 0;
+              return tB - tA;
+            });
+            setTasks(allTasks);
+            setLoadingTasks(false);
+          },
+          err => {
+            console.error(`[TaskShare] tasks listener error for member ${m.uid}:`, err);
+            setLoadingTasks(false);
+          }
+        );
+        unsubscribes.push(unsub);
+      });
+    } else {
+      const q = query(
+        collection(db, 'users', currentMember.uid, 'tasks'),
+        orderBy('createdAt', 'desc')
+      );
+      const unsub = onSnapshot(
+        q,
+        snapshot => {
+          setTasks(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
+          setLoadingTasks(false);
+        },
+        err => {
+          console.error('[TaskShare] tasks listener error:', err);
+          setLoadingTasks(false);
+        }
+      );
+      unsubscribes.push(unsub);
+    }
 
-    return unsub;
-  }, [familyId, currentUser, rpgStats, tasks]);
+    return () => {
+      unsubscribes.forEach(unsub => unsub());
+    };
+  }, [familyId, currentMember, members]);
 
   const handleWeeklyToggle = useCallback(async (task, e) => {
     const newWeeklyDone = !task.weeklyDone;
     try {
-      await updateDoc(doc(db, 'tasks', task.id), { weeklyDone: newWeeklyDone });
+      await updateDoc(doc(db, 'users', task.assignedTo, 'tasks', task.id), { weeklyDone: newWeeklyDone });
 
       if (task.assignedTo === currentUser?.uid) {
         const baseXP = 10;
@@ -1183,7 +1211,7 @@ export default function TaskShare({ familyId }) {
   const handleMonthlyToggle = useCallback(async (task, e) => {
     const newMonthlyDone = !task.monthlyDone;
     try {
-      await updateDoc(doc(db, 'tasks', task.id), { monthlyDone: newMonthlyDone });
+      await updateDoc(doc(db, 'users', task.assignedTo, 'tasks', task.id), { monthlyDone: newMonthlyDone });
 
       if (task.assignedTo === currentUser?.uid) {
         const baseXP = 10;
@@ -1262,7 +1290,7 @@ export default function TaskShare({ familyId }) {
     const newStatus = task.status === 'completed' ? 'pending' : 'completed';
     try {
       // 1. Update task in Firestore (always works)
-      await updateDoc(doc(db, 'tasks', task.id), { status: newStatus });
+      await updateDoc(doc(db, 'users', task.assignedTo, 'tasks', task.id), { status: newStatus });
 
       if (task.assignedTo === currentUser?.uid) {
         const today = new Date();

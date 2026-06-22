@@ -2051,7 +2051,7 @@ transition: all var(--tr);
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-  import { getFirestore, doc, getDoc, setDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  import { getFirestore, doc, getDoc, setDoc, collection, onSnapshot, runTransaction, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey:            'AIzaSyDm-vZtrXWiLEDOjAG_O5RB5zbeUQDg0xg',
@@ -2079,6 +2079,7 @@ transition: all var(--tr);
   let choreTarget = 'You';
   let activeFamilyId = null;
   let unsubscribeFamily = null;
+  let unsubscribeTasks = null;
 
   /* ══ State ═══════════════════════════════════════════════════ */
   let tasks   = [];
@@ -2122,6 +2123,9 @@ transition: all var(--tr);
 
   function saveRpgStats() {
     localStorage.setItem('rove_rpg_stats', JSON.stringify(rpgStats));
+    if (auth.currentUser) {
+      setDoc(doc(db, 'users', auth.currentUser.uid), { rpgStats }, { merge: true }).catch(console.error);
+    }
   }
 
   function getLevelDetails(xp) {
@@ -2356,6 +2360,14 @@ transition: all var(--tr);
 
   /* ══ Storage ══════════════════════════════════════════════════ */
   function saveTasks() { localStorage.setItem(TASKS_KEY, JSON.stringify(tasks)); }
+  async function syncTaskToFirestore(task) {
+    if (!auth.currentUser) return;
+    try {
+      await setDoc(doc(db, 'users', auth.currentUser.uid, 'tasks', String(task.id)), task);
+    } catch (e) {
+      console.error("Error syncing task to Firestore:", e);
+    }
+  }
   function saveSession() {
     if (session) localStorage.setItem(SESSION_KEY, JSON.stringify(session));
     else         localStorage.removeItem(SESSION_KEY);
@@ -2369,6 +2381,14 @@ transition: all var(--tr);
       localStorage.setItem('rove_active_style', activeStyle);
     } else {
       localStorage.removeItem('rove_active_style');
+    }
+    if (auth.currentUser) {
+      setDoc(doc(db, 'users', auth.currentUser.uid), {
+        roveCoins,
+        disciplineScore,
+        purchasedStyles,
+        activeStyle
+      }, { merge: true }).catch(console.error);
     }
   }
 
@@ -2482,11 +2502,30 @@ transition: all var(--tr);
     applyActiveStyle();
   }
 
+  function getFamilyList() {
+    if (FAMILY && FAMILY.length > 0) {
+      return FAMILY;
+    }
+    const currentUid = auth.currentUser ? auth.currentUser.uid : 'You';
+    const currentName = auth.currentUser ? (auth.currentUser.displayName || 'You') : 'You';
+    const currentEmail = auth.currentUser ? (auth.currentUser.email || '') : '';
+    return [{
+      id: currentUid,
+      name: currentName,
+      init: currentName.charAt(0).toUpperCase(),
+      color: '#3B82F6',
+      role: 'organizer',
+      email: currentEmail,
+      tasks: []
+    }];
+  }
+
   function syncFamilyTasks() {
-    FAMILY.forEach(m => m.tasks = []);
+    const family = getFamilyList();
+    family.forEach(m => m.tasks = []);
     tasks.forEach(t => {
       const isDone = (session ? session.completed.includes(t.id) : false) || t.done;
-      const member = FAMILY.find(m => m.id === t.assignedTo);
+      const member = family.find(m => m.id === t.assignedTo);
       if (member) {
         member.tasks.push({ id: t.id, name: t.name, done: isDone });
       }
@@ -2497,7 +2536,8 @@ transition: all var(--tr);
     const container = $('sheet-members');
     if (!container) return;
     const currentUid = auth.currentUser ? auth.currentUser.uid : 'You';
-    container.innerHTML = FAMILY.map(m => `
+    const family = getFamilyList();
+    container.innerHTML = family.map(m => `
       <div class="sheet-member">
         <div class="sheet-member-av" style="background:${m.color};">
           ${m.init}
@@ -2963,6 +3003,7 @@ transition: all var(--tr);
         if (t) {
           t.weeklyDone = !t.weeklyDone;
           saveTasks();
+          syncTaskToFirestore(t);
           weeklyBtn.classList.toggle('on', t.weeklyDone);
           weeklyBtn.style.background = t.weeklyDone ? 'var(--accent-gradient)' : 'transparent';
           weeklyBtn.style.borderColor = t.weeklyDone ? 'var(--accent)' : 'rgba(255,255,255,0.18)';
@@ -2988,6 +3029,7 @@ transition: all var(--tr);
         if (t) {
           t.monthlyDone = !t.monthlyDone;
           saveTasks();
+          syncTaskToFirestore(t);
           monthlyBtn.classList.toggle('on', t.monthlyDone);
           monthlyBtn.style.background = t.monthlyDone ? 'var(--accent-gradient)' : 'transparent';
           monthlyBtn.style.borderColor = t.monthlyDone ? 'var(--accent)' : 'rgba(255,255,255,0.18)';
@@ -3027,6 +3069,7 @@ transition: all var(--tr);
       const st = { id: Date.now(), name, done: false };
       t.subtasks.push(st);
       saveTasks();
+      syncTaskToFirestore(t);
       subInput.value = '';
       refreshSubRows(li, t);
       subInput.focus();
@@ -3044,6 +3087,7 @@ transition: all var(--tr);
         st.done = !st.done;
         st.isCompleted = st.done;
         saveTasks();
+        syncTaskToFirestore(t);
         refreshSubRows(li, t);
         return;
       }
@@ -3053,6 +3097,7 @@ transition: all var(--tr);
         if (!t) return;
         t.subtasks = t.subtasks.filter(s => s.id != dl.dataset.sid);
         saveTasks();
+        syncTaskToFirestore(t);
         refreshSubRows(li, t);
         return;
       }
@@ -3076,7 +3121,19 @@ transition: all var(--tr);
     const ri = li.querySelector('.ri');
     ri.style.transition = 'opacity 0.4s ease-in-out, transform 0.4s ease-in-out';
     ri.style.opacity = '0'; ri.style.transform = 'translateX(8px)';
-    setTimeout(() => { tasks = tasks.filter(t => t.id != id); saveTasks(); li.remove(); syncStart(); }, 400);
+    setTimeout(async () => {
+      tasks = tasks.filter(t => t.id != id);
+      saveTasks();
+      li.remove();
+      if (auth.currentUser) {
+        try {
+          await deleteDoc(doc(db, 'users', auth.currentUser.uid, 'tasks', String(id)));
+        } catch (e) {
+          console.error("Error deleting task from Firestore:", e);
+        }
+      }
+      syncStart();
+    }, 400);
   }
 
   function syncStart() {
@@ -3198,6 +3255,7 @@ transition: all var(--tr);
 
     tasks.push(task);
     saveTasks();
+    syncTaskToFirestore(task);
     renderReview();
     
     // Clear inputs
@@ -3672,7 +3730,8 @@ transition: all var(--tr);
   function renderParentView() {
     const list = $('pm-list');
     list.innerHTML = '';
-    FAMILY.forEach((m, idx) => {
+    const family = getFamilyList();
+    family.forEach((m, idx) => {
       const total = m.tasks.length;
       const done  = m.tasks.filter(t => t.done).length;
       const pct   = total > 0 ? Math.round(done / total * 100) : 0;
@@ -3717,7 +3776,8 @@ transition: all var(--tr);
 
   function renderTargetChips() {
     const row = $('target-row');
-    row.innerHTML = FAMILY.map(m => `
+    const family = getFamilyList();
+    row.innerHTML = family.map(m => `
       <button class="target-chip ${choreTarget===m.id ? 'on' : ''}"
               data-mid="${m.id}" onclick="setTarget('${m.id}')">
         <div class="target-chip-av" style="background:${m.color}">${m.init}</div>
@@ -3733,7 +3793,8 @@ transition: all var(--tr);
     const name = $('push-input').value.trim();
     if (!name) return;
 
-    const member = FAMILY.find(m => m.id === choreTarget);
+    const family = getFamilyList();
+    const member = family.find(m => m.id === choreTarget);
     if (!member) return;
 
     const dateVal = $('push-date-input').value;
@@ -4229,26 +4290,45 @@ transition: all var(--tr);
       const syncUserFamily = async () => {
         try {
           const userDocRef = doc(db, 'users', user.uid);
-          const userDoc = await getDoc(userDocRef);
-          
-          let familyId = null;
           const pendingInvite = localStorage.getItem('pendingInvite');
+          let familyId = null;
           
           if (pendingInvite) {
             familyId = pendingInvite;
-            await setDoc(userDocRef, { familyId });
-            localStorage.removeItem('pendingInvite');
-            
-            setTimeout(() => {
-              alert("Success! You've joined the family group.");
-            }, 500);
-          } else if (userDoc.exists()) {
-            familyId = userDoc.data().familyId;
+            try {
+              await runTransaction(db, async (transaction) => {
+                const uDocRef = doc(db, 'users', user.uid);
+                const memberDocRef = doc(db, 'families', familyId, 'members', user.uid);
+                
+                transaction.set(uDocRef, { familyId }, { merge: true });
+                transaction.set(memberDocRef, {
+                  uid: user.uid,
+                  displayName: name,
+                  email: email,
+                  role: 'member',
+                  color: '#3B82F6',
+                  currentXP: rpgStats.currentXP || 0,
+                  level: rpgStats.level || 1,
+                  streakCount: rpgStats.streakCount || 0
+                }, { merge: true });
+              });
+              localStorage.removeItem('pendingInvite');
+              setTimeout(() => {
+                alert("Success! You've joined the family group.");
+              }, 500);
+            } catch (err) {
+              console.error("Atomic auto-join transaction failed:", err);
+            }
+          } else {
+            const userDoc = await getDoc(userDocRef);
+            if (userDoc.exists()) {
+              familyId = userDoc.data().familyId;
+            }
           }
           
           if (!familyId) {
             familyId = 'family_' + user.uid;
-            await setDoc(userDocRef, { familyId });
+            await setDoc(userDocRef, { familyId }, { merge: true });
           }
           
           activeFamilyId = familyId;
@@ -4264,10 +4344,40 @@ transition: all var(--tr);
               email: email,
               role: role,
               color: '#3B82F6',
-              currentXP: 0,
-              level: 1,
-              streakCount: 0
+              currentXP: rpgStats.currentXP || 0,
+              level: rpgStats.level || 1,
+              streakCount: rpgStats.streakCount || 0
             });
+          }
+
+          // Load user stats from root document
+          const userDoc = await getDoc(userDocRef);
+          if (userDoc.exists()) {
+            const data = userDoc.data();
+            if (data.rpgStats) {
+              rpgStats = data.rpgStats;
+              localStorage.setItem('rove_rpg_stats', JSON.stringify(rpgStats));
+            }
+            if (typeof data.roveCoins === 'number') {
+              roveCoins = data.roveCoins;
+              localStorage.setItem('rove_coins', roveCoins);
+            }
+            if (typeof data.disciplineScore === 'number') {
+              disciplineScore = data.disciplineScore;
+              localStorage.setItem('rove_discipline', disciplineScore);
+            }
+            if (data.purchasedStyles) {
+              purchasedStyles = data.purchasedStyles;
+              localStorage.setItem('rove_purchased_styles', JSON.stringify(purchasedStyles));
+            }
+            if (data.activeStyle !== undefined) {
+              activeStyle = data.activeStyle;
+              if (activeStyle) localStorage.setItem('rove_active_style', activeStyle);
+              else localStorage.removeItem('rove_active_style');
+            }
+            applyActiveStyle();
+            updatePremiumUI();
+            updateRpgUI();
           }
           
           // Setup snapshot listener for family members
@@ -4305,6 +4415,30 @@ transition: all var(--tr);
           console.error("Error during Firestore family sync:", err);
         }
       };
+
+      // Set up real-time listener for tasks
+      if (unsubscribeTasks) unsubscribeTasks();
+      unsubscribeTasks = onSnapshot(collection(db, 'users', user.uid, 'tasks'), snapshot => {
+        const dbTasks = [];
+        snapshot.forEach(docSnap => {
+          const t = docSnap.data();
+          let assigned = t.assignedTo || 'You';
+          if (assigned === 'rithwik') assigned = 'You';
+          dbTasks.push({
+            ...t,
+            id: Number(t.id) || t.id,
+            assignedTo: assigned,
+            subtasks: Array.isArray(t.subtasks) ? t.subtasks : []
+          });
+        });
+        tasks = dbTasks;
+        saveTasks();
+        syncFamilyTasks();
+        renderReview();
+      }, err => {
+        console.error("Tasks snapshot listener failed:", err);
+      });
+
       syncUserFamily();
       checkAuthStatus();
     } else {
@@ -4313,8 +4447,14 @@ transition: all var(--tr);
         unsubscribeFamily();
         unsubscribeFamily = null;
       }
+      if (unsubscribeTasks) {
+        unsubscribeTasks();
+        unsubscribeTasks = null;
+      }
       activeFamilyId = null;
       FAMILY = [];
+      tasks = [];
+      saveTasks();
       renderFamilySheet();
       syncFamilyTasks();
       checkAuthStatus();

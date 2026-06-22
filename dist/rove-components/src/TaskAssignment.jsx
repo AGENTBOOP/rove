@@ -274,7 +274,7 @@ const AssignTaskModal = ({ open, onClose, members, currentUser }) => {
 
     setSubmitting(true);
     try {
-      await addDoc(collection(db, 'tasks'), {
+      await addDoc(collection(db, 'users', assignedTo, 'tasks'), {
         title:         title.trim(),
         assignedTo,
         createdBy:     currentUser.uid,
@@ -1001,48 +1001,72 @@ export default function TaskAssignment({ familyId }) {
   useEffect(() => {
     if (!familyId || !currentMember) return;
 
-    const tasksRef = collection(db, 'tasks');
+    const unsubscribes = [];
+    const tasksMap = {};
 
-    let q;
     if (currentMember.role === 'owner') {
-      // Owner sees all tasks they created for this family group
-      q = query(
-        tasksRef,
-        where('familyGroupId', '==', familyId),
-        where('createdBy',     '==', currentMember.uid),
-        orderBy('createdAt',  'desc')
-      );
+      if (members.length === 0) {
+        setTasks([]);
+        setLoadingTasks(false);
+        return;
+      }
+      members.forEach(m => {
+        const q = query(collection(db, 'users', m.uid, 'tasks'), orderBy('createdAt', 'desc'));
+        const unsub = onSnapshot(
+          q,
+          snapshot => {
+            tasksMap[m.uid] = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+            const allTasks = [];
+            members.forEach(member => {
+              if (tasksMap[member.uid]) {
+                allTasks.push(...tasksMap[member.uid]);
+              }
+            });
+            allTasks.sort((a, b) => {
+              const tA = a.createdAt?.seconds || 0;
+              const tB = b.createdAt?.seconds || 0;
+              return tB - tA;
+            });
+            setTasks(allTasks);
+            setLoadingTasks(false);
+          },
+          err => {
+            console.error(`Tasks listener error for member ${m.uid}:`, err);
+            setLoadingTasks(false);
+          }
+        );
+        unsubscribes.push(unsub);
+      });
     } else {
-      // Sub-member sees only tasks assigned to them
-      q = query(
-        tasksRef,
-        where('familyGroupId', '==', familyId),
-        where('assignedTo',    '==', currentMember.uid),
-        orderBy('createdAt',  'desc')
+      const q = query(
+        collection(db, 'users', currentMember.uid, 'tasks'),
+        orderBy('createdAt', 'desc')
       );
+      const unsub = onSnapshot(
+        q,
+        snapshot => {
+          setTasks(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
+          setLoadingTasks(false);
+        },
+        err => {
+          console.error('Tasks listener error:', err);
+          setLoadingTasks(false);
+        }
+      );
+      unsubscribes.push(unsub);
     }
 
-    const unsubscribe = onSnapshot(
-      q,
-      snapshot => {
-        setTasks(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
-        setLoadingTasks(false);
-      },
-      err => {
-        console.error('Tasks listener error:', err);
-        setLoadingTasks(false);
-      }
-    );
-
-    return unsubscribe;
-  }, [familyId, currentMember]);
+    return () => {
+      unsubscribes.forEach(unsub => unsub());
+    };
+  }, [familyId, currentMember, members]);
 
   // ── Toggle task completion ─────────────────────────────────────────────────
   const handleToggle = useCallback(async (task, e) => {
     const newStatus = task.status === 'completed' ? 'pending' : 'completed';
     try {
       // 1. Update task in Firestore (always works)
-      await updateDoc(doc(db, 'tasks', task.id), { status: newStatus });
+      await updateDoc(doc(db, 'users', task.assignedTo, 'tasks', task.id), { status: newStatus });
 
       if (task.assignedTo === currentUser?.uid) {
         const today = new Date();
@@ -1165,7 +1189,7 @@ export default function TaskAssignment({ familyId }) {
   const handleWeeklyToggle = useCallback(async (task, e) => {
     const newWeeklyDone = !task.weeklyDone;
     try {
-      await updateDoc(doc(db, 'tasks', task.id), { weeklyDone: newWeeklyDone });
+      await updateDoc(doc(db, 'users', task.assignedTo, 'tasks', task.id), { weeklyDone: newWeeklyDone });
 
       if (task.assignedTo === currentUser?.uid) {
         const baseXP = 10;
@@ -1242,7 +1266,7 @@ export default function TaskAssignment({ familyId }) {
   const handleMonthlyToggle = useCallback(async (task, e) => {
     const newMonthlyDone = !task.monthlyDone;
     try {
-      await updateDoc(doc(db, 'tasks', task.id), { monthlyDone: newMonthlyDone });
+      await updateDoc(doc(db, 'users', task.assignedTo, 'tasks', task.id), { monthlyDone: newMonthlyDone });
 
       if (task.assignedTo === currentUser?.uid) {
         const baseXP = 10;
