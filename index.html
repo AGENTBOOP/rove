@@ -1533,6 +1533,30 @@ transition: all var(--tr);
       font-family: 'Inter', sans-serif;
       transition: all 0.2s var(--ease);
     }
+    .attr-pill {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--muted);
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 3px 10px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Inter', sans-serif;
+    }
+    .attr-pill:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+    .attr-pill.active {
+      background: var(--accent-dim);
+      border-color: var(--accent);
+      color: var(--accent);
+      box-shadow: 0 0 8px rgba(59, 130, 246, 0.25);
+    }
     .add-option-input:focus {
       border-color: var(--accent);
       background: rgba(255, 255, 255, 0.08);
@@ -1776,6 +1800,44 @@ transition: all var(--tr);
           🥶 Buy Streak Freeze (Premium Only)
         </button>
       </div>
+
+      <!-- Character Stats Attributes Section -->
+      <div style="margin-top: 10px; margin-bottom: 12px; padding: 10px 0; border-top: 1px solid rgba(255, 255, 255, 0.04); display: flex; flex-direction: column; gap: 8px;">
+        <span style="font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);">Character Stats</span>
+        
+        <!-- Endurance Track -->
+        <div class="attribute-row" style="display: flex; flex-direction: column; gap: 3px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 10.5px; font-weight: 600; color: #fff; font-family: 'Outfit', sans-serif;">🏃 Endurance <span id="attr-endurance-lvl" style="color: #60a5fa; font-weight: 700; margin-left: 2px;">Lvl. 1</span></span>
+            <span id="attr-endurance-xp" style="font-size: 9px; color: var(--muted); font-family: 'Inter', sans-serif;">0 / 100 XP</span>
+          </div>
+          <div style="height: 4px; background: rgba(255, 255, 255, 0.05); border-radius: 4px; overflow: hidden; position: relative;">
+            <div id="attr-endurance-bar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%); transition: width 0.3s ease; box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);"></div>
+          </div>
+        </div>
+
+        <!-- Focus Track -->
+        <div class="attribute-row" style="display: flex; flex-direction: column; gap: 3px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 10.5px; font-weight: 600; color: #fff; font-family: 'Outfit', sans-serif;">⚡ Focus <span id="attr-focus-lvl" style="color: #a78bfa; font-weight: 700; margin-left: 2px;">Lvl. 1</span></span>
+            <span id="attr-focus-xp" style="font-size: 9px; color: var(--muted); font-family: 'Inter', sans-serif;">0 / 100 XP</span>
+          </div>
+          <div style="height: 4px; background: rgba(255, 255, 255, 0.05); border-radius: 4px; overflow: hidden; position: relative;">
+            <div id="attr-focus-bar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #8b5cf6 0%, #a78bfa 100%); transition: width 0.3s ease; box-shadow: 0 0 8px rgba(139, 92, 246, 0.4);"></div>
+          </div>
+        </div>
+
+        <!-- Mindset Track -->
+        <div class="attribute-row" style="display: flex; flex-direction: column; gap: 3px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 10.5px; font-weight: 600; color: #fff; font-family: 'Outfit', sans-serif;">🧠 Mindset <span id="attr-mindset-lvl" style="color: #34d399; font-weight: 700; margin-left: 2px;">Lvl. 1</span></span>
+            <span id="attr-mindset-xp" style="font-size: 9px; color: var(--muted); font-family: 'Inter', sans-serif;">0 / 100 XP</span>
+          </div>
+          <div style="height: 4px; background: rgba(255, 255, 255, 0.05); border-radius: 4px; overflow: hidden; position: relative;">
+            <div id="attr-mindset-bar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #10b981 0%, #34d399 100%); transition: width 0.3s ease; box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);"></div>
+          </div>
+        </div>
+      </div>
       
       <!-- Weekly completion tracker dots (M, T, W, Th, F, S, S) -->
       <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.04);">
@@ -1889,6 +1951,14 @@ transition: all var(--tr);
               <option value="Education" style="background: #1C1C20; color: #fff;">Education</option>
               <option value="Sports" style="background: #1C1C20; color: #fff;">Sports</option>
             </select>
+          </div>
+          <div class="add-option-field" style="display: flex; align-items: center; gap: 4px;">
+            <label style="font-size: 10.5px; color: var(--muted); font-weight: 600; text-transform: uppercase; margin-right: 4px;">Attribute</label>
+            <div id="add-task-attribute-container" style="display: flex; gap: 4px;">
+              <button type="button" class="attr-pill active" data-val="focus">Focus</button>
+              <button type="button" class="attr-pill" data-val="endurance">Endurance</button>
+              <button type="button" class="attr-pill" data-val="mindset">Mindset</button>
+            </div>
           </div>
         </div>
       </div>
@@ -2098,6 +2168,7 @@ transition: all var(--tr);
   let activeTimelineFilter = 'today';
   let currentViewMode = 'daily'; // daily vs long-term
   let selectedDates = [];
+  let selectedAttribute = 'focus';
   let calCurrentDate = new Date();
 
   /* ══ RPG State ═══════════════════════════════════════════════ */
@@ -2107,6 +2178,12 @@ transition: all var(--tr);
     streakCount: 0,
     lastCompletedDate: null,
     completedDates: []
+  };
+
+  let attributes = {
+    endurance: { level: 1, xp: 0, nextLevelXp: 100 },
+    focus: { level: 1, xp: 0, nextLevelXp: 100 },
+    mindset: { level: 1, xp: 0, nextLevelXp: 100 }
   };
 
   function loadRpgStats() {
@@ -2119,12 +2196,38 @@ transition: all var(--tr);
         console.error(e);
       }
     }
+    const attrsData = localStorage.getItem('rove_attributes');
+    if (attrsData) {
+      try {
+        attributes = JSON.parse(attrsData);
+        if (!attributes.endurance) attributes.endurance = { level: 1, xp: 0, nextLevelXp: 100 };
+        if (!attributes.focus) attributes.focus = { level: 1, xp: 0, nextLevelXp: 100 };
+        if (!attributes.mindset) attributes.mindset = { level: 1, xp: 0, nextLevelXp: 100 };
+      } catch(e) {
+        console.error(e);
+      }
+    } else {
+      attributes = {
+        endurance: { level: 1, xp: 0, nextLevelXp: 100 },
+        focus: { level: 1, xp: 0, nextLevelXp: 100 },
+        mindset: { level: 1, xp: 0, nextLevelXp: 100 }
+      };
+    }
   }
 
   function saveRpgStats() {
     localStorage.setItem('rove_rpg_stats', JSON.stringify(rpgStats));
+    localStorage.setItem('rove_attributes', JSON.stringify(attributes));
     if (auth.currentUser) {
-      setDoc(doc(db, 'users', auth.currentUser.uid), { rpgStats }, { merge: true }).catch(console.error);
+      setDoc(doc(db, 'users', auth.currentUser.uid), { rpgStats, attributes }, { merge: true }).catch(console.error);
+      if (activeFamilyId) {
+        setDoc(doc(db, 'families', activeFamilyId, 'members', auth.currentUser.uid), {
+          currentXP: rpgStats.currentXP || 0,
+          level: rpgStats.level || 1,
+          streakCount: rpgStats.streakCount || 0,
+          attributes
+        }, { merge: true }).catch(console.error);
+      }
     }
   }
 
@@ -2220,8 +2323,9 @@ transition: all var(--tr);
     
     const rpgStreakCount = $('rpg-streak-count');
     if (rpgStreakCount) rpgStreakCount.innerHTML = `<span style="color:${fireColor}; margin-right:4px;">🔥</span>${rpgStats.streakCount} Day Streak`;
-
+    
     renderWeeklyDots();
+    updateAttributesUI();
   }
 
   function pulseXPBar() {
@@ -2230,6 +2334,100 @@ transition: all var(--tr);
     bar.classList.remove('xp-bar-pulse');
     void bar.offsetWidth;
     bar.classList.add('xp-bar-pulse');
+  }
+
+  function updateAttributesUI() {
+    const tracks = ['endurance', 'focus', 'mindset'];
+    tracks.forEach(trackName => {
+      const track = attributes[trackName] || { level: 1, xp: 0, nextLevelXp: 100 };
+      const lvlEl = $(`attr-${trackName}-lvl`);
+      const xpEl = $(`attr-${trackName}-xp`);
+      const barEl = $(`attr-${trackName}-bar`);
+      
+      if (lvlEl) lvlEl.textContent = `Lvl. ${track.level}`;
+      if (xpEl) xpEl.textContent = `${track.xp} / ${track.nextLevelXp} XP`;
+      if (barEl) {
+        const pct = Math.min(100, Math.round((track.xp / track.nextLevelXp) * 100));
+        barEl.style.width = `${pct}%`;
+      }
+    });
+  }
+
+  function awardAttributeXP(attributeType, amount, sourceElement) {
+    const trackName = (attributeType || 'focus').toLowerCase();
+    if (!attributes[trackName]) {
+      attributes[trackName] = { level: 1, xp: 0, nextLevelXp: 100 };
+    }
+    
+    const track = attributes[trackName];
+    track.xp += amount;
+    
+    let leveledUp = false;
+    while (track.xp >= track.nextLevelXp) {
+      track.xp -= track.nextLevelXp;
+      track.level += 1;
+      track.nextLevelXp = Math.round(track.nextLevelXp * 1.2);
+      leveledUp = true;
+    }
+    
+    saveRpgStats();
+    
+    if (leveledUp) {
+      triggerLevelUpAnimation(trackName, track.level, sourceElement);
+    }
+    
+    updateAttributesUI();
+  }
+
+  function triggerLevelUpAnimation(attributeName, newLevel, sourceElement) {
+    const capitalizedAttr = attributeName.charAt(0).toUpperCase() + attributeName.slice(1);
+    
+    const toast = document.createElement('div');
+    toast.className = 'level-up-toast';
+    toast.style.cssText = `
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px) scale(0.9);
+      background: linear-gradient(135deg, rgba(20, 20, 25, 0.95), rgba(30, 30, 35, 0.95));
+      border: 1.5px solid var(--accent);
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.3), inset 0 0 12px rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 12px 24px;
+      color: #fff;
+      font-family: 'Outfit', sans-serif;
+      z-index: 10000;
+      opacity: 0;
+      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      pointer-events: none;
+      backdrop-filter: blur(8px);
+    `;
+    
+    toast.innerHTML = `
+      <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--accent); font-weight: 700;">Level Up!</div>
+      <div style="font-size: 14px; font-weight: 600;">${capitalizedAttr} reached Lvl. ${newLevel}</div>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+      toast.style.opacity = '1';
+      toast.style.transform = 'translateX(-50%) translateY(0) scale(1)';
+    }, 50);
+    
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateX(-50%) translateY(-20px) scale(0.9)';
+      setTimeout(() => toast.remove(), 500);
+    }, 2800);
+
+    if (sourceElement) {
+      triggerConfetti(sourceElement);
+    }
   }
 
   function triggerConfetti(targetElement) {
@@ -3014,6 +3212,7 @@ transition: all var(--tr);
             rpgStats.currentXP = (rpgStats.currentXP || 0) + 10;
             rpgStats.level = getLevelDetails(rpgStats.currentXP).level;
             saveRpgStats();
+            awardAttributeXP(t.attributeType || 'focus', 10, weeklyBtn);
             console.log("Current XP:", rpgStats.currentXP);
             updateRpgUI();
             pulseXPBar();
@@ -3040,6 +3239,7 @@ transition: all var(--tr);
             rpgStats.currentXP = (rpgStats.currentXP || 0) + 10;
             rpgStats.level = getLevelDetails(rpgStats.currentXP).level;
             saveRpgStats();
+            awardAttributeXP(t.attributeType || 'focus', 10, monthlyBtn);
             console.log("Current XP:", rpgStats.currentXP);
             updateRpgUI();
             pulseXPBar();
@@ -3198,6 +3398,19 @@ transition: all var(--tr);
       const isHidden = tray.style.display === 'none' || !tray.style.display;
       tray.style.display = isHidden ? 'flex' : 'none';
     });
+
+    const container = $('add-task-attribute-container');
+    if (container) {
+      const pills = container.querySelectorAll('.attr-pill');
+      pills.forEach(pill => {
+        pill.addEventListener('click', e => {
+          e.stopPropagation();
+          pills.forEach(p => p.classList.remove('active'));
+          pill.classList.add('active');
+          selectedAttribute = pill.dataset.val;
+        });
+      });
+    }
   })();
 
   addInput.addEventListener('keydown', e => {
@@ -3250,7 +3463,8 @@ transition: all var(--tr);
       isEveryday: isEverydayVal,
       isWeekly: isWeeklyVal,
       isMonthly: isMonthlyVal,
-      category: categoryVal
+      category: categoryVal,
+      attributeType: selectedAttribute || 'focus'
     };
 
     tasks.push(task);
@@ -3260,6 +3474,15 @@ transition: all var(--tr);
     
     // Clear inputs
     selectedDates = [];
+    selectedAttribute = 'focus';
+    const container = $('add-task-attribute-container');
+    if (container) {
+      const pills = container.querySelectorAll('.attr-pill');
+      pills.forEach(p => {
+        if (p.dataset.val === 'focus') p.classList.add('active');
+        else p.classList.remove('active');
+      });
+    }
     updateDateText();
     $('add-task-time').value = '';
     $('add-task-duration').value = '';
@@ -3534,6 +3757,7 @@ transition: all var(--tr);
     rpgStats.currentXP = (rpgStats.currentXP || 0) + 10;
     rpgStats.level = getLevelDetails(rpgStats.currentXP).level;
     saveRpgStats();
+    awardAttributeXP(task.attributeType || 'focus', 10, focusCard);
     console.log("Current XP:", rpgStats.currentXP);
     updateRpgUI();
     triggerConfetti(focusCard);
@@ -4357,6 +4581,17 @@ transition: all var(--tr);
             if (data.rpgStats) {
               rpgStats = data.rpgStats;
               localStorage.setItem('rove_rpg_stats', JSON.stringify(rpgStats));
+            }
+            if (data.attributes) {
+              attributes = data.attributes;
+              localStorage.setItem('rove_attributes', JSON.stringify(attributes));
+            } else {
+              attributes = {
+                endurance: { level: 1, xp: 0, nextLevelXp: 100 },
+                focus: { level: 1, xp: 0, nextLevelXp: 100 },
+                mindset: { level: 1, xp: 0, nextLevelXp: 100 }
+              };
+              localStorage.setItem('rove_attributes', JSON.stringify(attributes));
             }
             if (typeof data.roveCoins === 'number') {
               roveCoins = data.roveCoins;

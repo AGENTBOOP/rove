@@ -130,6 +130,105 @@ const getLevelDetails = (xp) => {
   return { level, title, pct, maxXP };
 };
 
+const getNextLevelXpForLevel = (lvl) => {
+  let nextXp = 100;
+  for (let i = 1; i < lvl; i++) {
+    nextXp = Math.round(nextXp * 1.2);
+  }
+  return nextXp;
+};
+
+const adjustAttributeXP = (attributesState, attributeType, amount) => {
+  const trackName = (attributeType || 'focus').toLowerCase();
+  const updatedAttributes = {
+    endurance: { level: 1, xp: 0, nextLevelXp: 100 },
+    focus: { level: 1, xp: 0, nextLevelXp: 100 },
+    mindset: { level: 1, xp: 0, nextLevelXp: 100 },
+    ...(attributesState || {})
+  };
+  
+  const track = {
+    level: 1,
+    xp: 0,
+    nextLevelXp: 100,
+    ...(updatedAttributes[trackName] || {})
+  };
+  
+  let leveledUp = false;
+  let oldLevel = track.level;
+  
+  if (amount >= 0) {
+    track.xp += amount;
+    while (track.xp >= track.nextLevelXp) {
+      track.xp -= track.nextLevelXp;
+      track.level += 1;
+      track.nextLevelXp = getNextLevelXpForLevel(track.level);
+    }
+    if (track.level > oldLevel) {
+      leveledUp = track.level;
+    }
+  } else {
+    track.xp += amount;
+    while (track.xp < 0 && track.level > 1) {
+      track.level -= 1;
+      track.nextLevelXp = getNextLevelXpForLevel(track.level);
+      track.xp += track.nextLevelXp;
+    }
+    if (track.level === 1 && track.xp < 0) {
+      track.xp = 0;
+    }
+  }
+  
+  updatedAttributes[trackName] = track;
+  return { updatedAttributes, leveledUp };
+};
+
+const triggerLevelUpAnimation = (attributeName, newLevel) => {
+  const capitalizedAttr = attributeName.charAt(0).toUpperCase() + attributeName.slice(1);
+  const toast = document.createElement('div');
+  toast.className = 'level-up-toast';
+  toast.style.cssText = `
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px) scale(0.9);
+    background: linear-gradient(135deg, rgba(20, 20, 25, 0.95), rgba(30, 30, 35, 0.95));
+    border: 1.5px solid #3B82F6;
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3), inset 0 0 12px rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 12px 24px;
+    color: #fff;
+    font-family: 'Outfit', sans-serif;
+    z-index: 10000;
+    opacity: 0;
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    pointer-events: none;
+    backdrop-filter: blur(8px);
+  `;
+  
+  toast.innerHTML = `
+    <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: #3B82F6; font-weight: 700;">Level Up!</div>
+    <div style="font-size: 14px; font-weight: 600;">${capitalizedAttr} reached Lvl. ${newLevel}</div>
+  `;
+  
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.style.opacity = '1';
+    toast.style.transform = 'translateX(-50%) translateY(0) scale(1)';
+  }, 50);
+
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(-50%) translateY(-20px) scale(0.9)';
+    setTimeout(() => toast.remove(), 500);
+  }, 2800);
+};
+
 const getWeekDates = (date = new Date()) => {
   const d = new Date(date);
   const day = d.getDay();
@@ -503,6 +602,7 @@ const AssignTaskModal = ({ open, onClose, members, currentUser }) => {
   const [isWeekly,    setIsWeekly]    = useState(false);
   const [isMonthly,   setIsMonthly]   = useState(false);
   const [category,    setCategory]    = useState('General');
+  const [attributeType, setAttributeType] = useState('focus');
   const [submitting, setSubmitting] = useState(false);
   const [error,      setError]      = useState('');
   const titleRef = useRef(null);
@@ -517,6 +617,7 @@ const AssignTaskModal = ({ open, onClose, members, currentUser }) => {
       setIsWeekly(false);
       setIsMonthly(false);
       setCategory('General');
+      setAttributeType('focus');
       setTimeout(() => titleRef.current?.focus(), 80);
     }
   }, [open]);
@@ -556,6 +657,7 @@ const AssignTaskModal = ({ open, onClose, members, currentUser }) => {
         category,
         weeklyDone:    false,
         monthlyDone:   false,
+        attributeType,
       });
       onClose();
     } catch (err) {
@@ -741,6 +843,42 @@ const AssignTaskModal = ({ open, onClose, members, currentUser }) => {
                   Monthly
                 </label>
               </div>
+            </div>
+          </div>
+
+          {/* Attribute Track Selector */}
+          <div className="space-y-2">
+            <label className="block text-xs font-semibold uppercase tracking-widest text-white/40">
+              Attribute Track
+            </label>
+            <div className="flex gap-2">
+              {['endurance', 'focus', 'mindset'].map(attr => {
+                const colors = {
+                  endurance: {
+                    active: 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400',
+                    inactive: 'border-white/10 hover:bg-emerald-500/5 text-white/40'
+                  },
+                  focus: {
+                    active: 'bg-blue-500/20 border-blue-500/50 text-blue-400',
+                    inactive: 'border-white/10 hover:bg-blue-500/5 text-white/40'
+                  },
+                  mindset: {
+                    active: 'bg-purple-500/20 border-purple-500/50 text-purple-400',
+                    inactive: 'border-white/10 hover:bg-purple-500/5 text-white/40'
+                  }
+                };
+                const activeStyle = attributeType === attr ? colors[attr].active : colors[attr].inactive;
+                return (
+                  <button
+                    key={attr}
+                    type="button"
+                    onClick={() => setAttributeType(attr)}
+                    className={`flex-1 py-2 px-3 text-xs font-medium rounded-xl border transition-all ${activeStyle}`}
+                  >
+                    {attr.charAt(0).toUpperCase() + attr.slice(1)}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -983,6 +1121,11 @@ export default function TaskShare({ familyId }) {
         streakCount: currentMember.streakCount || 0,
         lastCompletedDate: currentMember.lastCompletedDate || null,
         completedDates: currentMember.completedDates || [],
+        attributes: currentMember.attributes || {
+          endurance: { level: 1, xp: 0, nextLevelXp: 100 },
+          focus: { level: 1, xp: 0, nextLevelXp: 100 },
+          mindset: { level: 1, xp: 0, nextLevelXp: 100 }
+        }
       });
       hasInitializedRpg.current = true;
     }
@@ -1187,15 +1330,33 @@ export default function TaskShare({ familyId }) {
           }
         }
 
+        const currentAttributes = rpgStats?.attributes || {
+          endurance: { level: 1, xp: 0, nextLevelXp: 100 },
+          focus: { level: 1, xp: 0, nextLevelXp: 100 },
+          mindset: { level: 1, xp: 0, nextLevelXp: 100 }
+        };
+        const { updatedAttributes, leveledUp } = adjustAttributeXP(currentAttributes, task.attributeType || 'focus', xpChange);
+
+        if (newWeeklyDone && leveledUp) {
+          triggerLevelUpAnimation(task.attributeType || 'focus', leveledUp);
+        }
+
         const updates = {
           currentXP: newXP,
           level: newLevel,
           streakCount: streakCount,
           lastCompletedDate: lastCompletedDate,
           completedDates: completedDates,
+          attributes: updatedAttributes,
         };
 
         setRpgStats(updates);
+
+        try {
+          await updateDoc(doc(db, 'users', currentUser.uid), { attributes: updatedAttributes });
+        } catch (uErr) {
+          console.warn('[TaskShare] Firestore root user attributes write failed/blocked:', uErr);
+        }
 
         try {
           await updateDoc(doc(db, 'families', familyId, 'members', currentUser.uid), updates);
@@ -1264,15 +1425,33 @@ export default function TaskShare({ familyId }) {
           }
         }
 
+        const currentAttributes = rpgStats?.attributes || {
+          endurance: { level: 1, xp: 0, nextLevelXp: 100 },
+          focus: { level: 1, xp: 0, nextLevelXp: 100 },
+          mindset: { level: 1, xp: 0, nextLevelXp: 100 }
+        };
+        const { updatedAttributes, leveledUp } = adjustAttributeXP(currentAttributes, task.attributeType || 'focus', xpChange);
+
+        if (newMonthlyDone && leveledUp) {
+          triggerLevelUpAnimation(task.attributeType || 'focus', leveledUp);
+        }
+
         const updates = {
           currentXP: newXP,
           level: newLevel,
           streakCount: streakCount,
           lastCompletedDate: lastCompletedDate,
           completedDates: completedDates,
+          attributes: updatedAttributes,
         };
 
         setRpgStats(updates);
+
+        try {
+          await updateDoc(doc(db, 'users', currentUser.uid), { attributes: updatedAttributes });
+        } catch (uErr) {
+          console.warn('[TaskShare] Firestore root user attributes write failed/blocked:', uErr);
+        }
 
         try {
           await updateDoc(doc(db, 'families', familyId, 'members', currentUser.uid), updates);
@@ -1354,12 +1533,24 @@ export default function TaskShare({ familyId }) {
           }
         }
 
+        const currentAttributes = rpgStats?.attributes || {
+          endurance: { level: 1, xp: 0, nextLevelXp: 100 },
+          focus: { level: 1, xp: 0, nextLevelXp: 100 },
+          mindset: { level: 1, xp: 0, nextLevelXp: 100 }
+        };
+        const { updatedAttributes, leveledUp } = adjustAttributeXP(currentAttributes, task.attributeType || 'focus', xpChange);
+
+        if (newStatus === 'completed' && leveledUp) {
+          triggerLevelUpAnimation(task.attributeType || 'focus', leveledUp);
+        }
+
         const updates = {
           currentXP: newXP,
           level: newLevel,
           streakCount: streakCount,
           lastCompletedDate: lastCompletedDate,
           completedDates: completedDates,
+          attributes: updatedAttributes,
         };
 
         if (newStatus === 'completed') {
@@ -1399,6 +1590,12 @@ export default function TaskShare({ familyId }) {
         setRpgStats(updates);
 
         // Attempt to sync to Firestore in a try/catch (ignoring permission write errors)
+        try {
+          await updateDoc(doc(db, 'users', currentUser.uid), { attributes: updatedAttributes });
+        } catch (uErr) {
+          console.warn('[TaskShare] Firestore root user attributes write failed/blocked:', uErr);
+        }
+
         try {
           await updateDoc(doc(db, 'families', familyId, 'members', currentUser.uid), updates);
         } catch (dbErr) {
@@ -1543,6 +1740,65 @@ export default function TaskShare({ familyId }) {
             >
               🥶 Buy Streak Freeze (Premium Only)
             </button>
+          </div>
+
+          {/* Character Stats Attributes Section */}
+          <div className="mt-3.5 pt-2.5 border-t border-white/[0.04] flex flex-col gap-2">
+            <span className="text-[9px] font-bold tracking-widest uppercase text-white/35" style={{ fontFamily: "'Outfit', sans-serif" }}>Character Stats</span>
+            
+            {/* Endurance Track */}
+            <div className="flex flex-col gap-1">
+              <div className="flex justify-between items-center">
+                <span className="text-xs font-semibold text-white" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                  🏃 Endurance <span className="text-[#60a5fa] font-bold ml-0.5">Lvl. {rpgStats.attributes?.endurance?.level || 1}</span>
+                </span>
+                <span className="text-[9px] text-[#8e8e9f]" style={{ fontFamily: "'Inter', sans-serif" }}>
+                  {rpgStats.attributes?.endurance?.xp || 0} / {rpgStats.attributes?.endurance?.nextLevelXp || 100} XP
+                </span>
+              </div>
+              <div className="h-1 bg-white/5 rounded-full overflow-hidden relative">
+                <div
+                  className="h-full bg-gradient-to-r from-[#3b82f6] to-[#60a5fa] transition-all duration-300 ease-out shadow-[0_0_8px_rgba(59,130,246,0.4)]"
+                  style={{ width: `${Math.min(100, Math.round(((rpgStats.attributes?.endurance?.xp || 0) / (rpgStats.attributes?.endurance?.nextLevelXp || 100)) * 100))}%` }}
+                ></div>
+              </div>
+            </div>
+
+            {/* Focus Track */}
+            <div className="flex flex-col gap-1">
+              <div className="flex justify-between items-center">
+                <span className="text-xs font-semibold text-white" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                  ⚡ Focus <span className="text-[#a78bfa] font-bold ml-0.5">Lvl. {rpgStats.attributes?.focus?.level || 1}</span>
+                </span>
+                <span className="text-[9px] text-[#8e8e9f]" style={{ fontFamily: "'Inter', sans-serif" }}>
+                  {rpgStats.attributes?.focus?.xp || 0} / {rpgStats.attributes?.focus?.nextLevelXp || 100} XP
+                </span>
+              </div>
+              <div className="h-1 bg-white/5 rounded-full overflow-hidden relative">
+                <div
+                  className="h-full bg-gradient-to-r from-[#8b5cf6] to-[#a78bfa] transition-all duration-300 ease-out shadow-[0_0_8px_rgba(139,92,246,0.4)]"
+                  style={{ width: `${Math.min(100, Math.round(((rpgStats.attributes?.focus?.xp || 0) / (rpgStats.attributes?.focus?.nextLevelXp || 100)) * 100))}%` }}
+                ></div>
+              </div>
+            </div>
+
+            {/* Mindset Track */}
+            <div className="flex flex-col gap-1">
+              <div className="flex justify-between items-center">
+                <span className="text-xs font-semibold text-white" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                  🧠 Mindset <span className="text-[#34d399] font-bold ml-0.5">Lvl. {rpgStats.attributes?.mindset?.level || 1}</span>
+                </span>
+                <span className="text-[9px] text-[#8e8e9f]" style={{ fontFamily: "'Inter', sans-serif" }}>
+                  {rpgStats.attributes?.mindset?.xp || 0} / {rpgStats.attributes?.mindset?.nextLevelXp || 100} XP
+                </span>
+              </div>
+              <div className="h-1 bg-white/5 rounded-full overflow-hidden relative">
+                <div
+                  className="h-full bg-gradient-to-r from-[#10b981] to-[#34d399] transition-all duration-300 ease-out shadow-[0_0_8px_rgba(16,185,129,0.4)]"
+                  style={{ width: `${Math.min(100, Math.round(((rpgStats.attributes?.mindset?.xp || 0) / (rpgStats.attributes?.mindset?.nextLevelXp || 100)) * 100))}%` }}
+                ></div>
+              </div>
+            </div>
           </div>
           
           {/* Weekly completion tracker dots (M, T, W, Th, F, S, S) */}
