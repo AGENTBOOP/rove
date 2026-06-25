@@ -34,6 +34,8 @@ import {
   doc,
   serverTimestamp,
   Timestamp,
+  getDoc,
+  runTransaction,
 } from 'firebase/firestore';
 import { format, parseISO, isValid } from 'date-fns';
 import { db, auth } from './firebase';
@@ -225,6 +227,229 @@ const getWeekDates = (date = new Date()) => {
     x.setDate(monday.getDate() + i);
     return format(x, 'yyyy-MM-dd');
   });
+};
+
+const AddMemberModal = ({ open, onClose, familyId, currentUser }) => {
+  const [username, setUsername] = useState('');
+  const [searching, setSearching] = useState(false);
+  const [searchResult, setSearchResult] = useState(null);
+  const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      setUsername('');
+      setError('');
+      setSearchResult(null);
+    }
+  }, [open]);
+
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSearchResult(null);
+    const trimmed = username.trim().toLowerCase();
+    if (!trimmed) return;
+
+    setSearching(true);
+    try {
+      const usernameDocRef = doc(db, 'usernames', trimmed);
+      const usernameDoc = await getDoc(usernameDocRef);
+      if (!usernameDoc.exists()) {
+        setError('User not found.');
+        return;
+      }
+      const targetUid = usernameDoc.data().uid;
+      const targetCaseName = usernameDoc.data().caseSensitiveName;
+
+      const targetUserDoc = await getDoc(doc(db, 'users', targetUid));
+      const targetName = targetUserDoc.exists() ? (targetUserDoc.data().displayName || targetCaseName) : targetCaseName;
+      const targetEmail = targetUserDoc.exists() ? (targetUserDoc.data().email || '') : '';
+
+      setSearchResult({
+        uid: targetUid,
+        username: targetCaseName,
+        displayName: targetName,
+        email: targetEmail
+      });
+    } catch (err) {
+      console.error(err);
+      setError('Search failed. Please try again.');
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  const handleAdd = async () => {
+    if (!searchResult) return;
+    setError('');
+    setSubmitting(true);
+    try {
+      await runTransaction(db, async (transaction) => {
+        const myUserDocRef = doc(db, 'users', currentUser.uid);
+        const myUserSnapshot = await transaction.get(myUserDocRef);
+        let myFamilyId = myUserSnapshot.exists() ? myUserSnapshot.data().familyId : null;
+
+        if (!myFamilyId) {
+          myFamilyId = 'family_' + currentUser.uid;
+          transaction.set(myUserDocRef, { familyId: myFamilyId }, { merge: true });
+        }
+
+        const targetUserDocRef = doc(db, 'users', searchResult.uid);
+        transaction.update(targetUserDocRef, { familyId: myFamilyId });
+
+        const newMemberRef = doc(db, 'families', myFamilyId, 'members', searchResult.uid);
+        transaction.set(newMemberRef, {
+          uid: searchResult.uid,
+          displayName: searchResult.displayName,
+          email: searchResult.email,
+          role: 'member',
+          color: '#3B82F6',
+          currentXP: 0,
+          level: 1,
+          streakCount: 0,
+          username: searchResult.username
+        });
+      });
+
+      alert(`Success! @${searchResult.username} has been added to your family.`);
+      onClose();
+    } catch (err) {
+      console.error(err);
+      setError('Failed to add user: ' + err.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (!open) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4"
+      onClick={e => { if (e.target === e.currentTarget) onClose(); }}
+      role="dialog"
+      aria-modal="true"
+    >
+      <div className="w-full max-w-md bg-[#1C1C20] border border-white/8 rounded-2xl shadow-2xl overflow-hidden p-6 space-y-4">
+        <div className="flex justify-between items-center">
+          <h2 className="text-white font-semibold text-lg">Add Family Member</h2>
+          <button onClick={onClose} className="text-white/40 hover:text-white/80">✕</button>
+        </div>
+        <p className="text-white/60 text-xs">Search for another user by their unique username to instantly add them to your family group.</p>
+        
+        <form onSubmit={handleSearch} className="flex gap-2">
+          <input
+            type="text"
+            placeholder="Search by username..."
+            value={username}
+            onChange={e => setUsername(e.target.value)}
+            className="flex-1 bg-[#121214] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-[#3B82F6]"
+          />
+          <button
+            type="submit"
+            disabled={searching}
+            className="bg-[#3B82F6] text-white rounded-xl px-4 text-sm font-semibold hover:bg-blue-500 disabled:opacity-50"
+          >
+            {searching ? '...' : 'Search'}
+          </button>
+        </form>
+
+        {error && <p className="text-red-400 text-xs">{error}</p>}
+
+        {searchResult && (
+          <div className="bg-white/5 border border-white/10 rounded-xl p-4 flex items-center justify-between">
+            <div className="flex flex-col">
+              <span className="text-white text-sm font-semibold">{searchResult.displayName}</span>
+              <span className="text-white/40 text-xs">@{searchResult.username}</span>
+            </div>
+            <button
+              onClick={handleAdd}
+              disabled={submitting}
+              className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
+            >
+              {submitting ? 'Adding...' : '+ Add'}
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const UsernameOnboardingModal = ({ open, currentUser }) => {
+  const [username, setUsername] = useState('');
+  const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    const trimmed = username.trim();
+    const lowercaseUsername = trimmed.toLowerCase();
+    if (!/^[a-zA-Z0-9_]{3,15}$/.test(trimmed)) {
+      setError("Username must be 3-15 alphanumeric characters or underscores.");
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      await runTransaction(db, async (transaction) => {
+        const usernameDocRef = doc(db, 'usernames', lowercaseUsername);
+        const usernameSnapshot = await transaction.get(usernameDocRef);
+        if (usernameSnapshot.exists()) {
+          throw new Error("Username already taken.");
+        }
+
+        transaction.set(usernameDocRef, {
+          uid: currentUser.uid,
+          caseSensitiveName: trimmed
+        });
+
+        const userDocRef = doc(db, 'users', currentUser.uid);
+        transaction.update(userDocRef, {
+          username: trimmed
+        });
+      });
+      window.location.reload();
+    } catch (err) {
+      setError(err.message || "Failed to save username. Try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/85 backdrop-blur-sm px-4">
+      <div className="w-full max-w-md bg-[#1C1C20] border border-white/8 rounded-2xl p-6 space-y-4 shadow-2xl">
+        <h2 className="text-white font-bold text-lg">Choose your unique username</h2>
+        <p className="text-white/60 text-xs leading-relaxed">
+          This username will allow other family members to find and add you directly to their family groups.
+        </p>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="flex flex-col gap-1.5">
+            <input
+              type="text"
+              placeholder="e.g. jaishel"
+              value={username}
+              onChange={e => setUsername(e.target.value)}
+              className="bg-[#121214] border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#3B82F6]"
+            />
+            {error && <span className="text-red-400 text-xs">{error}</span>}
+          </div>
+          <button
+            type="submit"
+            disabled={submitting}
+            className="w-full bg-[#3B82F6] hover:bg-blue-500 text-white rounded-xl py-3 font-semibold text-sm disabled:opacity-50"
+          >
+            {submitting ? 'Saving...' : 'Save Username'}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
 };
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -1028,6 +1253,8 @@ export default function TaskAssignment({ familyId }) {
   const [tasks,         setTasks]         = useState([]);
   const [currentMember, setCurrentMember] = useState(null); // enriched user obj
   const [modalOpen,     setModalOpen]     = useState(false);
+  const [addMemberOpen, setAddMemberOpen] = useState(false);
+  const [onboardOpen,   setOnboardOpen]   = useState(false);
   const [loadingMembers,setLoadingMembers]= useState(true);
   const [loadingTasks,  setLoadingTasks]  = useState(true);
   const [filterStatus,  setFilterStatus]  = useState('all'); // 'all' | 'pending' | 'completed'
@@ -1078,6 +1305,14 @@ export default function TaskAssignment({ familyId }) {
         }
       });
       hasInitializedRpg.current = true;
+    }
+  }, [currentMember]);
+
+  useEffect(() => {
+    if (currentMember && !currentMember.username) {
+      setOnboardOpen(true);
+    } else {
+      setOnboardOpen(false);
     }
   }, [currentMember]);
 
@@ -1821,25 +2056,19 @@ export default function TaskAssignment({ familyId }) {
                 </div>
               ))}
               
-              {/* If no other family members, render Invite/Add Member button */}
-              {members.filter(m => m.uid !== currentMember?.uid).length === 0 && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    const link = `${window.location.origin}/?inviteCode=${familyId}`;
-                    navigator.clipboard.writeText(link);
-                    alert(`Invite link copied to clipboard!\nShare this with your family: ${link}`);
-                  }}
-                  className="flex flex-col items-center gap-1.5 flex-shrink-0 focus:outline-none"
-                >
-                  <div className="w-10 h-10 rounded-full border border-dashed border-white/20 flex items-center justify-center bg-white/5 hover:bg-white/10 transition-colors">
-                    <span className="text-white/60 text-lg font-light">+</span>
-                  </div>
-                  <span className="text-[10px] font-medium text-white/40 whitespace-nowrap">
-                    Invite Member
-                  </span>
-                </button>
-              )}
+              {/* Render Add Member button unconditionally */}
+              <button
+                type="button"
+                onClick={() => setAddMemberOpen(true)}
+                className="flex flex-col items-center gap-1.5 flex-shrink-0 focus:outline-none"
+              >
+                <div className="w-10 h-10 rounded-full border border-dashed border-white/20 flex items-center justify-center bg-white/5 hover:bg-white/10 transition-colors">
+                  <span className="text-white/60 text-lg font-light">+</span>
+                </div>
+                <span className="text-[10px] font-medium text-white/40 whitespace-nowrap">
+                  Add Member
+                </span>
+              </button>
             </div>
           )}
         </section>
@@ -1931,6 +2160,18 @@ export default function TaskAssignment({ familyId }) {
         onClose={() => setModalOpen(false)}
         members={members}
         currentUser={currentMember ?? { uid: currentUser?.uid, familyId }}
+      />
+
+      <AddMemberModal
+        open={addMemberOpen}
+        onClose={() => setAddMemberOpen(false)}
+        familyId={familyId}
+        currentUser={currentUser}
+      />
+
+      <UsernameOnboardingModal
+        open={onboardOpen}
+        currentUser={currentUser}
       />
 
       {/*

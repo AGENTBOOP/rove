@@ -1766,14 +1766,36 @@ transition: all var(--tr);
   <!-- Invite modal -->
   <div id="invite-overlay">
     <div id="invite-modal">
-      <div class="invite-title">Invite Family Member</div>
-      <div class="invite-sub">Share this private link. Once opened on their device, they'll be linked automatically.</div>
-      <div class="invite-link-row">
-        <span class="invite-link-text" id="invite-link-text"></span>
-        <button class="copy-btn" id="copy-btn">Copy</button>
+      <div class="invite-title">Add Family Member</div>
+      <div class="invite-sub">Search for another user by their unique username to instantly add them to your family group.</div>
+      <div class="search-username-row" style="display: flex; gap: 8px; margin-bottom: 12px;">
+        <input type="text" id="search-username-input" placeholder="Search by username..." style="flex: 1; background: #09090b; border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 12px 14px; color: #fff; font-size: 13px; outline: none; font-family: inherit;" />
+        <button id="search-username-btn" style="background: #3B82F6; color: #fff; border: none; border-radius: 12px; padding: 0 16px; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.2s;">Search</button>
       </div>
-      <p class="invite-note">🔒 Expires in 48 hours. Single-use link.</p>
+      <div id="search-result-container" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 12px 14px; display: none; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+          <span id="search-result-name" style="font-weight: 600; color: #fff; font-size: 13px;"></span>
+          <span id="search-result-username" style="font-size: 11px; color: var(--muted);"></span>
+        </div>
+        <button id="add-to-family-btn" style="background: #10b981; color: #fff; border: none; border-radius: 8px; padding: 8px 12px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s;">+ Add to Family</button>
+      </div>
+      <div id="search-error-msg" style="color: #ef4444; font-size: 11px; margin-bottom: 12px; display: none;"></div>
       <button class="close-invite-btn" id="close-invite-btn">Done</button>
+    </div>
+  </div>
+
+  <!-- Username Onboarding modal -->
+  <div id="username-onboarding-overlay" style="position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; padding: 20px;">
+    <div style="width: 100%; max-width: 400px; background: #121214; border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; padding: 24px 28px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+      <h2 style="font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 6px; font-family: 'Outfit', sans-serif;">Choose your unique username</h2>
+      <p style="font-size: 12px; color: var(--muted); margin-bottom: 20px; line-height: 1.5;">This username will allow other family members to find and add you directly to their family groups.</p>
+      
+      <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px;">
+        <input type="text" id="onboard-username-input" placeholder="e.g. jaishel" style="background: #09090b; border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 12px 14px; color: #fff; font-size: 14px; outline: none;" />
+        <span id="onboard-error-msg" style="color: #ef4444; font-size: 11px; display: none;"></span>
+      </div>
+      
+      <button id="onboard-submit-btn" style="width: 100%; background: #3B82F6; color: #fff; border: none; border-radius: 12px; padding: 12px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s;">Save Username</button>
     </div>
   </div>
 
@@ -4079,16 +4101,98 @@ transition: all var(--tr);
       }
     });
 
-    function invCode() {
-      if (activeFamilyId) {
-        return window.location.origin + '/?inviteCode=' + activeFamilyId;
-      }
-      const c='ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
-      let s=''; for(let i=0;i<22;i++) s+=c[Math.floor(Math.random()*c.length)];
-      return window.location.origin + '/?inviteCode=' + s;
+    function openInv() {
+      $('search-username-input').value = '';
+      $('search-error-msg').style.display = 'none';
+      $('search-result-container').style.display = 'none';
+      invOv.classList.add('open');
     }
-    function openInv() { $('invite-link-text').textContent=invCode(); $('copy-btn').textContent='Copy'; $('copy-btn').classList.remove('copied'); invOv.classList.add('open'); }
     function closeInv(){ invOv.classList.remove('open'); }
+
+    $('search-username-btn').addEventListener('click', async () => {
+      const searchInput = $('search-username-input').value.trim().toLowerCase();
+      const errEl = $('search-error-msg');
+      const resContainer = $('search-result-container');
+      errEl.style.display = 'none';
+      resContainer.style.display = 'none';
+
+      if (!searchInput) return;
+
+      try {
+        const usernameDocRef = doc(db, 'usernames', searchInput);
+        const usernameDoc = await getDoc(usernameDocRef);
+        if (!usernameDoc.exists()) {
+          errEl.textContent = "User not found.";
+          errEl.style.display = 'block';
+          return;
+        }
+
+        const targetUid = usernameDoc.data().uid;
+        const targetCaseName = usernameDoc.data().caseSensitiveName;
+
+        const targetUserDoc = await getDoc(doc(db, 'users', targetUid));
+        const targetName = targetUserDoc.exists() ? (targetUserDoc.data().displayName || targetCaseName) : targetCaseName;
+
+        $('search-result-name').textContent = targetName;
+        $('search-result-username').textContent = '@' + targetCaseName;
+        resContainer.style.display = 'flex';
+
+        $('add-to-family-btn').onclick = async () => {
+          try {
+            $('add-to-family-btn').disabled = true;
+            $('add-to-family-btn').textContent = "Adding...";
+
+            await runTransaction(db, async (transaction) => {
+              const myUserDocRef = doc(db, 'users', auth.currentUser.uid);
+              const myUserSnapshot = await transaction.get(myUserDocRef);
+              let myFamilyId = myUserSnapshot.exists() ? myUserSnapshot.data().familyId : null;
+
+              if (!myFamilyId) {
+                myFamilyId = 'family_' + auth.currentUser.uid;
+                transaction.set(myUserDocRef, { familyId: myFamilyId }, { merge: true });
+              }
+
+              const targetUserDocRef = doc(db, 'users', targetUid);
+              transaction.update(targetUserDocRef, { familyId: myFamilyId });
+
+              const newMemberRef = doc(db, 'families', myFamilyId, 'members', targetUid);
+              transaction.set(newMemberRef, {
+                uid: targetUid,
+                displayName: targetName,
+                email: targetUserDoc.exists() ? (targetUserDoc.data().email || '') : '',
+                role: 'member',
+                color: '#3B82F6',
+                currentXP: 0,
+                level: 1,
+                streakCount: 0,
+                username: targetCaseName
+              });
+            });
+
+            $('search-username-input').value = '';
+            resContainer.style.display = 'none';
+            closeInv();
+            alert(`Success! @${targetCaseName} has been added to your family.`);
+          } catch (addErr) {
+            console.error("Direct add failed:", addErr);
+            alert("Failed to add user to family: " + addErr.message);
+          } finally {
+            $('add-to-family-btn').disabled = false;
+            $('add-to-family-btn').textContent = "+ Add to Family";
+          }
+        };
+      } catch (searchErr) {
+        console.error("Search failed:", searchErr);
+        errEl.textContent = "Search failed. Please try again.";
+        errEl.style.display = 'block';
+      }
+    });
+
+    $('search-username-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        $('search-username-btn').click();
+      }
+    });
 
     $('add-member-btn').addEventListener('click', () => {
       close();
@@ -4100,14 +4204,6 @@ transition: all var(--tr);
     });
     $('close-invite-btn').addEventListener('click', closeInv);
     invOv.addEventListener('click', e => { if(e.target===invOv) closeInv(); });
-
-    $('copy-btn').addEventListener('click', function() {
-      const t = $('invite-link-text').textContent;
-      navigator.clipboard.writeText(t).then(() => {
-        this.textContent='Copied!'; this.classList.add('copied');
-        setTimeout(() => { this.textContent='Copy'; this.classList.remove('copied'); }, 2400);
-      }).catch(() => { this.textContent='Copied!'; this.classList.add('copied'); });
-    });
 
     $('reset-group-btn').addEventListener('click', () => {
       if (confirm('Reset the family group?')) {
@@ -4611,6 +4707,65 @@ transition: all var(--tr);
               else localStorage.removeItem('rove_active_style');
             }
             applyActiveStyle();
+            
+            // Username Onboarding Check
+            if (!userDoc.data()?.username) {
+              const onboardingOverlay = $('username-onboarding-overlay');
+              if (onboardingOverlay) {
+                onboardingOverlay.style.display = 'flex';
+                
+                const submitBtn = $('onboard-submit-btn');
+                const usernameInputEl = $('onboard-username-input');
+                const errorMsgEl = $('onboard-error-msg');
+                
+                submitBtn.onclick = async () => {
+                  errorMsgEl.style.display = 'none';
+                  const usernameVal = usernameInputEl.value.trim();
+                  const lowercaseUsername = usernameVal.toLowerCase();
+                  
+                  if (!/^[a-zA-Z0-9_]{3,15}$/.test(usernameVal)) {
+                    errorMsgEl.textContent = "Username must be 3-15 alphanumeric characters or underscores.";
+                    errorMsgEl.style.display = 'block';
+                    return;
+                  }
+                  
+                  try {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = "Saving...";
+                    
+                    await runTransaction(db, async (transaction) => {
+                      const usernameDocRef = doc(db, 'usernames', lowercaseUsername);
+                      const usernameSnap = await transaction.get(usernameDocRef);
+                      
+                      if (usernameSnap.exists()) {
+                        throw new Error("Username already taken.");
+                      }
+                      
+                      transaction.set(usernameDocRef, {
+                        uid: user.uid,
+                        caseSensitiveName: usernameVal
+                      });
+                      
+                      transaction.update(userDocRef, {
+                        username: usernameVal
+                      });
+                      
+                      const familyMemberRef = doc(db, 'families', familyId, 'members', user.uid);
+                      transaction.set(familyMemberRef, { username: usernameVal }, { merge: true });
+                    });
+                    
+                    onboardingOverlay.style.display = 'none';
+                  } catch (txErr) {
+                    console.error("Username transaction failed:", txErr);
+                    errorMsgEl.textContent = txErr.message || "Failed to save username. Try again.";
+                    errorMsgEl.style.display = 'block';
+                  } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = "Save Username";
+                  }
+                };
+              }
+            }
             updatePremiumUI();
             updateRpgUI();
           }
