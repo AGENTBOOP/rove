@@ -2143,7 +2143,7 @@ transition: all var(--tr);
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-  import { getFirestore, doc, getDoc, setDoc, collection, onSnapshot, runTransaction, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteField, collection, onSnapshot, runTransaction, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey:            'AIzaSyDm-vZtrXWiLEDOjAG_O5RB5zbeUQDg0xg',
@@ -4089,15 +4089,24 @@ transition: all var(--tr);
     overlay.addEventListener('click', close);
 
     $('switch-acct-btn').addEventListener('click', async () => {
-      if (confirm('Sign out?')) {
-        try {
-          await signOut(auth);
-          close();
-        } catch (err) {
-          console.error("Sign out error:", err);
-          close();
-          checkAuthStatus();
-        }
+      if (!confirm('Sign out of your Rove account?')) return;
+      // Close the sheet immediately so the UI doesn't linger
+      close();
+      try {
+        // Clear all local state before Firebase resolves
+        localStorage.removeItem('rove_logged_in');
+        localStorage.removeItem('rove_rpg_stats');
+        localStorage.removeItem('rove_attributes');
+        activeFamilyId = null;
+        FAMILY = [];
+        tasks = [];
+        saveTasks();
+        await signOut(auth);
+        // onAuthStateChanged will handle routing to the login screen
+      } catch (err) {
+        console.error('Sign out error:', err);
+        // Still force the UI back to the login screen on failure
+        checkAuthStatus();
       }
     });
 
@@ -4205,13 +4214,35 @@ transition: all var(--tr);
     $('close-invite-btn').addEventListener('click', closeInv);
     invOv.addEventListener('click', e => { if(e.target===invOv) closeInv(); });
 
-    $('reset-group-btn').addEventListener('click', () => {
-      if (confirm('Reset the family group?')) {
-        tasks = []; saveTasks();
-        session = null; saveSession();
+    $('reset-group-btn').addEventListener('click', async () => {
+      if (!confirm('Are you sure you want to leave and reset your family group?\n\nIf you created this group, it will be permanently deleted for everyone.')) return;
+      const user = auth.currentUser;
+      if (!user) return;
+      const currentFamilyId = activeFamilyId;
+      try {
+        // 1. Remove familyId from the user's profile document
+        const userDocRef = doc(db, 'users', user.uid);
+        await updateDoc(userDocRef, { familyId: deleteField() });
+
+        // 2. If the user is the owner of this family, delete the family document
+        if (currentFamilyId && currentFamilyId === 'family_' + user.uid) {
+          await deleteDoc(doc(db, 'families', currentFamilyId));
+        }
+
+        // 3. Reset all local state and close the sheet
+        activeFamilyId = null;
+        FAMILY = [];
+        tasks = [];
+        saveTasks();
+        session = null;
+        saveSession();
         syncFamilyTasks();
+        renderFamilySheet();
         close();
-        setTimeout(openInv, 400);
+        alert('Your family group has been reset. You will be assigned a fresh group on your next sign-in.');
+      } catch (err) {
+        console.error('Reset family error:', err);
+        alert('Something went wrong while resetting the family group. Please try again.');
       }
     });
 
