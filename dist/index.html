@@ -3088,6 +3088,99 @@ transition: all var(--tr);
     setTimeout(closePaywall, 1200);
   });
 
+    /* ══ Weekly scores ═══════════════════════════════════════════ */
+  function getWeeklyScores() {
+    try { return JSON.parse(localStorage.getItem(WEEKLY_KEY)) || {}; } catch(_) { return {}; }
+  }
+  function saveWeeklyScore(d, n) {
+    const a = getWeeklyScores(); a[d] = n; localStorage.setItem(WEEKLY_KEY, JSON.stringify(a));
+  }
+  function getWeekDates(iso) {
+    const d = new Date(iso + 'T12:00:00');
+    const dow = d.getDay(); const diff = dow === 0 ? -6 : 1 - dow;
+    const mon = new Date(d); mon.setDate(d.getDate() + diff);
+    return Array.from({length:7}, (_, i) => {
+      const x = new Date(mon); x.setDate(mon.getDate() + i); return x.toISOString().slice(0,10);
+    });
+  }
+
+  /* ══ Ring ════════════════════════════════════════════════════ */
+  ringFillEl.style.strokeDasharray = `${RING_C}`;
+  ringFillEl.style.strokeDashoffset = `${RING_C}`;
+  let currentRingPct = 0;
+  function animatePercentText(targetPct) {
+    const startPct = currentRingPct;
+    const duration = 750; // 0.75s duration
+    const startTime = performance.now();
+
+    function updateText(timestamp) {
+      const elapsed = timestamp - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const easeProgress = 1 - Math.pow(1 - progress, 5); // Ease Out Quint
+      const current = Math.round(startPct + easeProgress * (targetPct - startPct));
+      ringPctEl.textContent = current + '%';
+
+      if (progress < 1) {
+        requestAnimationFrame(updateText);
+      } else {
+        ringPctEl.textContent = targetPct + '%';
+        currentRingPct = targetPct;
+      }
+    }
+    requestAnimationFrame(updateText);
+  }
+
+  function setRing(pct, instant) {
+    if (instant) {
+      ringFillEl.style.transition = 'none';
+      ringFillEl.style.strokeDashoffset = RING_C - (pct / 100) * RING_C;
+      void ringFillEl.offsetWidth;
+      ringPctEl.textContent = pct + '%';
+      currentRingPct = pct;
+    } else {
+      ringFillEl.style.transition = 'stroke-dashoffset 0.75s cubic-bezier(0.16, 1, 0.3, 1), stroke 0.5s ease, filter 0.5s ease';
+      ringFillEl.style.strokeDashoffset = RING_C - (pct / 100) * RING_C;
+      animatePercentText(pct);
+    }
+    ringWrapEl.classList.toggle('lit',       pct > 0 && pct < 100);
+    ringWrapEl.classList.toggle('done-glow', pct === 100);
+    ringFillEl.classList.toggle('done',      pct === 100);
+    ringPctEl.classList.toggle('done',       pct === 100);
+
+    // Accent dot position update on tracking path line
+    const dot = $('ring-dot');
+    if (dot) {
+      if (instant) { dot.style.transition = 'none'; void dot.offsetWidth; }
+      else           dot.style.transition = 'all 0.75s var(--ease)';
+      const theta = -Math.PI / 2 + (pct / 100) * 2 * Math.PI;
+      const x = 96 + 86 * Math.cos(theta);
+      const y = 96 + 86 * Math.sin(theta);
+      dot.setAttribute('cx', x);
+      dot.setAttribute('cy', y);
+      dot.style.opacity = (pct > 0 && pct < 100) ? '1' : '0';
+    }
+  }
+  function getSessionTasks() {
+    if (!session || !session.taskIds) return tasks;
+    return session.taskIds.map(id => tasks.find(t => t.id === id)).filter(Boolean);
+  }
+  function calcPct() {
+    if (!session) return 0;
+    const sTasks = getSessionTasks();
+    if (sTasks.length === 0) return 0;
+    return Math.round((session.completed.length / sTasks.length) * 100);
+  }
+  function isSessionDone() {
+    if (!session) return true;
+    const sTasks = getSessionTasks();
+    return (session.completed.length + session.skipped.length) >= sTasks.length;
+  }
+  function currentTask() {
+    if (!session) return null;
+    const sTasks = getSessionTasks();
+    return session.currentIdx < sTasks.length ? sTasks[session.currentIdx] : null;
+  }
+
   function getFamilyList() { return []; }
   function syncFamilyTasks() {}
   function renderFamilySheet() {}
