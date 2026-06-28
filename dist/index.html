@@ -2978,6 +2978,116 @@ transition: all var(--tr);
   }
 
   
+  /* ══ checkProStatus — global gate utility ════════════════════ */
+  async function checkProStatus(uid) {
+    try {
+      const snap = await getDoc(doc(db, 'users', uid));
+      if (snap.exists()) {
+        const data = snap.data();
+        isPro       = !!(data.isPro);
+        premiumTier = data.premiumTier || 'free';
+        isPremium   = isPro;
+        if (isPro) localStorage.setItem('focus_premium', 'true');
+      }
+    } catch (e) { console.warn('checkProStatus failed:', e); }
+  }
+
+  /* ══ Premium & Paywall Logic ═════════════════════════════════ */
+  const paywallSheet   = $('paywall-sheet');
+  const paywallOverlay = $('paywall-overlay');
+
+  const TIER_LABELS = {
+    monthly:  'Get Monthly Pro \u2014 $2.99/mo',
+    annual:   'Get Annual Pro \u2014 $13.99/yr',
+    lifetime: 'Get Lifetime Access \u2014 $32.99'
+  };
+
+  function selectPaywallTier(tier) {
+    selectedPaywallTier = tier;
+    document.querySelectorAll('.pw-tier').forEach(el => el.classList.remove('selected'));
+    const card = $('pw-tier-' + tier);
+    if (card) card.classList.add('selected');
+    const btn = $('paywall-upgrade-btn');
+    if (btn && !btn.disabled) btn.textContent = TIER_LABELS[tier] || 'Upgrade to Pro';
+  }
+
+  let _countdownInterval = null;
+  function startPaywallCountdown() {
+    clearInterval(_countdownInterval);
+    const key = 'rove_pw_deadline';
+    let deadline = parseInt(sessionStorage.getItem(key) || '0', 10);
+    if (!deadline || deadline < Date.now()) {
+      deadline = Date.now() + 24 * 60 * 60 * 1000;
+      sessionStorage.setItem(key, String(deadline));
+    }
+    function tick() {
+      const diff = Math.max(0, deadline - Date.now());
+      const h = Math.floor(diff / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      const el = $('pw-countdown');
+      if (el) el.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    }
+    tick();
+    _countdownInterval = setInterval(tick, 1000);
+  }
+
+  function openPaywall() {
+    paywallOverlay.classList.add('open');
+    paywallSheet.classList.add('open');
+    paywallSheet.removeAttribute('aria-hidden');
+    selectPaywallTier(selectedPaywallTier);
+    startPaywallCountdown();
+  }
+
+  function closePaywall() {
+    paywallOverlay.classList.remove('open');
+    paywallSheet.classList.remove('open');
+    paywallSheet.setAttribute('aria-hidden', 'true');
+    clearInterval(_countdownInterval);
+    const btn = $('paywall-upgrade-btn');
+    if (btn) { btn.textContent = TIER_LABELS['annual']; btn.disabled = false; }
+  }
+
+  function updatePremiumUI() {
+    const b1 = $('profile-premium-badge');
+    const b2 = $('acct-premium-badge');
+    if (b1) b1.style.display = isPro ? 'flex' : 'none';
+    if (b2) b2.style.display = isPro ? 'flex' : 'none';
+  }
+
+  $('close-paywall-btn').addEventListener('click', closePaywall);
+  paywallOverlay.addEventListener('click', closePaywall);
+
+  document.querySelectorAll('.pw-tier').forEach(el => {
+    el.addEventListener('click', () => selectPaywallTier(el.dataset.tier));
+  });
+
+  $('paywall-upgrade-btn').addEventListener('click', async () => {
+    const btn = $('paywall-upgrade-btn');
+    btn.disabled = true;
+    btn.innerHTML = `<span class="spinner"></span> Processing...`;
+
+    await new Promise(r => setTimeout(r, 1500));
+
+    isPremium   = true;
+    isPro       = true;
+    premiumTier = selectedPaywallTier;
+    localStorage.setItem('focus_premium', 'true');
+    localStorage.setItem('rove_premium_tier', premiumTier);
+
+    if (auth.currentUser) {
+      setDoc(doc(db, 'users', auth.currentUser.uid), {
+        isPro: true, premiumTier
+      }, { merge: true }).catch(console.error);
+    }
+
+    btn.className = 'success';
+    btn.textContent = 'Pro Activated! \uD83C\uDF89';
+    updatePremiumUI();
+    setTimeout(closePaywall, 1200);
+  });
+
   function getFamilyList() { return []; }
   function syncFamilyTasks() {}
   function renderFamilySheet() {}
@@ -4516,33 +4626,48 @@ function formatTime(timeStr) {
   }
 
   // Firebase Auth State listener
-  onAuthStateChanged(auth, user => {
+  onAuthStateChanged(auth, async user => {
     const loader = $('auth-loading-overlay');
-    if (user) {
-      localStorage.setItem('rove_logged_in', 'true');
-      
-      const name = user.displayName || 'User';
-      const email = user.email || '';
-      const acctNameEl = document.querySelector('.acct-name');
-      const acctEmailEl = document.querySelector('.acct-email');
-      const initialEl = document.querySelector('.account-initial');
-      const acctAvEl = document.querySelector('.acct-av');
-      
-      if (acctNameEl) acctNameEl.textContent = name;
-      if (acctEmailEl) acctEmailEl.textContent = email;
-      if (initialEl) initialEl.textContent = name.charAt(0).toUpperCase();
-      if (acctAvEl) acctAvEl.textContent = name.charAt(0).toUpperCase();
+    
+    // Helper to hide loader safely
+    const hideLoader = () => {
+      if (loader) {
+        loader.style.opacity = '0';
+        setTimeout(() => {
+          loader.style.display = 'none';
+        }, 350);
+      }
+    };
 
-      // Sync Pro status from Firestore
-      checkProStatus(user.uid).then(() => updatePremiumUI());
+    try {
+      if (user) {
+        localStorage.setItem('rove_logged_in', 'true');
+        
+        const name = user.displayName || 'User';
+        const email = user.email || '';
+        const acctNameEl = document.querySelector('.acct-name');
+        const acctEmailEl = document.querySelector('.acct-email');
+        const initialEl = document.querySelector('.account-initial');
+        const acctAvEl = document.querySelector('.acct-av');
+        
+        if (acctNameEl) acctNameEl.textContent = name;
+        if (acctEmailEl) acctEmailEl.textContent = email;
+        if (initialEl) initialEl.textContent = name.charAt(0).toUpperCase();
+        if (acctAvEl) acctAvEl.textContent = name.charAt(0).toUpperCase();
 
-      // Dynamically fetch and sync Family Data from Firestore
-      const syncUserProfile = async () => {
+        // 1. Sync Pro status from Firestore (defensive)
+        try {
+          await checkProStatus(user.uid);
+          updatePremiumUI();
+        } catch (proErr) {
+          console.error("Pro status check failed:", proErr);
+        }
+
+        // 2. Fetch and sync user profile (defensive)
         try {
           const userDocRef = doc(db, 'users', user.uid);
-          
-          // Load user stats from root document
           const userDoc = await getDoc(userDocRef);
+          
           if (userDoc.exists()) {
             const data = userDoc.data();
             if (data.rpgStats) {
@@ -4612,25 +4737,25 @@ function formatTime(timeStr) {
                   onboardBtn.textContent = 'Checking...';
  
                   try {
-                     await runTransaction(db, async (transaction) => {
-                       const handleDocRef = doc(db, 'usernames', handle);
-                       const handleSnap  = await transaction.get(handleDocRef);
-                       if (handleSnap.exists()) {
-                         throw new Error('This handle is already claimed.');
-                       }
-                       transaction.set(handleDocRef, { uid: user.uid, caseSensitiveName: handle });
-                       transaction.set(userDocRef, { username: handle }, { merge: true });
-                     });
+                    await runTransaction(db, async (transaction) => {
+                      const handleDocRef = doc(db, 'usernames', handle);
+                      const handleSnap  = await transaction.get(handleDocRef);
+                      if (handleSnap.exists()) {
+                        throw new Error('This handle is already claimed.');
+                      }
+                      transaction.set(handleDocRef, { uid: user.uid, caseSensitiveName: handle });
+                      transaction.set(userDocRef, { username: handle }, { merge: true });
+                    });
  
-                     onboardOverlay.style.display = 'none';
-                     showScreen(sReview);
+                    onboardOverlay.style.display = 'none';
+                    showScreen(sReview);
                   } catch (txErr) {
-                     console.error('Handle claim failed:', txErr);
-                     onboardErr.textContent = txErr.message || 'Could not save handle. Try again.';
-                     onboardErr.style.display = 'block';
+                    console.error('Handle claim failed:', txErr);
+                    onboardErr.textContent = txErr.message || 'Could not save handle. Try again.';
+                    onboardErr.style.display = 'block';
                   } finally {
-                     onboardBtn.disabled = false;
-                     onboardBtn.textContent = 'Claim Handle →';
+                    onboardBtn.disabled = false;
+                    onboardBtn.textContent = 'Claim Handle →';
                   }
                 };
               }
@@ -4640,6 +4765,7 @@ function formatTime(timeStr) {
             updatePremiumUI();
             updateRpgUI();
           } else {
+            // Document initialization
             await setDoc(userDocRef, {
               isPro: false,
               premiumTier: 'free',
@@ -4648,55 +4774,58 @@ function formatTime(timeStr) {
               purchasedStyles: [],
               rpgStats: { currentXP: 0, level: 1, streakCount: 0 }
             });
+            // Try syncing again
             syncUserProfile();
           }
-        } catch (err) {
-          console.error("Error during Firestore profile sync:", err);
+        } catch (profileErr) {
+          console.error("Error setting up user profile from Firestore:", profileErr);
         }
-      };
-      // Set up real-time listener for tasks
-      if (unsubscribeTasks) unsubscribeTasks();
-      unsubscribeTasks = onSnapshot(collection(db, 'users', user.uid, 'tasks'), snapshot => {
-        const dbTasks = [];
-        snapshot.forEach(docSnap => {
-          const t = docSnap.data();
-          dbTasks.push({
-            ...t,
-            id: Number(t.id) || t.id,
-            assignedTo: 'You',
-            subtasks: Array.isArray(t.subtasks) ? t.subtasks : []
+
+        // 3. Set up tasks listener (defensive)
+        try {
+          if (unsubscribeTasks) unsubscribeTasks();
+          unsubscribeTasks = onSnapshot(collection(db, 'users', user.uid, 'tasks'), snapshot => {
+            const dbTasks = [];
+            snapshot.forEach(docSnap => {
+              const t = docSnap.data();
+              dbTasks.push({
+                ...t,
+                id: Number(t.id) || t.id,
+                assignedTo: 'You',
+                subtasks: Array.isArray(t.subtasks) ? t.subtasks : []
+              });
+            });
+            tasks = dbTasks;
+            saveTasks();
+            renderReview();
+          }, err => {
+            console.error("Tasks snapshot listener failed:", err);
           });
-        });
-        tasks = dbTasks;
+        } catch (tasksErr) {
+          console.error("Failed to bind tasks snapshot listener:", tasksErr);
+        }
+
+        checkAuthStatus();
+      } else {
+        localStorage.removeItem('rove_logged_in');
+        if (unsubscribeTasks) {
+          unsubscribeTasks();
+          unsubscribeTasks = null;
+        }
+        activeFamilyId = null;
+        FAMILY = [];
+        tasks = [];
         saveTasks();
-        renderReview();
-      }, err => {
-        console.error("Tasks snapshot listener failed:", err);
-      });
-
-      syncUserProfile();
-      checkAuthStatus();
-    } else {
-      localStorage.removeItem('rove_logged_in');
-      
-      if (unsubscribeTasks) {
-        unsubscribeTasks();
-        unsubscribeTasks = null;
+        renderFamilySheet();
+        syncFamilyTasks();
+        checkAuthStatus();
       }
-      activeFamilyId = null;
-      FAMILY = [];
-      tasks = [];
-      saveTasks();
-      renderFamilySheet();
-      syncFamilyTasks();
+    } catch (authErr) {
+      console.error("Unhandled error in onAuthStateChanged:", authErr);
+      localStorage.removeItem('rove_logged_in');
       checkAuthStatus();
-    }
-
-    if (loader) {
-      loader.style.opacity = '0';
-      setTimeout(() => {
-        loader.style.display = 'none';
-      }, 350);
+    } finally {
+      hideLoader();
     }
   });
 
