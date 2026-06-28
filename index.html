@@ -158,7 +158,7 @@
     .screen {
       position: absolute; inset: 0;
       display: flex; flex-direction: column; align-items: center;
-      padding: 116px 18px 30px;
+      padding: 116px 18px 94px;
       overflow-y: auto;
       opacity: 0; pointer-events: none;
       transition: opacity 0.35s var(--ease);
@@ -1909,7 +1909,7 @@ transition: all var(--tr);
   <div id="sheet-overlay"></div>
 
   <!-- Family Sheet -->
-  <div id="family-sheet" role="dialog" aria-modal="true" aria-label="Account & Family" aria-hidden="true">
+  <div id="family-sheet" role="dialog" aria-modal="true" aria-label="Account Settings" aria-hidden="true">
     <div class="sheet-handle"></div>
 
     <p class="sheet-cap">Your Account</p>
@@ -1924,31 +1924,6 @@ transition: all var(--tr);
       </div>
     </div>
     <button class="acct-link" id="switch-acct-btn">Switch account →</button>
-
-    <p class="sheet-cap">Family</p>
-    <div class="sheet-members" id="sheet-members"></div>
-
-    <button class="add-member-btn" id="add-member-btn">
-      <span style="font-size:15px;line-height:1">+</span> Invite Family Member
-    </button>
-
-    <!-- Parent View toggle -->
-    <label class="mode-row">
-      <div>
-        <div class="mode-title">Parent View</div>
-        <div class="mode-sub">Manage tasks & push chores to family</div>
-      </div>
-      <div class="sw">
-        <input type="checkbox" id="parent-toggle" />
-        <div class="sw-track"></div>
-        <div class="sw-thumb"></div>
-      </div>
-    </label>
-
-    <div class="danger-zone">
-      <p class="danger-lbl">Danger Zone</p>
-      <button class="reset-group-btn" id="reset-group-btn">Reset & Start Fresh Group</button>
-    </div>
   </div>
 
   <!-- Paywall overlay & sheet -->
@@ -2049,44 +2024,12 @@ transition: all var(--tr);
     <div class="shop-list" id="shop-list"></div>
   </div>
 
-  <!-- Add Member modal (handle search) -->
-  <div id="invite-overlay">
-    <div id="invite-modal">
-      <div class="inv-handle"></div>
-      <div class="invite-title">Find &amp; Add Member</div>
-      <div class="invite-sub">Type their @handle to instantly add them to your family group.</div>
-
-      <div class="handle-search-wrap">
-        <span class="at-prefix">@</span>
-        <input type="text" id="search-username-input"
-               placeholder="username..."
-               autocomplete="off" autocorrect="off"
-               autocapitalize="none" spellcheck="false" />
-        <button id="search-username-btn">Search</button>
-      </div>
-
-      <div id="search-result-container">
-        <div class="search-result-info">
-          <div class="search-result-avatar" id="search-result-avatar"></div>
-          <div class="search-result-text">
-            <span id="search-result-name"></span>
-            <span id="search-result-username"></span>
-          </div>
-        </div>
-        <button id="add-to-family-btn">+ Add</button>
-      </div>
-
-      <div id="search-error-msg"></div>
-      <button class="close-invite-btn" id="close-invite-btn">Cancel</button>
-    </div>
-  </div>
-
   <!-- Username Onboarding overlay -->
   <div id="username-onboarding-overlay">
     <div class="onboard-card">
       <div class="onboard-icon">✦</div>
       <div class="onboard-title">Pick your handle</div>
-      <div class="onboard-sub">Your unique @handle lets family members find and add you instantly. Choose wisely — it's permanent.</div>
+      <div class="onboard-sub">Your unique @handle identifies your character in the solo discipline universe. Choose wisely — it's permanent.</div>
 
       <div class="onboard-input-wrap">
         <span class="at-prefix">@</span>
@@ -2112,92 +2055,7 @@ transition: all var(--tr);
         <button id="focus-toggle-btn" class="header-pill-btn" style="margin: 0; display: inline-block;">Focus</button>
       </div>
     </div>
-
-    <!-- RPG Dashboard Card -->
-    <div class="rpg-card" style="background: rgba(20, 20, 25, 0.5); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 14px 16px; margin: 0 auto 16px; width: 100%; max-width: 440px; text-align: left; box-sizing: border-box; position: relative; z-index: 10;">
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span id="rpg-streak-count" style="font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 700; color: #fff;">
-            <span style="color:#8e8e9f; margin-right:4px;">🔥</span>0 Day Streak
-          </span>
-        </div>
-        <!-- Locked Streak Freeze Button -->
-        <button id="rpg-freeze-btn" class="streak-freeze-btn" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 6px 10px; font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 700; color: #8e8e9f; cursor: not-allowed; transition: all 0.2s;" disabled>
-          🥶 Buy Streak Freeze (Premium Only)
-        </button>
-      </div>
-
-      <!-- Character Stats Attributes Section -->
-      <div style="margin-top: 10px; margin-bottom: 12px; padding: 10px 0; border-top: 1px solid rgba(255, 255, 255, 0.04); display: flex; flex-direction: column; gap: 8px;">
-        <span style="font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);">Character Stats</span>
-        
-        <!-- Endurance Track -->
-        <div class="attribute-row" style="display: flex; flex-direction: column; gap: 3px;">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 10.5px; font-weight: 600; color: #fff; font-family: 'Outfit', sans-serif;">🏃 Endurance <span id="attr-endurance-lvl" style="color: #60a5fa; font-weight: 700; margin-left: 2px;">Lvl. 1</span></span>
-            <span id="attr-endurance-xp" style="font-size: 9px; color: var(--muted); font-family: 'Inter', sans-serif;">0 / 100 XP</span>
-          </div>
-          <div style="height: 4px; background: rgba(255, 255, 255, 0.05); border-radius: 4px; overflow: hidden; position: relative;">
-            <div id="attr-endurance-bar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%); transition: width 0.3s ease; box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);"></div>
-          </div>
-        </div>
-
-        <!-- Focus Track -->
-        <div class="attribute-row" style="display: flex; flex-direction: column; gap: 3px;">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 10.5px; font-weight: 600; color: #fff; font-family: 'Outfit', sans-serif;">⚡ Focus <span id="attr-focus-lvl" style="color: #a78bfa; font-weight: 700; margin-left: 2px;">Lvl. 1</span></span>
-            <span id="attr-focus-xp" style="font-size: 9px; color: var(--muted); font-family: 'Inter', sans-serif;">0 / 100 XP</span>
-          </div>
-          <div style="height: 4px; background: rgba(255, 255, 255, 0.05); border-radius: 4px; overflow: hidden; position: relative;">
-            <div id="attr-focus-bar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #8b5cf6 0%, #a78bfa 100%); transition: width 0.3s ease; box-shadow: 0 0 8px rgba(139, 92, 246, 0.4);"></div>
-          </div>
-        </div>
-
-        <!-- Mindset Track -->
-        <div class="attribute-row" style="display: flex; flex-direction: column; gap: 3px;">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 10.5px; font-weight: 600; color: #fff; font-family: 'Outfit', sans-serif;">🧠 Mindset <span id="attr-mindset-lvl" style="color: #34d399; font-weight: 700; margin-left: 2px;">Lvl. 1</span></span>
-            <span id="attr-mindset-xp" style="font-size: 9px; color: var(--muted); font-family: 'Inter', sans-serif;">0 / 100 XP</span>
-          </div>
-          <div style="height: 4px; background: rgba(255, 255, 255, 0.05); border-radius: 4px; overflow: hidden; position: relative;">
-            <div id="attr-mindset-bar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #10b981 0%, #34d399 100%); transition: width 0.3s ease; box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);"></div>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Weekly completion tracker dots (M, T, W, Th, F, S, S) -->
-      <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.04);">
-        <span style="font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);">Weekly Tracker</span>
-        <div id="rpg-weekly-dots" style="display: flex; justify-content: space-between; align-items: center; padding: 4px 6px;">
-          <!-- Rendered by JS -->
-        </div>
-      </div>
-    </div>
-    <div class="filter-bar">
-      <button id="focus-filter-btn" class="filter-btn active" type="button">
-        <svg class="filter-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="3"></circle>
-          <path d="M3 12c4-8 14-8 18 0-4 8-14 8-18 0z"></path>
-        </svg>
-        <span>Focus on Me</span>
-      </button>
-    </div>
-
-    <!-- Collapsible Analytics Section -->
-    <div class="analytics-card" id="analytics-card">
-      <button class="analytics-header" id="analytics-toggle-btn">
-        <span>📊 Discipline Analytics</span>
-        <span class="chevron-arrow">▼</span>
-      </button>
-      <div class="analytics-body" id="analytics-body" style="display: none;">
-        <div class="discipline-stats">
-          <span class="stat-lbl">Discipline Score:</span>
-          <span class="stat-val" id="discipline-score-val">0</span>
-        </div>
-        <div class="analytics-chart-container" id="analytics-chart-container"></div>
-      </div>
-    </div>
-
+    
     <!-- Timeline Date Filter -->
     <div class="timeline-bar" id="timeline-bar">
       <button class="timeline-pill active" data-filter="today">Today</button>
@@ -2353,37 +2211,119 @@ transition: all var(--tr);
     </div>
   </div>
 
-  <!-- ══════════ PARENT SCREEN ══════════ -->
-  <div id="screen-parent" class="screen">
+  <!-- ══════════ SKILL TREE SCREEN ══════════ -->
+  <div id="screen-profile" class="screen">
     <div class="wrap">
-      <div class="parent-header">
-        <h1 class="parent-title">Family View</h1>
-        <p class="parent-sub" id="parent-date"></p>
+      <div style="text-align: center; margin-bottom: 24px;">
+        <h2 style="font-family: 'Outfit', sans-serif; font-size: 24px; font-weight: 800; color: #fff;">Skill Tree &amp; Profile</h2>
+        <p style="font-size: 12px; color: var(--muted); margin-top: 4px;">Level up your attributes by staying disciplined.</p>
       </div>
-      <ul class="pm-list" id="pm-list" role="list"></ul>
-    </div>
-  </div>
-
-  <!-- Push Chore Bar (visible only in Parent screen) -->
-  <div id="push-bar">
-    <div class="push-inner" style="display: flex; flex-direction: column; gap: 8px;">
-      <div class="target-row" id="target-row"></div>
       
-      <!-- Inline Future Date Assignment -->
-      <div style="display: flex; align-items: center; gap: 8px; padding: 0 4px;">
-        <label for="push-date-input" style="font-size: 10.5px; color: var(--muted); font-weight: 700; text-transform: uppercase; font-family: 'Outfit', sans-serif;">Assign Future Date:</label>
-        <input type="date" id="push-date-input" class="add-option-input" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 6px; color: #fff; font-size: 11px; padding: 3px 6px; outline: none; font-family: 'Inter', sans-serif;" />
-      </div>
+      <!-- RPG Card -->
+      <div class="rpg-card" style="background: rgba(20, 20, 25, 0.5); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 16px 18px; width: 100%; box-sizing: border-box;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span id="rpg-streak-count" style="font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 700; color: #fff;">
+              <span style="color:#8e8e9f; margin-right:4px;">🔥</span>0 Day Streak
+            </span>
+          </div>
+          <!-- Locked Streak Freeze Button -->
+          <button id="rpg-freeze-btn" class="streak-freeze-btn" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 6px 10px; font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 700; color: #8e8e9f; cursor: not-allowed; transition: all 0.2s;" disabled>
+            🥶 Buy Streak Freeze (Premium Only)
+          </button>
+        </div>
 
-      <div class="push-row">
-        <input class="push-input" id="push-input" type="text"
-               placeholder="+ Push a new chore..." maxlength="80" autocomplete="off" />
-        <button class="push-send" id="push-send">Send</button>
+        <!-- Character Stats Attributes Section -->
+        <div style="margin-top: 10px; margin-bottom: 14px; padding: 12px 0; border-top: 1px solid rgba(255, 255, 255, 0.04); display: flex; flex-direction: column; gap: 10px;">
+          <span style="font-size: 9.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);">Character Stats</span>
+          
+          <!-- Endurance Track -->
+          <div class="attribute-row" style="display: flex; flex-direction: column; gap: 4px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 11px; font-weight: 600; color: #fff; font-family: 'Outfit', sans-serif;">🏃 Endurance <span id="attr-endurance-lvl" style="color: #60a5fa; font-weight: 700; margin-left: 2px;">Lvl. 1</span></span>
+              <span id="attr-endurance-xp" style="font-size: 9px; color: var(--muted); font-family: 'Inter', sans-serif;">0 / 100 XP</span>
+            </div>
+            <div style="height: 4px; background: rgba(255, 255, 255, 0.05); border-radius: 4px; overflow: hidden; position: relative;">
+              <div id="attr-endurance-bar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%); transition: width 0.3s ease; box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);"></div>
+            </div>
+          </div>
+
+          <!-- Focus Track -->
+          <div class="attribute-row" style="display: flex; flex-direction: column; gap: 4px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 11px; font-weight: 600; color: #fff; font-family: 'Outfit', sans-serif;">⚡ Focus <span id="attr-focus-lvl" style="color: #a78bfa; font-weight: 700; margin-left: 2px;">Lvl. 1</span></span>
+              <span id="attr-focus-xp" style="font-size: 9px; color: var(--muted); font-family: 'Inter', sans-serif;">0 / 100 XP</span>
+            </div>
+            <div style="height: 4px; background: rgba(255, 255, 255, 0.05); border-radius: 4px; overflow: hidden; position: relative;">
+              <div id="attr-focus-bar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #8b5cf6 0%, #a78bfa 100%); transition: width 0.3s ease; box-shadow: 0 0 8px rgba(139, 92, 246, 0.4);"></div>
+            </div>
+          </div>
+
+          <!-- Mindset Track -->
+          <div class="attribute-row" style="display: flex; flex-direction: column; gap: 4px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 11px; font-weight: 600; color: #fff; font-family: 'Outfit', sans-serif;">🧠 Mindset <span id="attr-mindset-lvl" style="color: #34d399; font-weight: 700; margin-left: 2px;">Lvl. 1</span></span>
+              <span id="attr-mindset-xp" style="font-size: 9px; color: var(--muted); font-family: 'Inter', sans-serif;">0 / 100 XP</span>
+            </div>
+            <div style="height: 4px; background: rgba(255, 255, 255, 0.05); border-radius: 4px; overflow: hidden; position: relative;">
+              <div id="attr-mindset-bar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #10b981 0%, #34d399 100%); transition: width 0.3s ease; box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);"></div>
+            </div>
+          </div>
+        </div>
+        
+        <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.04);">
+          <span style="font-size: 9.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);">Weekly Tracker</span>
+          <div id="rpg-weekly-dots" style="display: flex; justify-content: space-between; align-items: center; padding: 4px 6px;">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Bottom navigation removed -->
+  <!-- ══════════ ANALYTICS SCREEN ══════════ -->
+  <div id="screen-analytics" class="screen">
+    <div class="wrap">
+      <div style="text-align: center; margin-bottom: 24px;">
+        <h2 style="font-family: 'Outfit', sans-serif; font-size: 24px; font-weight: 800; color: #fff;">Discipline Analytics</h2>
+        <p style="font-size: 12px; color: var(--muted); margin-top: 4px;">Track your weekly progress and consistency.</p>
+      </div>
+      
+      <div class="analytics-card" id="analytics-card" style="background: rgba(20, 20, 25, 0.5); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 18px 20px; width: 100%; box-sizing: border-box;">
+        <div class="discipline-stats" style="border-bottom: 1px solid rgba(255, 255, 255, 0.04); padding-bottom: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+          <span class="stat-lbl" style="font-size: 13px; color: var(--muted); font-weight: 500;">Discipline Score:</span>
+          <span class="stat-val" id="discipline-score-val" style="font-size: 20px; color: #fff; font-weight: 800; font-family: 'Outfit', sans-serif;">0</span>
+        </div>
+        <div class="analytics-chart-container" id="analytics-chart-container" style="height: 140px; width: 100%;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sleek Bottom Navigation Tab Bar -->
+  <nav id="bottom-nav">
+    <button class="nav-item active" id="nav-btn-dashboard">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
+      <span class="nav-label">Dashboard</span>
+    </button>
+    <button class="nav-item" id="nav-btn-profile">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+      </svg>
+      <span class="nav-label">Skill Tree</span>
+    </button>
+    <button class="nav-item" id="nav-btn-analytics">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="20" x2="18" y2="10"></line>
+        <line x1="12" y1="20" x2="12" y2="4"></line>
+        <line x1="6" y1="20" x2="6" y2="14"></line>
+      </svg>
+      <span class="nav-label">Analytics</span>
+    </button>
+  </nav>
 
   <!-- ══════════ INTRO SCREEN ══════════ -->
   <div id="screen-intro" class="screen">
@@ -2827,13 +2767,17 @@ transition: all var(--tr);
       $('app-header').style.display = 'none';
       const subHeader = $('rove-sub-header');
       if (subHeader) subHeader.style.display = 'none';
+      const bottomNav = $('bottom-nav');
+      if (bottomNav) bottomNav.style.display = 'none';
       
-      [sReview, sFocus, sComplete, sParent].forEach(s => s.classList.remove('active'));
+      [sReview, sFocus, sComplete, sProfile, sAnalytics].forEach(s => s.classList.remove('active'));
       introScreen.classList.add('active');
     } else {
       $('app-header').style.display = 'flex';
       const subHeader = $('rove-sub-header');
       if (subHeader) subHeader.style.display = 'flex';
+      const bottomNav = $('bottom-nav');
+      if (bottomNav) bottomNav.style.display = 'flex';
       introScreen.classList.remove('active');
       
       if (session && !isSessionDone()) {
@@ -2858,10 +2802,11 @@ transition: all var(--tr);
 
   /* ══ DOM refs ════════════════════════════════════════════════ */
   const $   = id => document.getElementById(id);
-  const sReview   = $('screen-review');
-  const sFocus    = $('screen-focus');
-  const sComplete = $('screen-complete');
-  const sParent   = $('screen-parent');
+  const sReview    = $('screen-review');
+  const sFocus     = $('screen-focus');
+  const sComplete  = $('screen-complete');
+  const sProfile   = $('screen-profile');
+  const sAnalytics = $('screen-analytics');
 
   const reviewList = $('review-list');
   const addInput   = $('add-input');
@@ -3032,292 +2977,14 @@ transition: all var(--tr);
     applyActiveStyle();
   }
 
-  function getFamilyList() {
-    if (FAMILY && FAMILY.length > 0) {
-      return FAMILY;
-    }
-    const currentUid = auth.currentUser ? auth.currentUser.uid : 'You';
-    const currentName = auth.currentUser ? (auth.currentUser.displayName || 'You') : 'You';
-    const currentEmail = auth.currentUser ? (auth.currentUser.email || '') : '';
-    return [{
-      id: currentUid,
-      name: currentName,
-      init: currentName.charAt(0).toUpperCase(),
-      color: '#3B82F6',
-      role: 'organizer',
-      email: currentEmail,
-      tasks: []
-    }];
-  }
-
-  function syncFamilyTasks() {
-    const family = getFamilyList();
-    family.forEach(m => m.tasks = []);
-    tasks.forEach(t => {
-      const isDone = (session ? session.completed.includes(t.id) : false) || t.done;
-      const member = family.find(m => m.id === t.assignedTo);
-      if (member) {
-        member.tasks.push({ id: t.id, name: t.name, done: isDone });
-      }
-    });
-  }
-
-  function renderFamilySheet() {
-    const container = $('sheet-members');
-    if (!container) return;
-    const currentUid = auth.currentUser ? auth.currentUser.uid : 'You';
-    const family = getFamilyList();
-    container.innerHTML = family.map(m => `
-      <div class="sheet-member">
-        <div class="sheet-member-av" style="background:${m.color};">
-          ${m.init}
-          ${(m.role==='organizer' || (m.id === currentUid && isPremium)) ? '<span class="star-wrap"><svg width="8" height="8" viewBox="0 0 24 24" fill="#000"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></polygon></svg></span>' : ''}
-        </div>
-        <div>
-          <div class="sheet-member-name">${m.name}${m.id === currentUid ? ' <span style="font-size:10px;color:#A0A0A0;font-weight:400">(You)</span>' : ''}</div>
-          <div class="sheet-member-role">${m.role==='organizer' ? 'Family Organizer' : 'Member'}</div>
-        </div>
-        ${m.role==='organizer' ? '<span class="owner-pill">Owner</span>' : ''}
-      </div>
-    `).join('');
-  }
-
-  /* ══ Weekly scores ═══════════════════════════════════════════ */
-  function getWeeklyScores() {
-    try { return JSON.parse(localStorage.getItem(WEEKLY_KEY)) || {}; } catch(_) { return {}; }
-  }
-  function saveWeeklyScore(d, n) {
-    const a = getWeeklyScores(); a[d] = n; localStorage.setItem(WEEKLY_KEY, JSON.stringify(a));
-  }
-  function getWeekDates(iso) {
-    const d = new Date(iso + 'T12:00:00');
-    const dow = d.getDay(); const diff = dow === 0 ? -6 : 1 - dow;
-    const mon = new Date(d); mon.setDate(d.getDate() + diff);
-    return Array.from({length:7}, (_, i) => {
-      const x = new Date(mon); x.setDate(mon.getDate() + i); return x.toISOString().slice(0,10);
-    });
-  }
-
-  /* ══ Ring ════════════════════════════════════════════════════ */
-  ringFillEl.style.strokeDasharray = `${RING_C}`;
-  ringFillEl.style.strokeDashoffset = `${RING_C}`;
-  let currentRingPct = 0;
-  function animatePercentText(targetPct) {
-    const startPct = currentRingPct;
-    const duration = 750; // 0.75s duration
-    const startTime = performance.now();
-
-    function updateText(timestamp) {
-      const elapsed = timestamp - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      const easeProgress = 1 - Math.pow(1 - progress, 5); // Ease Out Quint
-      const current = Math.round(startPct + easeProgress * (targetPct - startPct));
-      ringPctEl.textContent = current + '%';
-
-      if (progress < 1) {
-        requestAnimationFrame(updateText);
-      } else {
-        ringPctEl.textContent = targetPct + '%';
-        currentRingPct = targetPct;
-      }
-    }
-    requestAnimationFrame(updateText);
-  }
-
-  function setRing(pct, instant) {
-    if (instant) {
-      ringFillEl.style.transition = 'none';
-      ringFillEl.style.strokeDashoffset = RING_C - (pct / 100) * RING_C;
-      void ringFillEl.offsetWidth;
-      ringPctEl.textContent = pct + '%';
-      currentRingPct = pct;
-    } else {
-      ringFillEl.style.transition = 'stroke-dashoffset 0.75s cubic-bezier(0.16, 1, 0.3, 1), stroke 0.5s ease, filter 0.5s ease';
-      ringFillEl.style.strokeDashoffset = RING_C - (pct / 100) * RING_C;
-      animatePercentText(pct);
-    }
-    ringWrapEl.classList.toggle('lit',       pct > 0 && pct < 100);
-    ringWrapEl.classList.toggle('done-glow', pct === 100);
-    ringFillEl.classList.toggle('done',      pct === 100);
-    ringPctEl.classList.toggle('done',       pct === 100);
-
-    // Accent dot position update on tracking path line
-    const dot = $('ring-dot');
-    if (dot) {
-      if (instant) { dot.style.transition = 'none'; void dot.offsetWidth; }
-      else           dot.style.transition = 'all 0.75s var(--ease)';
-      const theta = -Math.PI / 2 + (pct / 100) * 2 * Math.PI;
-      const x = 96 + 86 * Math.cos(theta);
-      const y = 96 + 86 * Math.sin(theta);
-      dot.setAttribute('cx', x);
-      dot.setAttribute('cy', y);
-      dot.style.opacity = (pct > 0 && pct < 100) ? '1' : '0';
-    }
-  }
-  function getSessionTasks() {
-    if (!session || !session.taskIds) return tasks;
-    return session.taskIds.map(id => tasks.find(t => t.id === id)).filter(Boolean);
-  }
-  function calcPct() {
-    if (!session) return 0;
-    const sTasks = getSessionTasks();
-    if (sTasks.length === 0) return 0;
-    return Math.round((session.completed.length / sTasks.length) * 100);
-  }
-  function isSessionDone() {
-    if (!session) return true;
-    const sTasks = getSessionTasks();
-    return (session.completed.length + session.skipped.length) >= sTasks.length;
-  }
-  function currentTask() {
-    if (!session) return null;
-    const sTasks = getSessionTasks();
-    return session.currentIdx < sTasks.length ? sTasks[session.currentIdx] : null;
-  }
-
-  /* ══ Screen router ═══════════════════════════════════════════ */
-  function showScreen(el) {
-    [sReview, sFocus, sComplete, sParent].forEach(s => s.classList.remove('active'));
-    el.classList.add('active');
-    pushBar.classList.toggle('show', el === sParent);
-
-    // Deep Focus Mode toggle
-    const phoneContent = $('phone-content');
-    if (phoneContent) {
-      if (el === sFocus) {
-        phoneContent.classList.add('deep-focus-active');
-      } else {
-        phoneContent.classList.remove('deep-focus-active');
-      }
-    }
-
-    // Sync header title
-    const headerTitle = $('header-title');
-    if (el === sParent) {
-      if (headerTitle) headerTitle.textContent = 'Family View';
-    } else {
-      if (headerTitle) headerTitle.textContent = 'Rove';
-    }
-    syncStart();
-  }
-
-  function handleModeClick(mode) {
-    if (mode === 'parent') {
-      if (!isPremium) {
-        openPaywall();
-        return;
-      }
-      renderParentView();
-      showScreen(sParent);
-      const parentToggle = $('parent-toggle');
-      if (parentToggle) parentToggle.checked = true;
-    } else {
-      const parentToggle = $('parent-toggle');
-      if (parentToggle) parentToggle.checked = false;
-      if (session && !isSessionDone()) {
-        showScreen(sFocus);
-      } else if (session && isSessionDone()) {
-        showScreen(sComplete);
-      } else {
-        showScreen(sReview);
-        setTimeout(() => addInput.focus(), 120);
-      }
-    }
-  }
-
-  // Navigation button listeners removed
-
-  $('focus-filter-btn').addEventListener('click', () => {
-    focusOnMe = !focusOnMe;
-    $('focus-filter-btn').classList.toggle('active', focusOnMe);
-    renderReview();
-  });
-
-  $('exit-focus-btn').addEventListener('click', () => {
-    session = null;
-    saveSession();
-    choreActive = false;
-    hideChore();
-    clearTimeout(choreTimer);
-    setRing(0, true);
-    renderReview();
-    showScreen(sReview);
-    setTimeout(() => addInput.focus(), 100);
-  });
-
-  /* ══ checkProStatus ═════════════════════════════════ */
-  async function checkProStatus(uid) {
-    try {
-      const snap = await getDoc(doc(db, 'users', uid));
-      if (snap.exists()) {
-        const data = snap.data();
-        isPro = !!(data.isPro); premiumTier = data.premiumTier || 'free'; isPremium = isPro;
-        if (isPro) localStorage.setItem('focus_premium', 'true');
-      }
-    } catch (e) { console.warn('checkProStatus failed:', e); }
-  }
-
-  /* ══ Premium & Paywall Logic ══════════════════════════════════ */
-  const paywallSheet   = $('paywall-sheet');
-  const paywallOverlay = $('paywall-overlay');
-  const TIER_LABELS    = { monthly:'Get Monthly Pro — $2.99/mo', annual:'Get Annual Pro — $13.99/yr', lifetime:'Get Lifetime Access — $32.99' };
-
-  function selectPaywallTier(tier) {
-    selectedPaywallTier = tier;
-    document.querySelectorAll('.pw-tier').forEach(el => el.classList.remove('selected'));
-    const c = $('pw-tier-'+tier); if (c) c.classList.add('selected');
-    const btn = $('paywall-upgrade-btn'); if (btn && !btn.disabled) btn.textContent = TIER_LABELS[tier] || 'Upgrade to Pro';
-  }
-
-  let _countdownInterval = null;
-  function startPaywallCountdown() {
-    clearInterval(_countdownInterval);
-    const key = 'rove_pw_deadline';
-    let dl = parseInt(sessionStorage.getItem(key)||'0',10);
-    if (!dl||dl<Date.now()) { dl = Date.now()+86400000; sessionStorage.setItem(key,String(dl)); }
-    function tick() {
-      const d=Math.max(0,dl-Date.now()), h=Math.floor(d/3600000), m=Math.floor((d%3600000)/60000), s=Math.floor((d%60000)/1000);
-      const el=$('pw-countdown'); if(el) el.textContent=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
-    }
-    tick(); _countdownInterval=setInterval(tick,1000);
-  }
-
-  function openPaywall() {
-    paywallOverlay.classList.add('open'); paywallSheet.classList.add('open'); paywallSheet.removeAttribute('aria-hidden');
-    selectPaywallTier(selectedPaywallTier); startPaywallCountdown();
-  }
-
-  function closePaywall() {
-    paywallOverlay.classList.remove('open'); paywallSheet.classList.remove('open');
-    paywallSheet.setAttribute('aria-hidden','true'); clearInterval(_countdownInterval);
-    const btn=$('paywall-upgrade-btn'); if(btn){btn.textContent=TIER_LABELS['annual'];btn.disabled=false;}
-  }
-
-  function updatePremiumUI() {
-    const b1=$('profile-premium-badge'), b2=$('acct-premium-badge');
-    if(b1) b1.style.display=isPro?'flex':'none';
-    if(b2) b2.style.display=isPro?'flex':'none';
-    renderFamilySheet();
-    if(sParent.classList.contains('active')) renderParentView();
-  }
-
-  $('close-paywall-btn').addEventListener('click', closePaywall);
-  paywallOverlay.addEventListener('click', closePaywall);
-  document.querySelectorAll('.pw-tier').forEach(el => el.addEventListener('click', ()=>selectPaywallTier(el.dataset.tier)));
-
-  $('paywall-upgrade-btn').addEventListener('click', async () => {
-    const btn=$('paywall-upgrade-btn'); btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Processing...';
-    await new Promise(r=>setTimeout(r,1500));
-    isPremium=true; isPro=true; premiumTier=selectedPaywallTier;
-    localStorage.setItem('focus_premium','true'); localStorage.setItem('rove_premium_tier',premiumTier);
-    if(auth.currentUser) setDoc(doc(db,'users',auth.currentUser.uid),{isPro:true,premiumTier},{merge:true}).catch(console.error);
-    btn.className='success'; btn.textContent='Pro Activated! 🎉'; updatePremiumUI(); setTimeout(closePaywall,1200);
-  });
-
-  ════
-     REVIEW SCREEN
-  ══════════════════════════════════════════════════════════════ */
-  function formatTime(timeStr) {
+  
+  function getFamilyList() { return []; }
+  function syncFamilyTasks() {}
+  function renderFamilySheet() {}
+  function renderParentView() {}
+  function setTarget() {}
+  function pushChore() {}
+function formatTime(timeStr) {
     if (!timeStr) return '';
     try {
       const parts = timeStr.split(':');
@@ -3804,7 +3471,7 @@ transition: all var(--tr);
       openPaywall();
       return;
     }
-    const assignedTo = focusOnMe ? 'You' : 'Family';
+    const assignedTo = 'You';
     
     const timeVal = $('add-task-time').value;
     const durationVal = $('add-task-duration').value;
@@ -4427,7 +4094,6 @@ transition: all var(--tr);
     const btn     = $('account-btn');
     const overlay = $('sheet-overlay');
     const sheet   = $('family-sheet');
-    const invOv   = $('invite-overlay');
 
     function open()  { 
       overlay.classList.add('open'); 
@@ -4437,7 +4103,7 @@ transition: all var(--tr);
     function close() { 
       overlay.classList.remove('open'); 
       sheet.classList.remove('open'); 
-      sheet.setAttribute('aria-hidden','true'); 
+      sheet.setAttribute('aria-hidden', 'true'); 
     }
 
     btn.addEventListener('click', open);
@@ -4445,218 +4111,48 @@ transition: all var(--tr);
 
     $('switch-acct-btn').addEventListener('click', async () => {
       if (!confirm('Sign out of your Rove account?')) return;
-      // Close the sheet immediately so the UI doesn't linger
       close();
       try {
-        // Clear all local state before Firebase resolves
         localStorage.removeItem('rove_logged_in');
         localStorage.removeItem('rove_rpg_stats');
         localStorage.removeItem('rove_attributes');
-        activeFamilyId = null;
-        FAMILY = [];
         tasks = [];
         saveTasks();
         await signOut(auth);
-        // onAuthStateChanged will handle routing to the login screen
       } catch (err) {
         console.error('Sign out error:', err);
-        // Still force the UI back to the login screen on failure
         checkAuthStatus();
       }
     });
+  })();
 
-    function openInv() {
-      const inp = $('search-username-input');
-      const errEl = $('search-error-msg');
-      const resContainer = $('search-result-container');
-      if (inp) inp.value = '';
-      if (errEl) { errEl.textContent = ''; errEl.style.display = 'none'; }
-      if (resContainer) resContainer.style.display = 'none';
-      invOv.classList.add('open');
-      setTimeout(() => { if(inp) inp.focus(); }, 320);
+  (function initBottomNav() {
+    const btnDash = $('nav-btn-dashboard');
+    const btnProf = $('nav-btn-profile');
+    const btnAnal = $('nav-btn-analytics');
+    if (btnDash) {
+      btnDash.addEventListener('click', () => {
+        if (session && !isSessionDone()) {
+          showScreen(sFocus);
+        } else if (session && isSessionDone()) {
+          showScreen(sComplete);
+        } else {
+          showScreen(sReview);
+          setTimeout(() => addInput.focus(), 120);
+        }
+      });
     }
-    function closeInv() { invOv.classList.remove('open'); }
-
-    // Strip leading '@' and force lowercase on the search input
-    $('search-username-input').addEventListener('input', function() {
-      const raw = this.value;
-      const cleaned = raw.replace(/^@+/, '').toLowerCase().replace(/[^a-z0-9_]/g, '');
-      if (raw !== cleaned) this.value = cleaned;
-    });
-
-    async function performSearch() {
-      const rawVal = $('search-username-input').value.trim();
-      // Strip any leading '@' the user may have typed
-      const handle = rawVal.replace(/^@+/, '').toLowerCase();
-      const errEl = $('search-error-msg');
-      const resContainer = $('search-result-container');
-      errEl.textContent = ''; errEl.style.display = 'none';
-      resContainer.style.display = 'none';
-
-      if (!handle || handle.length < 3) {
-        errEl.textContent = 'Please enter at least 3 characters.';
-        errEl.style.display = 'block';
-        return;
-      }
-      if (!/^[a-z0-9_]{3,15}$/.test(handle)) {
-        errEl.textContent = 'Handles can only contain letters, numbers, and underscores.';
-        errEl.style.display = 'block';
-        return;
-      }
-
-      const searchBtn = $('search-username-btn');
-      searchBtn.textContent = '...'; searchBtn.disabled = true;
-
-      try {
-        const usernameDoc = await getDoc(doc(db, 'usernames', handle));
-        if (!usernameDoc.exists()) {
-          errEl.textContent = 'No user found with that handle.';
-          errEl.style.display = 'block';
-          return;
-        }
-
-        const targetUid = usernameDoc.data().uid;
-        const targetCaseName = usernameDoc.data().caseSensitiveName || handle;
-
-        // Don't let users add themselves
-        if (auth.currentUser && targetUid === auth.currentUser.uid) {
-          errEl.textContent = "That's you! Search for someone else's handle.";
-          errEl.style.display = 'block';
-          return;
-        }
-
-        const targetUserDoc = await getDoc(doc(db, 'users', targetUid));
-        const targetName = targetUserDoc.exists()
-          ? (targetUserDoc.data().displayName || targetCaseName)
-          : targetCaseName;
-
-        // Populate result card
-        $('search-result-avatar').textContent = targetName.charAt(0).toUpperCase();
-        $('search-result-name').textContent = targetName;
-        $('search-result-username').textContent = '@' + targetCaseName;
-        resContainer.style.display = 'flex';
-
-        // Store resolved data on the button for the onclick handler
-        const addBtn = $('add-to-family-btn');
-        addBtn.dataset.uid      = targetUid;
-        addBtn.dataset.name     = targetName;
-        addBtn.dataset.handle   = targetCaseName;
-        addBtn.dataset.email    = targetUserDoc.exists() ? (targetUserDoc.data().email || '') : '';
-      } catch (err) {
-        console.error('Handle search failed:', err);
-        errEl.textContent = 'Search failed. Please check your connection.';
-        errEl.style.display = 'block';
-      } finally {
-        searchBtn.textContent = 'Search'; searchBtn.disabled = false;
-      }
+    if (btnProf) {
+      btnProf.addEventListener('click', () => {
+        showScreen(sProfile);
+      });
     }
-
-    $('search-username-btn').addEventListener('click', performSearch);
-    $('search-username-input').addEventListener('keydown', e => {
-      if (e.key === 'Enter') performSearch();
-    });
-
-    $('add-to-family-btn').addEventListener('click', async () => {
-      const addBtn = $('add-to-family-btn');
-      const targetUid    = addBtn.dataset.uid;
-      const targetName   = addBtn.dataset.name;
-      const targetHandle = addBtn.dataset.handle;
-      const targetEmail  = addBtn.dataset.email || '';
-      if (!targetUid) return;
-
-      addBtn.disabled = true; addBtn.textContent = 'Adding...';
-      try {
-        await runTransaction(db, async (transaction) => {
-          const myUserDocRef = doc(db, 'users', auth.currentUser.uid);
-          const myUserSnap   = await transaction.get(myUserDocRef);
-          let myFamilyId = myUserSnap.exists() ? myUserSnap.data().familyId : null;
-          if (!myFamilyId) {
-            myFamilyId = 'family_' + auth.currentUser.uid;
-            transaction.set(myUserDocRef, { familyId: myFamilyId }, { merge: true });
-          }
-          // Write familyId onto the target user's profile
-          transaction.set(doc(db, 'users', targetUid), { familyId: myFamilyId }, { merge: true });
-          // Add target user as a member of the family
-          transaction.set(doc(db, 'families', myFamilyId, 'members', targetUid), {
-            uid: targetUid, displayName: targetName,
-            email: targetEmail, role: 'member',
-            color: '#818cf8', currentXP: 0, level: 1, streakCount: 0,
-            username: targetHandle
-          }, { merge: true });
-        });
-
-        // Clear and close
-        $('search-username-input').value = '';
-        $('search-result-container').style.display = 'none';
-        closeInv();
-        // The real-time onSnapshot will instantly refresh the member list
-      } catch (addErr) {
-        console.error('Add member transaction failed:', addErr);
-        const errEl = $('search-error-msg');
-        errEl.textContent = 'Could not add member: ' + addErr.message;
-        errEl.style.display = 'block';
-      } finally {
-        addBtn.disabled = false; addBtn.textContent = '+ Add';
-      }
-    });
-
-    $('add-member-btn').addEventListener('click', () => {
-      close();
-      if (!isPremium) {
-        setTimeout(openPaywall, 260);
-      } else {
-        setTimeout(openInv, 260);
-      }
-    });
-    $('close-invite-btn').addEventListener('click', closeInv);
-    invOv.addEventListener('click', e => { if(e.target===invOv) closeInv(); });
-
-    $('reset-group-btn').addEventListener('click', async () => {
-      if (!confirm('Are you sure you want to leave and reset your family group?\n\nIf you created this group, it will be permanently deleted for everyone.')) return;
-      const user = auth.currentUser;
-      if (!user) return;
-      const currentFamilyId = activeFamilyId;
-      try {
-        // 1. Remove familyId from the user's profile document
-        const userDocRef = doc(db, 'users', user.uid);
-        await updateDoc(userDocRef, { familyId: deleteField() });
-
-        // 2. If the user is the owner of this family, delete the family document
-        if (currentFamilyId && currentFamilyId === 'family_' + user.uid) {
-          await deleteDoc(doc(db, 'families', currentFamilyId));
-        }
-
-        // 3. Reset all local state and close the sheet
-        activeFamilyId = null;
-        FAMILY = [];
-        tasks = [];
-        saveTasks();
-        session = null;
-        saveSession();
-        syncFamilyTasks();
-        renderFamilySheet();
-        close();
-        alert('Your family group has been reset. You will be assigned a fresh group on your next sign-in.');
-      } catch (err) {
-        console.error('Reset family error:', err);
-        alert('Something went wrong while resetting the family group. Please try again.');
-      }
-    });
-
-    // Parent View toggle
-    $('parent-toggle').addEventListener('change', function() {
-      if (!isPremium && this.checked) {
-        this.checked = false;
-        close();
-        setTimeout(openPaywall, 260);
-        return;
-      }
-      close();
-      setTimeout(() => {
-        if (this.checked) handleModeClick('parent');
-        else              handleModeClick('focus');
-      }, 260);
-    });
+    if (btnAnal) {
+      btnAnal.addEventListener('click', () => {
+        showScreen(sAnalytics);
+        renderAnalyticsGraph();
+      });
+    }
   })();
 
   /* ══ Ambient Particles ═══════════════════════════════════════ */
@@ -5041,69 +4537,10 @@ transition: all var(--tr);
       checkProStatus(user.uid).then(() => updatePremiumUI());
 
       // Dynamically fetch and sync Family Data from Firestore
-      const syncUserFamily = async () => {
+      const syncUserProfile = async () => {
         try {
           const userDocRef = doc(db, 'users', user.uid);
-          const pendingInvite = localStorage.getItem('pendingInvite');
-          let familyId = null;
           
-          if (pendingInvite) {
-            familyId = pendingInvite;
-            try {
-              await runTransaction(db, async (transaction) => {
-                const uDocRef = doc(db, 'users', user.uid);
-                const memberDocRef = doc(db, 'families', familyId, 'members', user.uid);
-                
-                transaction.set(uDocRef, { familyId }, { merge: true });
-                transaction.set(memberDocRef, {
-                  uid: user.uid,
-                  displayName: name,
-                  email: email,
-                  role: 'member',
-                  color: '#3B82F6',
-                  currentXP: rpgStats.currentXP || 0,
-                  level: rpgStats.level || 1,
-                  streakCount: rpgStats.streakCount || 0
-                }, { merge: true });
-              });
-              localStorage.removeItem('pendingInvite');
-              setTimeout(() => {
-                alert("Success! You've joined the family group.");
-              }, 500);
-            } catch (err) {
-              console.error("Atomic auto-join transaction failed:", err);
-            }
-          } else {
-            const userDoc = await getDoc(userDocRef);
-            if (userDoc.exists()) {
-              familyId = userDoc.data().familyId;
-            }
-          }
-          
-          if (!familyId) {
-            familyId = 'family_' + user.uid;
-            await setDoc(userDocRef, { familyId }, { merge: true });
-          }
-          
-          activeFamilyId = familyId;
-          
-          // Ensure member doc exists in the family
-          const role = (familyId === 'family_' + user.uid) ? 'organizer' : 'member';
-          const memberDocRef = doc(db, 'families', familyId, 'members', user.uid);
-          const memberDoc = await getDoc(memberDocRef);
-          if (!memberDoc.exists()) {
-            await setDoc(memberDocRef, {
-              uid: user.uid,
-              displayName: name,
-              email: email,
-              role: role,
-              color: '#3B82F6',
-              currentXP: rpgStats.currentXP || 0,
-              level: rpgStats.level || 1,
-              streakCount: rpgStats.streakCount || 0
-            });
-          }
-
           // Load user stats from root document
           const userDoc = await getDoc(userDocRef);
           if (userDoc.exists()) {
@@ -5143,7 +4580,7 @@ transition: all var(--tr);
             applyActiveStyle();
             
             // ── Username Onboarding: intercept if no handle yet ──
-            if (!userDoc.data()?.username) {
+            if (!data.username) {
               const onboardOverlay = $('username-onboarding-overlay');
               const onboardInput   = $('onboard-username-input');
               const onboardErr     = $('onboard-error-msg');
@@ -5151,19 +4588,17 @@ transition: all var(--tr);
               if (onboardOverlay) {
                 onboardOverlay.style.display = 'flex';
                 setTimeout(() => { if(onboardInput) onboardInput.focus(); }, 350);
-
-                // Force lowercase + strip invalid chars as the user types
+ 
                 onboardInput.oninput = function() {
                   const cleaned = this.value.toLowerCase().replace(/[^a-z0-9_]/g, '');
                   if (this.value !== cleaned) this.value = cleaned;
                   onboardErr.style.display = 'none';
                 };
-
+ 
                 onboardBtn.onclick = async () => {
                   const handle = (onboardInput.value || '').trim().toLowerCase();
                   onboardErr.style.display = 'none';
-
-                  // Client-side validation
+ 
                   if (!handle) {
                     onboardErr.textContent = 'Please enter a handle.';
                     onboardErr.style.display = 'block'; return;
@@ -5172,108 +4607,78 @@ transition: all var(--tr);
                     onboardErr.textContent = 'Must be 3–15 characters: letters, numbers, underscores only.';
                     onboardErr.style.display = 'block'; return;
                   }
-
+ 
                   onboardBtn.disabled = true;
                   onboardBtn.textContent = 'Checking...';
-
+ 
                   try {
-                    await runTransaction(db, async (transaction) => {
-                      const handleDocRef = doc(db, 'usernames', handle);
-                      const handleSnap  = await transaction.get(handleDocRef);
-                      if (handleSnap.exists()) {
-                        throw new Error('This handle is already claimed.');
-                      }
-                      // Atomically write the global handle doc + update user profile
-                      transaction.set(handleDocRef, { uid: user.uid, caseSensitiveName: handle });
-                      transaction.set(userDocRef, { username: handle }, { merge: true });
-                      // Also stamp it on the member doc so it surfaces in the Family list
-                      const memberRef = doc(db, 'families', familyId, 'members', user.uid);
-                      transaction.set(memberRef, { username: handle }, { merge: true });
-                    });
-
-                    onboardOverlay.style.display = 'none';
+                     await runTransaction(db, async (transaction) => {
+                       const handleDocRef = doc(db, 'usernames', handle);
+                       const handleSnap  = await transaction.get(handleDocRef);
+                       if (handleSnap.exists()) {
+                         throw new Error('This handle is already claimed.');
+                       }
+                       transaction.set(handleDocRef, { uid: user.uid, caseSensitiveName: handle });
+                       transaction.set(userDocRef, { username: handle }, { merge: true });
+                     });
+ 
+                     onboardOverlay.style.display = 'none';
+                     showScreen(sReview);
                   } catch (txErr) {
-                    console.error('Handle claim failed:', txErr);
-                    onboardErr.textContent = txErr.message || 'Could not save handle. Try again.';
-                    onboardErr.style.display = 'block';
+                     console.error('Handle claim failed:', txErr);
+                     onboardErr.textContent = txErr.message || 'Could not save handle. Try again.';
+                     onboardErr.style.display = 'block';
                   } finally {
-                    onboardBtn.disabled = false;
-                    onboardBtn.textContent = 'Claim Handle →';
+                     onboardBtn.disabled = false;
+                     onboardBtn.textContent = 'Claim Handle →';
                   }
                 };
               }
+            } else {
+              showScreen(sReview);
             }
             updatePremiumUI();
             updateRpgUI();
+          } else {
+            await setDoc(userDocRef, {
+              isPro: false,
+              premiumTier: 'free',
+              roveCoins: 0,
+              disciplineScore: 0,
+              purchasedStyles: [],
+              rpgStats: { currentXP: 0, level: 1, streakCount: 0 }
+            });
+            syncUserProfile();
           }
-          
-          // Setup snapshot listener for family members
-          const membersRef = collection(db, 'families', familyId, 'members');
-          if (unsubscribeFamily) unsubscribeFamily();
-          
-          unsubscribeFamily = onSnapshot(membersRef, snapshot => {
-            const list = [];
-            snapshot.forEach(docSnap => {
-              const m = docSnap.data();
-              list.push({
-                id: docSnap.id,
-                name: m.displayName || 'Member',
-                init: (m.displayName || 'M').charAt(0).toUpperCase(),
-                color: m.color || '#8B5CF6',
-                role: m.role || 'member',
-                email: m.email || '',
-                tasks: []
-              });
-            });
-            
-            // Sort organizer first
-            FAMILY = list.sort((a, b) => {
-              if (a.role === 'organizer') return -1;
-              if (b.role === 'organizer') return 1;
-              return a.name.localeCompare(b.name);
-            });
-            
-            renderFamilySheet();
-            syncFamilyTasks();
-          }, err => {
-            console.error("Members snapshot listener failed:", err);
-          });
         } catch (err) {
-          console.error("Error during Firestore family sync:", err);
+          console.error("Error during Firestore profile sync:", err);
         }
       };
-
       // Set up real-time listener for tasks
       if (unsubscribeTasks) unsubscribeTasks();
       unsubscribeTasks = onSnapshot(collection(db, 'users', user.uid, 'tasks'), snapshot => {
         const dbTasks = [];
         snapshot.forEach(docSnap => {
           const t = docSnap.data();
-          let assigned = t.assignedTo || 'You';
-          if (assigned === 'rithwik') assigned = 'You';
           dbTasks.push({
             ...t,
             id: Number(t.id) || t.id,
-            assignedTo: assigned,
+            assignedTo: 'You',
             subtasks: Array.isArray(t.subtasks) ? t.subtasks : []
           });
         });
         tasks = dbTasks;
         saveTasks();
-        syncFamilyTasks();
         renderReview();
       }, err => {
         console.error("Tasks snapshot listener failed:", err);
       });
 
-      syncUserFamily();
+      syncUserProfile();
       checkAuthStatus();
     } else {
       localStorage.removeItem('rove_logged_in');
-      if (unsubscribeFamily) {
-        unsubscribeFamily();
-        unsubscribeFamily = null;
-      }
+      
       if (unsubscribeTasks) {
         unsubscribeTasks();
         unsubscribeTasks = null;
