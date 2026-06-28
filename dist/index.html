@@ -1250,60 +1250,116 @@ transition: all var(--tr);
       transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
     }
 
-    /* Premium Paywall */
+    /* ── Premium Paywall ─────────────────────────────────────── */
     #paywall-overlay {
       position: absolute; inset: 0; z-index: 550;
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+      background: rgba(0,0,0,0.78);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
       opacity: 0; pointer-events: none;
-      transition: opacity 0.35s ease;
+      transition: opacity 0.32s cubic-bezier(0.4,0,0.2,1);
     }
     #paywall-overlay.open { opacity: 1; pointer-events: auto; }
-
     #paywall-sheet {
       position: absolute; bottom: 0; left: 0; right: 0; z-index: 600;
-      background: rgba(20, 20, 24, 0.98);
-      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      background: linear-gradient(180deg,#141418 0%,#0f0f12 100%);
+      border-top: 1px solid rgba(255,255,255,0.07);
       border-radius: 28px 28px 0 0;
-      padding: 24px 20px 34px;
+      padding: 6px 18px 40px;
       transform: translateY(100%);
-      transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
-      display: flex; flex-direction: column; gap: 0;
+      transition: transform 0.45s cubic-bezier(0.16,1,0.3,1);
+      max-height: 95%; overflow-y: auto;
     }
     #paywall-sheet.open { transform: translateY(0); }
-
-    .paywall-card.pulse {
-      animation: cardPulse 1.2s ease-in-out infinite;
+    #paywall-sheet::-webkit-scrollbar { display:none; }
+    .pw-handle { width:36px; height:4px; background:rgba(255,255,255,0.1); border-radius:2px; margin:12px auto 16px; }
+    .pw-headline {
+      text-align:center; font-family:'Outfit',sans-serif;
+      font-size:20px; font-weight:800; color:#fff;
+      letter-spacing:-0.02em; margin-bottom:4px;
     }
-    @keyframes cardPulse {
-      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
-      50% { transform: scale(1.02); box-shadow: 0 0 15px 5px rgba(16, 185, 129, 0.25); }
-      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    .pw-sub { text-align:center; font-size:11.5px; color:rgba(255,255,255,0.38); margin-bottom:16px; line-height:1.5; }
+    /* comparison table */
+    .pw-table { width:100%; border-collapse:collapse; margin-bottom:16px; }
+    .pw-table th {
+      font-family:'Outfit',sans-serif; font-size:9.5px; font-weight:700;
+      letter-spacing:0.1em; text-transform:uppercase; padding:7px 5px;
     }
-
-    #paywall-upgrade-btn.success {
-      background: linear-gradient(135deg, #10b981, #059669) !important;
-      border-color: #10b981 !important;
-      box-shadow: 0 0 18px rgba(16, 185, 129, 0.4) !important;
-      transform: scale(1.02);
+    .pw-table th.col-benefit { text-align:left; color:rgba(255,255,255,0.32); }
+    .pw-table th.col-free { text-align:center; color:rgba(255,255,255,0.28); width:56px; }
+    .pw-table th.col-pro {
+      text-align:center; width:66px;
+      background:linear-gradient(135deg,rgba(99,102,241,0.18),rgba(168,85,247,0.18));
+      border-radius:8px 8px 0 0; color:#a78bfa;
     }
-
+    .pw-table td { padding:8px 5px; border-bottom:1px solid rgba(255,255,255,0.04); }
+    .pw-table td.col-benefit { font-size:11.5px; color:rgba(255,255,255,0.65); }
+    .pw-table td.col-free { text-align:center; font-size:13px; color:rgba(255,255,255,0.16); }
+    .pw-table td.col-pro {
+      text-align:center;
+      background:linear-gradient(135deg,rgba(99,102,241,0.07),rgba(168,85,247,0.07));
+    }
+    .pw-pro-check { font-size:13px; color:#a78bfa; }
+    .pw-pro-glow  { font-size:13px; color:#34d399; }
+    /* pricing tier cards */
+    .pw-tiers { display:flex; gap:7px; margin-bottom:14px; }
+    .pw-tier {
+      flex:1; border-radius:14px; padding:11px 6px;
+      border:1.5px solid rgba(255,255,255,0.08);
+      background:rgba(255,255,255,0.03);
+      text-align:center; cursor:pointer;
+      transition:all 0.22s; position:relative;
+    }
+    .pw-tier:hover { border-color:rgba(129,140,248,0.45); background:rgba(99,102,241,0.07); }
+    .pw-tier.selected {
+      border-color:#6366f1;
+      background:rgba(99,102,241,0.13);
+      box-shadow:0 0 0 2px rgba(99,102,241,0.22);
+    }
+    .pw-tier-badge {
+      position:absolute; top:-9px; left:50%; transform:translateX(-50%);
+      background:linear-gradient(135deg,#f59e0b,#fbbf24);
+      color:#000; font-size:8.5px; font-weight:800;
+      padding:2px 8px; border-radius:20px; white-space:nowrap;
+      font-family:'Outfit',sans-serif; letter-spacing:0.05em;
+    }
+    .pw-tier-label { font-size:9px; color:rgba(255,255,255,0.38); margin-bottom:4px; font-family:'Outfit',sans-serif; letter-spacing:0.06em; text-transform:uppercase; }
+    .pw-tier-price { font-size:17px; font-weight:800; color:#fff; font-family:'Outfit',sans-serif; line-height:1; }
+    .pw-tier-period { font-size:9px; color:rgba(255,255,255,0.28); margin-top:3px; }
+    /* countdown */
+    .pw-urgency {
+      text-align:center; font-size:11px; color:rgba(255,255,255,0.32);
+      margin-bottom:12px; display:flex; align-items:center; justify-content:center; gap:6px;
+    }
+    .pw-countdown { font-family:'Outfit',sans-serif; font-size:12px; font-weight:700; color:#f59e0b; letter-spacing:0.03em; }
+    /* CTA */
+    #paywall-upgrade-btn {
+      width:100%; padding:14px;
+      background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 100%);
+      border:none; border-radius:14px;
+      font-family:'Outfit',sans-serif; font-size:15px; font-weight:800;
+      color:#fff; cursor:pointer; transition:all 0.22s;
+      box-shadow:0 4px 20px rgba(99,102,241,0.45);
+      letter-spacing:0.01em;
+    }
+    #paywall-upgrade-btn:hover { transform:translateY(-1px); box-shadow:0 6px 24px rgba(99,102,241,0.6); }
+    #paywall-upgrade-btn:disabled { opacity:0.55; cursor:not-allowed; transform:none; }
+    #paywall-upgrade-btn.success { background:linear-gradient(135deg,#10b981,#059669) !important; box-shadow:0 4px 20px rgba(16,185,129,0.5) !important; }
+    #close-paywall-btn {
+      width:100%; margin-top:10px; background:transparent; border:none;
+      font-size:12px; color:rgba(255,255,255,0.28); cursor:pointer;
+      font-family:'Inter',sans-serif; padding:8px;
+    }
+    #close-paywall-btn:hover { color:rgba(255,255,255,0.55); }
     .spinner {
-      width: 15px; height: 15px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-radius: 50%;
-      border-top-color: #fff;
-      animation: spin 0.8s linear infinite;
-      display: inline-block;
-      vertical-align: middle;
-      margin-right: 6px;
+      width:15px; height:15px;
+      border:2px solid rgba(255,255,255,0.3);
+      border-radius:50%; border-top-color:#fff;
+      animation:spin 0.8s linear infinite;
+      display:inline-block; vertical-align:middle; margin-right:6px;
     }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+    @keyframes spin { to { transform:rotate(360deg); } }
 
-    /* Cosmetic Theme Styles */
+    /* Cosmetic Theme Styles (free) */
     #phone-content.theme-neon-purple {
       --accent: #d946ef;
       --accent-gradient: linear-gradient(135deg, #f472b6 0%, #d946ef 100%);
@@ -1325,6 +1381,36 @@ transition: all var(--tr);
       --accent-hover: linear-gradient(135deg, #6ee7b7 0%, #10b981 100%);
       --accent-glow: rgba(16, 185, 129, 0.22);
       --accent-dim: rgba(16, 185, 129, 0.12);
+    }
+    /* Pro-locked themes */
+    #phone-content.theme-cyberpunk {
+      --accent: #00ffe7;
+      --accent-gradient: linear-gradient(135deg,#00ffe7 0%,#7c3aed 100%);
+      --accent-hover: linear-gradient(135deg,#22d3ee 0%,#6d28d9 100%);
+      --accent-glow: rgba(0,255,231,0.22);
+      --accent-dim: rgba(0,255,231,0.1);
+      --bg: #070a10;
+      --surface: rgba(0,255,231,0.04);
+      --surface-card: rgba(0,255,231,0.06);
+      --border: rgba(0,255,231,0.12);
+    }
+    #phone-content.theme-carbon-fiber {
+      --bg: #060608;
+      --surface: rgba(22,22,26,0.9);
+      --surface-card: rgba(28,28,32,0.6);
+      --border: rgba(255,255,255,0.05);
+      --accent: #ef4444;
+      --accent-gradient: linear-gradient(135deg,#ef4444 0%,#dc2626 100%);
+      --accent-glow: rgba(239,68,68,0.2);
+      --accent-dim: rgba(239,68,68,0.1);
+      --text-gradient: linear-gradient(135deg,#f4f4f5 0%,#71717a 100%);
+    }
+    #phone-content.theme-sunset-gold {
+      --accent: #f59e0b;
+      --accent-gradient: linear-gradient(135deg,#fbbf24 0%,#d97706 100%);
+      --accent-hover: linear-gradient(135deg,#fcd34d 0%,#b45309 100%);
+      --accent-glow: rgba(245,158,11,0.22);
+      --accent-dim: rgba(245,158,11,0.1);
     }
 
     /* Collapsible Analytics Section */
@@ -1868,22 +1954,86 @@ transition: all var(--tr);
   <!-- Paywall overlay & sheet -->
   <div id="paywall-overlay"></div>
   <div id="paywall-sheet" role="dialog" aria-modal="true" aria-label="Premium Paywall" aria-hidden="true">
-    <div class="sheet-handle"></div>
-    <p class="sheet-cap" style="text-align: center; font-size: 16px; color: #fff; font-weight: 700; margin-top: 10px;">Upgrade to Premium</p>
-    <p class="paywall-sub" style="text-align: center; font-size: 13px; color: var(--muted); margin: 6px 0 20px; line-height: 1.4;">Unlock shared family chores, parent dashboards, and unlimited task lists.</p>
-    
-    <div class="paywall-card" id="paywall-card" style="background: rgba(139, 92, 246, 0.05); border: 1.5px solid rgba(139, 92, 246, 0.25); border-radius: 18px; padding: 20px; text-align: center; margin-bottom: 24px; transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);">
-      <div style="font-size: 28px; margin-bottom: 8px;">👑</div>
-      <div style="font-size: 15px; font-weight: 700; color: #fff; letter-spacing: 0.02em;">Family Premium Account</div>
-      <div style="font-size: 22px; font-weight: 800; color: #a855f7; margin-top: 6px; font-family: 'Outfit', sans-serif;">$4.99<span style="font-size: 13px; font-weight: 500; color: var(--muted);">/mo</span></div>
-      <p style="font-size: 11.5px; color: var(--muted); margin-top: 8px; line-height: 1.4;">Unlocks all members, real-time sync, and unlimited daily routines.</p>
+    <div class="pw-handle"></div>
+    <div class="pw-headline">Unlock Rove Pro &#x26A1;</div>
+    <div class="pw-sub">Everything you need to build elite-level habits.</div>
+
+    <!-- Comparison Table -->
+    <table class="pw-table">
+      <thead>
+        <tr>
+          <th class="col-benefit">Feature</th>
+          <th class="col-free">Free</th>
+          <th class="col-pro">&#x2605; Pro</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="col-benefit">Daily habit tracking</td>
+          <td class="col-free" style="color:rgba(255,255,255,0.4)">&#x2713;</td>
+          <td class="col-pro"><span class="pw-pro-glow">&#x2713;</span></td>
+        </tr>
+        <tr>
+          <td class="col-benefit">Family sync &amp; shared tasks</td>
+          <td class="col-free">&ndash;</td>
+          <td class="col-pro"><span class="pw-pro-check">&#x2605;</span></td>
+        </tr>
+        <tr>
+          <td class="col-benefit">AI Goal Breakdown</td>
+          <td class="col-free">&ndash;</td>
+          <td class="col-pro"><span class="pw-pro-check">&#x2605;</span></td>
+        </tr>
+        <tr>
+          <td class="col-benefit">Premium themes (Cyberpunk, Carbon&hellip;)</td>
+          <td class="col-free">&ndash;</td>
+          <td class="col-pro"><span class="pw-pro-check">&#x2605;</span></td>
+        </tr>
+        <tr>
+          <td class="col-benefit">Parent dashboard &amp; child tasks</td>
+          <td class="col-free">&ndash;</td>
+          <td class="col-pro"><span class="pw-pro-check">&#x2605;</span></td>
+        </tr>
+        <tr>
+          <td class="col-benefit">Unlimited long-term goals</td>
+          <td class="col-free" style="font-size:10px;color:rgba(255,255,255,0.28)">3 max</td>
+          <td class="col-pro"><span class="pw-pro-check">&#x221E;</span></td>
+        </tr>
+        <tr>
+          <td class="col-benefit">Streak freeze tokens</td>
+          <td class="col-free">&ndash;</td>
+          <td class="col-pro"><span class="pw-pro-check">&#x2605;</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Pricing Tiers -->
+    <div class="pw-tiers">
+      <div class="pw-tier" data-tier="monthly" id="pw-tier-monthly">
+        <div class="pw-tier-label">Monthly</div>
+        <div class="pw-tier-price">$2.99</div>
+        <div class="pw-tier-period">/month</div>
+      </div>
+      <div class="pw-tier selected" data-tier="annual" id="pw-tier-annual">
+        <div class="pw-tier-badge">SAVE 50%</div>
+        <div class="pw-tier-label">Annual</div>
+        <div class="pw-tier-price">$13.99</div>
+        <div class="pw-tier-period">/year &middot; $1.17/mo</div>
+      </div>
+      <div class="pw-tier" data-tier="lifetime" id="pw-tier-lifetime">
+        <div class="pw-tier-label">Lifetime</div>
+        <div class="pw-tier-price">$32.99</div>
+        <div class="pw-tier-period">one-time</div>
+      </div>
     </div>
 
-    <button class="start-btn" id="paywall-upgrade-btn" style="width: 100%; border-color: #a855f7; box-shadow: 0 4px 12px rgba(168, 85, 247, 0.15); display: flex; align-items: center; justify-content: center; gap: 10px;">
-      Upgrade Family Account - $4.99/mo
-    </button>
-    
-    <button class="acct-link" id="close-paywall-btn" style="width: 100%; margin-top: 14px; text-align: center; background: transparent; border: none; color: var(--muted); font-size: 12px; cursor: pointer;">Cancel</button>
+    <!-- Countdown urgency -->
+    <div class="pw-urgency">
+      <span>&#9201; Offer ends in</span>
+      <span class="pw-countdown" id="pw-countdown">23:59:59</span>
+    </div>
+
+    <button id="paywall-upgrade-btn">Get Annual Pro &mdash; $13.99/yr</button>
+    <button id="close-paywall-btn">Maybe later</button>
   </div>
 
   <!-- Style Shop Overlay & Sheet -->
@@ -2334,7 +2484,10 @@ transition: all var(--tr);
   let choreActive  = false;
   let pendingChore = 'Clean Room';
   let focusOnMe    = false;
-  let isPremium    = false;
+  let isPremium         = false;
+  let isPro             = false;        // true when premiumTier !== 'free'
+  let premiumTier       = 'free';       // 'free' | 'monthly' | 'annual' | 'lifetime'
+  let selectedPaywallTier = 'annual';   // default selected tier in paywall UI
 
   // Style Shop, Discipline Analytics, and Timeline scheduling state
   let roveCoins = 0;
@@ -2694,10 +2847,13 @@ transition: all var(--tr);
   }
 
   const SHOP_ITEMS = [
-    { id: 'default', name: 'Default Theme', cost: 0, desc: 'The original sleek glassmorphic UI.' },
-    { id: 'neon-purple', name: 'Neon Purple Accent', cost: 50, desc: 'Vibrant pink highlights & active indicators.' },
-    { id: 'emerald-mint', name: 'Emerald Mint Theme', cost: 75, desc: 'Eco green highlights & soft glass glow.' },
-    { id: 'carbon-dark', name: 'Carbon Dark Mode UI', cost: 100, desc: 'Deep charcoal elements & high contrast lines.' }
+    { id: 'default',      name: 'Default Minimalist', cost: 0,   desc: 'The original sleek glassmorphic UI.',           pro: false },
+    { id: 'neon-purple',  name: 'Neon Purple Accent',  cost: 50,  desc: 'Vibrant pink highlights & active indicators.',   pro: false },
+    { id: 'emerald-mint', name: 'Emerald Mint',        cost: 75,  desc: 'Eco green highlights & soft glass glow.',       pro: false },
+    { id: 'carbon-dark',  name: 'Carbon Dark UI',      cost: 100, desc: 'Deep charcoal elements & high-contrast lines.', pro: false },
+    { id: 'cyberpunk',    name: 'Cyberpunk Neon',      cost: 0,   desc: 'Electric cyan glows on deep space black.',      pro: true  },
+    { id: 'carbon-fiber', name: 'Automotive Carbon',   cost: 0,   desc: 'Track-inspired carbon weave + red accents.',    pro: true  },
+    { id: 'sunset-gold',  name: 'Sunset Gold',         cost: 0,   desc: 'Warm amber accents — focus like a champion.',   pro: true  },
   ];
 
   /* ══ DOM refs ════════════════════════════════════════════════ */
@@ -2774,7 +2930,7 @@ transition: all var(--tr);
   function applyActiveStyle() {
     const el = $('phone-content');
     if (!el) return;
-    el.classList.remove('theme-neon-purple', 'theme-carbon-dark', 'theme-emerald-mint');
+    el.classList.remove('theme-neon-purple','theme-carbon-dark','theme-emerald-mint','theme-cyberpunk','theme-carbon-fiber','theme-sunset-gold');
     if (activeStyle && activeStyle !== 'default') {
       el.classList.add('theme-' + activeStyle);
     }
@@ -2831,8 +2987,8 @@ transition: all var(--tr);
   }
 
   function loadStorage() {
-    try { isPremium = localStorage.getItem('focus_premium') === 'true'; }
-    catch(_) { isPremium = false; }
+    try { isPremium = localStorage.getItem('focus_premium') === 'true'; } catch(_) { isPremium = false; }
+    try { premiumTier = localStorage.getItem('rove_premium_tier') || 'free'; isPro = isPremium; } catch(_) { isPro = false; }
     try { tasks = JSON.parse(localStorage.getItem(TASKS_KEY)) || []; }
     catch(_) { tasks = []; }
     
@@ -3089,64 +3245,76 @@ transition: all var(--tr);
     setTimeout(() => addInput.focus(), 100);
   });
 
-  /* ══ Premium & Paywall Logic ═════════════════════════════════ */
-  const paywallSheet = $('paywall-sheet');
+  /* ══ checkProStatus ═════════════════════════════════ */
+  async function checkProStatus(uid) {
+    try {
+      const snap = await getDoc(doc(db, 'users', uid));
+      if (snap.exists()) {
+        const data = snap.data();
+        isPro = !!(data.isPro); premiumTier = data.premiumTier || 'free'; isPremium = isPro;
+        if (isPro) localStorage.setItem('focus_premium', 'true');
+      }
+    } catch (e) { console.warn('checkProStatus failed:', e); }
+  }
+
+  /* ══ Premium & Paywall Logic ══════════════════════════════════ */
+  const paywallSheet   = $('paywall-sheet');
   const paywallOverlay = $('paywall-overlay');
+  const TIER_LABELS    = { monthly:'Get Monthly Pro — $2.99/mo', annual:'Get Annual Pro — $13.99/yr', lifetime:'Get Lifetime Access — $32.99' };
+
+  function selectPaywallTier(tier) {
+    selectedPaywallTier = tier;
+    document.querySelectorAll('.pw-tier').forEach(el => el.classList.remove('selected'));
+    const c = $('pw-tier-'+tier); if (c) c.classList.add('selected');
+    const btn = $('paywall-upgrade-btn'); if (btn && !btn.disabled) btn.textContent = TIER_LABELS[tier] || 'Upgrade to Pro';
+  }
+
+  let _countdownInterval = null;
+  function startPaywallCountdown() {
+    clearInterval(_countdownInterval);
+    const key = 'rove_pw_deadline';
+    let dl = parseInt(sessionStorage.getItem(key)||'0',10);
+    if (!dl||dl<Date.now()) { dl = Date.now()+86400000; sessionStorage.setItem(key,String(dl)); }
+    function tick() {
+      const d=Math.max(0,dl-Date.now()), h=Math.floor(d/3600000), m=Math.floor((d%3600000)/60000), s=Math.floor((d%60000)/1000);
+      const el=$('pw-countdown'); if(el) el.textContent=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+    }
+    tick(); _countdownInterval=setInterval(tick,1000);
+  }
 
   function openPaywall() {
-    paywallOverlay.classList.add('open');
-    paywallSheet.classList.add('open');
-    paywallSheet.removeAttribute('aria-hidden');
+    paywallOverlay.classList.add('open'); paywallSheet.classList.add('open'); paywallSheet.removeAttribute('aria-hidden');
+    selectPaywallTier(selectedPaywallTier); startPaywallCountdown();
   }
 
   function closePaywall() {
-    paywallOverlay.classList.remove('open');
-    paywallSheet.classList.remove('open');
-    paywallSheet.setAttribute('aria-hidden', 'true');
-
-    // Reset payment button state
-    const btn = $('paywall-upgrade-btn');
-    btn.innerHTML = 'Upgrade Family Account - $4.99/mo';
-    btn.className = 'start-btn';
-    btn.disabled = false;
-    $('paywall-card').classList.remove('pulse');
+    paywallOverlay.classList.remove('open'); paywallSheet.classList.remove('open');
+    paywallSheet.setAttribute('aria-hidden','true'); clearInterval(_countdownInterval);
+    const btn=$('paywall-upgrade-btn'); if(btn){btn.textContent=TIER_LABELS['annual'];btn.disabled=false;}
   }
 
   function updatePremiumUI() {
-    $('profile-premium-badge').style.display = isPremium ? 'flex' : 'none';
-    $('acct-premium-badge').style.display = isPremium ? 'flex' : 'none';
+    const b1=$('profile-premium-badge'), b2=$('acct-premium-badge');
+    if(b1) b1.style.display=isPro?'flex':'none';
+    if(b2) b2.style.display=isPro?'flex':'none';
     renderFamilySheet();
-    if (sParent.classList.contains('active')) {
-      renderParentView();
-    }
+    if(sParent.classList.contains('active')) renderParentView();
   }
 
   $('close-paywall-btn').addEventListener('click', closePaywall);
   paywallOverlay.addEventListener('click', closePaywall);
+  document.querySelectorAll('.pw-tier').forEach(el => el.addEventListener('click', ()=>selectPaywallTier(el.dataset.tier)));
 
-  $('paywall-upgrade-btn').addEventListener('click', () => {
-    const btn = $('paywall-upgrade-btn');
-    btn.disabled = true;
-    btn.innerHTML = `<span class="spinner"></span> Processing via Sandbox...`;
-
-    setTimeout(() => {
-      // Transition button theme to success state & trigger soft pulse on card
-      btn.className = 'start-btn success';
-      btn.innerHTML = 'Success! Premium Activated 🎉';
-      $('paywall-card').classList.add('pulse');
-
-      // Update state and save
-      isPremium = true;
-      localStorage.setItem('focus_premium', 'true');
-      updatePremiumUI();
-
-      setTimeout(() => {
-        closePaywall();
-      }, 1000);
-    }, 1500);
+  $('paywall-upgrade-btn').addEventListener('click', async () => {
+    const btn=$('paywall-upgrade-btn'); btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Processing...';
+    await new Promise(r=>setTimeout(r,1500));
+    isPremium=true; isPro=true; premiumTier=selectedPaywallTier;
+    localStorage.setItem('focus_premium','true'); localStorage.setItem('rove_premium_tier',premiumTier);
+    if(auth.currentUser) setDoc(doc(db,'users',auth.currentUser.uid),{isPro:true,premiumTier},{merge:true}).catch(console.error);
+    btn.className='success'; btn.textContent='Pro Activated! 🎉'; updatePremiumUI(); setTimeout(closePaywall,1200);
   });
 
-  /* ══════════════════════════════════════════════════════════════
+  ════
      REVIEW SCREEN
   ══════════════════════════════════════════════════════════════ */
   function formatTime(timeStr) {
@@ -3320,6 +3488,7 @@ transition: all var(--tr);
           ${task.isMonthly ? `<span class="task-time-badge" style="color: var(--accent); border-color: var(--accent-dim); background: var(--accent-dim);">🔁 Monthly</span>` : ''}
           ${dateBadge}
         </span>
+        ${currentViewMode === 'long-term' ? `<button class="ai-split-btn svg-action" data-id="${task.id}" title="AI Goal Breakdown (Pro)" type="button" style="font-size:10px;font-weight:700;color:#a78bfa;border:1px solid rgba(99,102,241,0.35);border-radius:6px;padding:3px 7px;background:rgba(99,102,241,0.08);cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all 0.2s;">\u2726 AI Split</button>` : ''}
         <button class="sub-toggle svg-action" title="Toggle subtasks" type="button">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
         </button>
@@ -3357,7 +3526,7 @@ transition: all var(--tr);
     return `<svg width="9" height="8" viewBox="0 0 9 8" fill="none"><path d="M1.5 4L3.5 6L7.5 1.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
   }
 
-  function bindTaskEvents(li, taskId) {
+   function bindTaskEvents(li, taskId) {
     const ri     = li.querySelector('.ri');
     const subSec = li.querySelector('.sub-section');
     const subToggle  = li.querySelector('.sub-toggle');
@@ -3365,6 +3534,38 @@ transition: all var(--tr);
     const delBtn = li.querySelector('.del-btn');
     const subInput = li.querySelector('.sub-input');
     const subAddBtn = li.querySelector('.sub-add-btn');
+    const aiSplitBtn = li.querySelector('.ai-split-btn');
+
+    // AI Split — Pro-gated goal breakdown
+    if (aiSplitBtn) {
+      aiSplitBtn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        if (!isPro) { openPaywall(); return; }
+        const t = tasks.find(x => x.id == taskId);
+        if (!t) return;
+        aiSplitBtn.textContent = '✦ Splitting…';
+        aiSplitBtn.disabled = true;
+        await new Promise(r => setTimeout(r, 900));
+        const suggestions = [
+          `Research ${t.name} fundamentals`,
+          `Break ${t.name} into weekly milestones`,
+          `Identify blockers for ${t.name}`,
+          `Set measurable KPIs for ${t.name}`,
+          `Schedule review session for ${t.name}`
+        ].slice(0, 3 + Math.floor(Math.random() * 3));
+        suggestions.forEach(s => {
+          const id = Date.now() + Math.random();
+          t.subtasks = t.subtasks || [];
+          t.subtasks.push({ id, name: s, done: false });
+        });
+        saveTasks(); syncTaskToFirestore(t);
+        const subrows = li.querySelector('.subrows-' + t.id) || li.querySelector(`#subrows-${t.id}`);
+        if (subrows) subrows.innerHTML = buildSubRows(t);
+        if (subSec) subSec.classList.add('open');
+        aiSplitBtn.textContent = '✓ Done';
+        setTimeout(() => { aiSplitBtn.textContent = '✦ AI Split'; aiSplitBtn.disabled = false; }, 2000);
+      });
+    }
 
     // Weekly/Monthly Checkboxes
     const weeklyBtn = li.querySelector('.weekly-ck-btn');
@@ -4512,11 +4713,14 @@ transition: all var(--tr);
     container.innerHTML = SHOP_ITEMS.map(item => {
       const isPurchased = purchasedStyles.includes(item.id);
       const isActive = activeStyle === item.id || (item.id === 'default' && !activeStyle);
+      const isProLocked = item.pro && !isPro;
       
       let actionHtml = '';
-      if (!isPurchased) {
+      if (isProLocked) {
+        actionHtml = `<button class="shop-buy-btn" onclick="openPaywall()" style="background:rgba(99,102,241,0.15);border-color:rgba(99,102,241,0.4);color:#a78bfa;">&#x1F512; Pro</button>`;
+      } else if (!isPurchased && !item.pro) {
         const canBuy = roveCoins >= item.cost;
-        actionHtml = `<button class="shop-buy-btn" ${canBuy ? '' : 'disabled'} onclick="buyStyle('${item.id}', ${item.cost})">${item.cost} Coins</button>`;
+        actionHtml = `<button class="shop-buy-btn" ${canBuy ? '' : 'disabled'} onclick="buyStyle('${item.id}', ${item.cost})">${item.cost === 0 ? 'Free' : item.cost + ' Coins'}</button>`;
       } else {
         if (isActive) {
           actionHtml = `<button class="shop-equip-btn equipped" disabled>Equipped</button>`;
@@ -4526,9 +4730,9 @@ transition: all var(--tr);
       }
       
       return `
-        <div class="shop-item">
+        <div class="shop-item" style="${isProLocked ? 'opacity:0.75;' : ''}">
           <div class="shop-item-info">
-            <span class="shop-item-name">${esc(item.name)}</span>
+            <span class="shop-item-name">${esc(item.name)}${item.pro ? ' <span style="font-size:9px;font-weight:700;color:#a78bfa;background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.3);border-radius:4px;padding:1px 5px;margin-left:4px;">PRO</span>' : ''}</span>
             <span class="shop-item-desc">${esc(item.desc)}</span>
           </div>
           <div class="shop-item-actions">
@@ -4832,6 +5036,9 @@ transition: all var(--tr);
       if (acctEmailEl) acctEmailEl.textContent = email;
       if (initialEl) initialEl.textContent = name.charAt(0).toUpperCase();
       if (acctAvEl) acctAvEl.textContent = name.charAt(0).toUpperCase();
+
+      // Sync Pro status from Firestore
+      checkProStatus(user.uid).then(() => updatePremiumUI());
 
       // Dynamically fetch and sync Family Data from Firestore
       const syncUserFamily = async () => {
