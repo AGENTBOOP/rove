@@ -2872,31 +2872,33 @@ transition: all var(--tr);
 
   function checkAuthStatus() {
     const introScreen = $('screen-intro');
-    const loggedIn = localStorage.getItem('rove_logged_in') === 'true';
+    const appHeader   = $('app-header');
+    const loggedIn    = localStorage.getItem('rove_logged_in') === 'true';
     
     if (!loggedIn) {
-      $('app-header').style.display = 'none';
+      if (appHeader) appHeader.style.display = 'none';
       const subHeader = $('rove-sub-header');
       if (subHeader) subHeader.style.display = 'none';
       const bottomNav = $('bottom-nav');
       if (bottomNav) bottomNav.style.display = 'none';
       
-      [sReview, sFocus, sComplete, sProfile, sAnalytics].forEach(s => s.classList.remove('active'));
-      introScreen.classList.add('active');
+      [sReview, sFocus, sComplete, sProfile, sAnalytics].forEach(s => { if (s) s.classList.remove('active'); });
+      if (introScreen) introScreen.classList.add('active');
     } else {
-      $('app-header').style.display = 'flex';
+      if (appHeader) appHeader.style.display = 'flex';
       const subHeader = $('rove-sub-header');
       if (subHeader) subHeader.style.display = 'flex';
       const bottomNav = $('bottom-nav');
       if (bottomNav) bottomNav.style.display = 'flex';
-      introScreen.classList.remove('active');
+      if (introScreen) introScreen.classList.remove('active');
       
       if (session && !isSessionDone()) {
         setRing(calcPct(), true); renderFocusCard();
         showScreen(sFocus); scheduleDemoChore();
       } else {
         showScreen(sReview);
-        setTimeout(() => addInput.focus(), 200);
+        const addInputEl = $('add-input');
+        setTimeout(() => { if (addInputEl) addInputEl.focus(); }, 200);
       }
     }
   }
@@ -5138,17 +5140,29 @@ function formatTime(timeStr) {
             updatePremiumUI();
             updateRpgUI();
           } else {
-            // Document initialization
-            await setDoc(userDocRef, {
-              isPro: false,
-              premiumTier: 'free',
-              roveCoins: 0,
-              disciplineScore: 0,
-              purchasedStyles: [],
-              rpgStats: { currentXP: 0, level: 1, streakCount: 0 }
-            });
-            // Try syncing again
-            syncUserProfile();
+            // New user — create their document then go to username onboarding
+            try {
+              await setDoc(userDocRef, {
+                isPro: false,
+                premiumTier: 'free',
+                roveCoins: 0,
+                disciplineScore: 0,
+                purchasedStyles: [],
+                rpgStats: { currentXP: 0, level: 1, streakCount: 0 }
+              });
+            } catch (createErr) {
+              console.error('Failed to create user doc:', createErr);
+            }
+            // Show username onboarding
+            const onboardOverlay = $('username-onboarding-overlay');
+            if (onboardOverlay) {
+              onboardOverlay.style.display = 'flex';
+              const onboardInput = $('onboard-username-input');
+              setTimeout(() => { if (onboardInput) onboardInput.focus(); }, 350);
+            } else {
+              // Fallback: just go to dashboard
+              showScreen(sReview);
+            }
           }
         } catch (profileErr) {
           console.error("Error setting up user profile from Firestore:", profileErr);
