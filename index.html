@@ -2,41 +2,40 @@
 <html lang="en">
 <head>
   <script>
-    window.onerror = function(message, source, lineno, colno, error) {
-      console.error("Diagnostic capture:", message, source, lineno, colno, error);
+    function reportDiagnosticError(title, message, stack, source, line, col) {
+      console.error("DIAGNOSTIC ERROR:", title, message, stack);
       const overlay = document.getElementById('auth-loading-overlay');
       if (overlay) {
         overlay.style.background = '#120404';
         overlay.style.opacity = '1';
         overlay.style.display = 'flex';
+        const fileInfo = source ? `File: ${source.split('/').pop()}:${line}:${col}` : '';
         overlay.innerHTML = `
-          <div style="color: #ef4444; font-family: monospace; font-size: 11px; padding: 24px; max-width: 90%; word-break: break-all; text-align: left; background: rgba(0,0,0,0.8); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-            <h3 style="margin: 0 0 10px 0; color: #f87171; font-size: 13px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;">Runtime Exception</h3>
+          <div style="color: #ef4444; font-family: monospace; font-size: 11.5px; padding: 24px; max-width: 90%; word-break: break-all; text-align: left; background: rgba(0,0,0,0.85); border: 1.5px solid rgba(239, 68, 68, 0.3); border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.6);">
+            <h3 style="margin: 0 0 10px 0; color: #f87171; font-size: 13px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;">${title}</h3>
             <p style="margin: 0 0 12px 0; color: #fff; font-weight: 600; line-height: 1.4;">${message}</p>
-            <p style="margin: 0; color: #a1a1aa; font-size: 9px;">File: ${source ? source.split('/').pop() : 'unknown'}:${lineno}:${colno}</p>
-            ${error && error.stack ? \`<pre style="margin: 14px 0 0 0; white-space: pre-wrap; font-size: 9px; color: #fca5a5; max-height: 180px; overflow-y: auto; padding: 10px; background: rgba(0,0,0,0.4); border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); line-height: 1.3;">${error.stack}</pre>\` : ''}
+            ${fileInfo ? \`<p style="margin: 0; color: #a1a1aa; font-size: 9.5px;">${fileInfo}</p>\` : ''}
+            ${stack ? \`<pre style="margin: 14px 0 0 0; white-space: pre-wrap; font-size: 9px; color: #fca5a5; max-height: 200px; overflow-y: auto; padding: 12px; background: rgba(0,0,0,0.5); border-radius: 8px; border: 1px solid rgba(255,255,255,0.06); line-height: 1.35; font-family: monospace;">${stack}</pre>\` : ''}
           </div>
         `;
       }
+    }
+
+    window.onerror = function(message, source, lineno, colno, error) {
+      reportDiagnosticError("Runtime Exception", message, error ? error.stack : '', source, lineno, colno);
     };
-    window.onunhandledrejection = function(event) {
-      console.error("Diagnostic promise capture:", event.reason);
-      const overlay = document.getElementById('auth-loading-overlay');
-      if (overlay) {
-        overlay.style.background = '#120404';
-        overlay.style.opacity = '1';
-        overlay.style.display = 'flex';
-        const msg = event.reason ? (event.reason.message || event.reason) : 'Unknown Promise Rejection';
-        const stack = event.reason && event.reason.stack ? event.reason.stack : '';
-        overlay.innerHTML = `
-          <div style="color: #ef4444; font-family: monospace; font-size: 11px; padding: 24px; max-width: 90%; word-break: break-all; text-align: left; background: rgba(0,0,0,0.8); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-            <h3 style="margin: 0 0 10px 0; color: #f87171; font-size: 13px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;">Promise Rejection</h3>
-            <p style="margin: 0 0 12px 0; color: #fff; font-weight: 600; line-height: 1.4;">${msg}</p>
-            ${stack ? \`<pre style="margin: 14px 0 0 0; white-space: pre-wrap; font-size: 9px; color: #fca5a5; max-height: 180px; overflow-y: auto; padding: 10px; background: rgba(0,0,0,0.4); border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); line-height: 1.3;">${stack}</pre>\` : ''}
-          </div>
-        `;
+
+    window.addEventListener('error', function(event) {
+      if (event.error) {
+        reportDiagnosticError("Script Error", event.message, event.error.stack, event.filename, event.lineno, event.colno);
       }
-    };
+    }, true);
+
+    window.addEventListener('unhandledrejection', function(event) {
+      const msg = event.reason ? (event.reason.message || event.reason) : 'Unknown Promise Rejection';
+      const stack = event.reason && event.reason.stack ? event.reason.stack : '';
+      reportDiagnosticError("Promise Rejection", msg, stack);
+    });
   </script>
 
   <meta charset="UTF-8" />
@@ -5202,7 +5201,20 @@ function formatTime(timeStr) {
   });
 
   /* ══ Init ════════════════════════════════════════════════════ */
-  loadStorage(); loadRpgStats(); syncFamilyTasks(); renderFamilySheet(); renderReview(); initParticles(); updatePremiumUI(); updateRpgUI(); initCalendarPicker();
+  try {
+    loadStorage();
+    loadRpgStats();
+    syncFamilyTasks();
+    renderFamilySheet();
+    renderReview();
+    initParticles();
+    updatePremiumUI();
+    updateRpgUI();
+    initCalendarPicker();
+  } catch (initErr) {
+    console.error("Initialization block failed:", initErr);
+  }
+  
 </script>
 </body>
 </html>
