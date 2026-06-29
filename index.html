@@ -2465,11 +2465,23 @@ transition: all var(--tr);
     <div style="width: 24px; height: 24px; border: 2.5px solid rgba(255,255,255,0.08); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
     <span style="font-size: 11px; font-weight: 500; color: var(--muted); font-family: 'Inter', sans-serif;">Checking auth...</span>
   </div>
+  <div id="diagnostic-log" style="position: absolute; bottom: 12px; left: 12px; z-index: 10005; color: #10b981; font-family: monospace; font-size: 8px; line-height: 1.3; pointer-events: none; text-align: left; background: rgba(0,0,0,0.75); padding: 6px; border-radius: 6px; max-width: 90%; max-height: 120px; overflow-y: auto; border: 1px solid rgba(16, 185, 129, 0.2); word-break: break-all;">[Debug Log]</div>
 
   </div><!-- #phone-content -->
   </div><!-- #phone-wrapper -->
 
 <script type="module">
+  // Define logger
+  window.logDebug = function(msg) {
+    console.log("DEBUG:", msg);
+    const el = document.getElementById('diagnostic-log');
+    if (el) {
+      el.innerHTML += "<br>• " + msg;
+      el.scrollTop = el.scrollHeight;
+    }
+  };
+  window.logDebug("ES Module initialization started");
+
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
   import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteField, collection, onSnapshot, runTransaction, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -2483,9 +2495,9 @@ transition: all var(--tr);
     appId:             '1:965652912843:web:70c06397a1b7d250d6994e',
   };
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
+  window.logDebug("Initializing Firebase..."); const app = initializeApp(firebaseConfig); window.logDebug("Firebase App initialized.");
+  const auth = getAuth(app); window.logDebug("Auth service fetched.");
+  const db = getFirestore(app); window.logDebug("Firestore service fetched.");
 
   /* ══ Constants ═══════════════════════════════════════════════ */
   const RING_R  = 86;
@@ -4987,11 +4999,11 @@ function formatTime(timeStr) {
   }
 
   // Firebase Auth State listener
-  onAuthStateChanged(auth, async user => {
+  window.logDebug("Registering onAuthStateChanged..."); onAuthStateChanged(auth, async user => { window.logDebug("onAuthStateChanged callback triggered. User: " + (user ? user.uid : "null"));
     const loader = $('auth-loading-overlay');
     
     // Helper to hide loader safely
-    const hideLoader = () => {
+    const hideLoader = () => { window.logDebug("hideLoader function called");
       if (loader) {
         loader.style.opacity = '0';
         setTimeout(() => {
@@ -5027,7 +5039,7 @@ function formatTime(timeStr) {
         // 2. Fetch and sync user profile (defensive)
         try {
           const userDocRef = doc(db, 'users', user.uid);
-          const userDoc = await getDoc(userDocRef);
+          window.logDebug("Fetching user doc..."); const userDoc = await getDoc(userDocRef); window.logDebug("User doc fetched. exists: " + userDoc.exists());
           
           if (userDoc.exists()) {
             const data = userDoc.data();
