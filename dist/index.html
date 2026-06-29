@@ -1,6 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>
+    window.onerror = function(message, source, lineno, colno, error) {
+      console.error("Diagnostic capture:", message, source, lineno, colno, error);
+      const overlay = document.getElementById('auth-loading-overlay');
+      if (overlay) {
+        overlay.style.background = '#120404';
+        overlay.style.opacity = '1';
+        overlay.style.display = 'flex';
+        overlay.innerHTML = `
+          <div style="color: #ef4444; font-family: monospace; font-size: 11px; padding: 24px; max-width: 90%; word-break: break-all; text-align: left; background: rgba(0,0,0,0.8); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+            <h3 style="margin: 0 0 10px 0; color: #f87171; font-size: 13px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;">Runtime Exception</h3>
+            <p style="margin: 0 0 12px 0; color: #fff; font-weight: 600; line-height: 1.4;">${message}</p>
+            <p style="margin: 0; color: #a1a1aa; font-size: 9px;">File: ${source ? source.split('/').pop() : 'unknown'}:${lineno}:${colno}</p>
+            ${error && error.stack ? \`<pre style="margin: 14px 0 0 0; white-space: pre-wrap; font-size: 9px; color: #fca5a5; max-height: 180px; overflow-y: auto; padding: 10px; background: rgba(0,0,0,0.4); border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); line-height: 1.3;">${error.stack}</pre>\` : ''}
+          </div>
+        `;
+      }
+    };
+    window.onunhandledrejection = function(event) {
+      console.error("Diagnostic promise capture:", event.reason);
+      const overlay = document.getElementById('auth-loading-overlay');
+      if (overlay) {
+        overlay.style.background = '#120404';
+        overlay.style.opacity = '1';
+        overlay.style.display = 'flex';
+        const msg = event.reason ? (event.reason.message || event.reason) : 'Unknown Promise Rejection';
+        const stack = event.reason && event.reason.stack ? event.reason.stack : '';
+        overlay.innerHTML = `
+          <div style="color: #ef4444; font-family: monospace; font-size: 11px; padding: 24px; max-width: 90%; word-break: break-all; text-align: left; background: rgba(0,0,0,0.8); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+            <h3 style="margin: 0 0 10px 0; color: #f87171; font-size: 13px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;">Promise Rejection</h3>
+            <p style="margin: 0 0 12px 0; color: #fff; font-weight: 600; line-height: 1.4;">${msg}</p>
+            ${stack ? \`<pre style="margin: 14px 0 0 0; white-space: pre-wrap; font-size: 9px; color: #fca5a5; max-height: 180px; overflow-y: auto; padding: 10px; background: rgba(0,0,0,0.4); border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); line-height: 1.3;">${stack}</pre>\` : ''}
+          </div>
+        `;
+      }
+    };
+  </script>
+
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Rove — Daily Planner</title>
@@ -1859,6 +1897,55 @@ transition: all var(--tr);
     #screen-intro {
       padding-top: 30px !important;
     }
+
+    /* UI/UX Overhaul CSS Rules */
+    #add-options-toggle-btn.active .plus-icon {
+      transform: rotate(45deg);
+      color: var(--accent);
+    }
+    @keyframes streak-melt {
+      0% { box-shadow: 0 0 4px rgba(251, 146, 60, 0.2), inset 0 0 0 1px rgba(251, 146, 60, 0.1); border-color: rgba(251, 146, 60, 0.3); }
+      50% { box-shadow: 0 0 12px rgba(239, 68, 68, 0.45), inset 0 0 0 1px rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.5); }
+      100% { box-shadow: 0 0 4px rgba(251, 146, 60, 0.2), inset 0 0 0 1px rgba(251, 146, 60, 0.1); border-color: rgba(251, 146, 60, 0.3); }
+    }
+    .streak-at-risk {
+      animation: streak-melt 2.5s infinite ease-in-out !important;
+      position: relative;
+    }
+    .streak-at-risk::before {
+      content: '🔥 Streak At Risk!';
+      position: absolute;
+      right: 64px;
+      top: -6px;
+      font-size: 8px;
+      font-weight: 700;
+      color: #fb923c;
+      background: #110808;
+      border: 1px solid rgba(251, 146, 60, 0.3);
+      padding: 1px 5px;
+      border-radius: 4px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      pointer-events: none;
+      z-index: 10;
+    }
+    @keyframes lvl-bounce {
+      0% { transform: scale(1); filter: brightness(1); }
+      50% { transform: scale(1.15); filter: brightness(1.4); }
+      100% { transform: scale(1); filter: brightness(1); }
+    }
+    .lvl-up-flash {
+      animation: lvl-bounce 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+    }
+    .ri-wrap {
+      overflow: hidden;
+      position: relative;
+      border-radius: 14px;
+    }
+    .ri {
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: transform;
+    }
   </style>
 </head>
 <body>
@@ -2071,11 +2158,10 @@ transition: all var(--tr);
         <span class="add-icon">+</span>
         <input class="add-input" id="add-input" type="text" placeholder="Add a task..."
                maxlength="120" autocomplete="off" spellcheck="false" aria-label="Add a task" />
-        <button id="add-options-toggle-btn" type="button" title="Task scheduling & duration options">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="1"></circle>
-            <circle cx="19" cy="12" r="1"></circle>
-            <circle cx="5" cy="12" r="1"></circle>
+        <button id="add-options-toggle-btn" type="button" title="Task scheduling & duration options" style="display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); color: var(--muted); cursor: pointer; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); padding: 0;">
+          <svg class="plus-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
           </svg>
         </button>
       </div>
@@ -2643,6 +2729,20 @@ transition: all var(--tr);
     
     if (leveledUp) {
       triggerLevelUpAnimation(trackName, track.level, sourceElement);
+      const lvlEl = $(`attr-${trackName}-lvl`);
+      if (lvlEl) {
+        lvlEl.classList.remove('lvl-up-flash');
+        void lvlEl.offsetWidth;
+        lvlEl.classList.add('lvl-up-flash');
+        setTimeout(() => lvlEl.classList.remove('lvl-up-flash'), 600);
+      }
+      const barEl = $(`attr-${trackName}-bar`);
+      if (barEl) {
+        barEl.classList.remove('lvl-up-flash');
+        void barEl.offsetWidth;
+        barEl.classList.add('lvl-up-flash');
+        setTimeout(() => barEl.classList.remove('lvl-up-flash'), 600);
+      }
     }
     
     updateAttributesUI();
@@ -3181,6 +3281,103 @@ transition: all var(--tr);
     return session.currentIdx < sTasks.length ? sTasks[session.currentIdx] : null;
   }
 
+    /* ══ showScreen - distraction free router ════════════════════ */
+  function showScreen(el) {
+    [sReview, sFocus, sComplete, sProfile, sAnalytics].forEach(s => {
+      if (s) s.classList.remove('active');
+    });
+    if (el) el.classList.add('active');
+    
+    const isFocus = (el === sFocus);
+    const isComp  = (el === sComplete);
+    
+    const phoneWrap = $('phone-wrapper');
+    if (phoneWrap) {
+      phoneWrap.classList.toggle('focus-mode', isFocus || isComp);
+    }
+
+    if (isFocus) renderFocus();
+    if (isComp)  renderComplete();
+
+    // Strict progressive disclosure for Focus View:
+    const appHeader = $('app-header');
+    const subHeader = $('rove-sub-header');
+    const bottomNav = $('bottom-nav');
+    
+    if (isFocus) {
+      if (appHeader) appHeader.style.display = 'none';
+      if (subHeader) subHeader.style.display = 'none';
+      if (bottomNav) bottomNav.style.display = 'none';
+    } else {
+      if (appHeader) appHeader.style.display = 'flex';
+      const loggedIn = localStorage.getItem('rove_logged_in') === 'true';
+      if (subHeader) subHeader.style.display = loggedIn ? 'flex' : 'none';
+      if (bottomNav) bottomNav.style.display = loggedIn ? 'flex' : 'none';
+    }
+
+    const repeatingOptionsContainer = $('repeating-options-container');
+    if (repeatingOptionsContainer) {
+      repeatingOptionsContainer.style.display = focusOnMe ? 'none' : 'flex';
+    }
+    const addCard = document.querySelector('.add-card');
+    if (addCard) {
+      addCard.style.display = (el === sReview) ? 'block' : 'none';
+    }
+    const activeScreen = document.querySelector('.screen.active');
+    if (activeScreen) {
+      activeScreen.removeAttribute('aria-hidden');
+    }
+    [sReview, sFocus, sComplete, sProfile, sAnalytics].forEach(s => {
+      if (s && s !== el) s.setAttribute('aria-hidden', 'true');
+    });
+  }
+
+  /* ══ Reusable Task Actions ════════════════════════════════════ */
+  function completeTask(taskId, targetElement) {
+    const task = tasks.find(t => t.id == taskId);
+    if (!task) return;
+    
+    task.done = true;
+    task.completedDate = TODAY;
+    saveTasks();
+    syncTaskToFirestore(task);
+
+    roveCoins += 5;
+    saveShopState();
+
+    loadRpgStats();
+    rpgStats.currentXP = (rpgStats.currentXP || 0) + 10;
+    rpgStats.level = getLevelDetails(rpgStats.currentXP).level;
+    saveRpgStats();
+    awardAttributeXP(task.attributeType || 'focus', 10, targetElement);
+    updateRpgUI();
+    triggerConfetti(targetElement);
+    pulseXPBar();
+    renderReview();
+  }
+
+  function deferTaskToTomorrow(taskId, li) {
+    const task = tasks.find(t => t.id == taskId);
+    if (!task) return;
+
+    const tomorrowDateObj = new Date();
+    tomorrowDateObj.setDate(tomorrowDateObj.getDate() + 1);
+    const TOMORROW = tomorrowDateObj.toISOString().slice(0, 10);
+
+    task.scheduledDate = TOMORROW;
+    task.scheduledDates = [TOMORROW];
+    saveTasks();
+    syncTaskToFirestore(task);
+
+    li.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+    li.style.opacity = '0';
+    li.style.transform = 'scale(0.9)';
+    setTimeout(() => {
+      li.remove();
+      renderReview();
+    }, 400);
+  }
+
   function getFamilyList() { return []; }
   function syncFamilyTasks() {}
   function renderFamilySheet() {}
@@ -3309,6 +3506,12 @@ function formatTime(timeStr) {
   function buildTaskHTML(task) {
     const hasSubs = (task.subtasks || []).length > 0;
     const isCompleted = task.done && task.completedDate === TODAY;
+    
+    const hour = new Date().getHours();
+    const isPastFour = hour >= 16;
+    const isCoreHabit = task.isEveryday || task.isWeekly || task.isMonthly;
+    const isStreakAtRisk = isPastFour && isCoreHabit && !task.done && (rpgStats && rpgStats.streakCount > 0);
+    const streakClass = isStreakAtRisk ? 'streak-at-risk' : '';
 
     let dateBadge = '';
     if (currentViewMode === 'long-term') {
@@ -3338,7 +3541,7 @@ function formatTime(timeStr) {
     }
 
     return `
-      <div class="ri ${isCompleted ? 'done-task' : ''}" data-id="${task.id}">
+      <div class="ri ${isCompleted ? 'done-task' : ''} ${streakClass}" data-id="${task.id}">
         <div class="dh" aria-label="Drag to reorder">
           <svg width="10" height="15" viewBox="0 0 10 15" fill="currentColor">
             <circle cx="2" cy="2" r="1.5"/>
@@ -3551,8 +3754,74 @@ function formatTime(timeStr) {
     });
 
     // Drag-and-drop
+      // Swipe gestures
+    attachSwipeGesture(li, taskId);
+
     attachDrag(li, ri);
   }
+
+  function attachSwipeGesture(li, taskId) {
+    const ri = li.querySelector('.ri');
+    if (!ri) return;
+
+    let startX = 0;
+    let startY = 0;
+    let currentX = 0;
+    let isSwiping = false;
+
+    ri.addEventListener('touchstart', e => {
+      if (e.target.closest('.svg-action') || e.target.closest('.weekly-ck-btn') || e.target.closest('.monthly-ck-btn') || e.target.closest('.dh')) return;
+      
+      const touch = e.touches[0];
+      startX = touch.clientX;
+      startY = touch.clientY;
+      ri.style.transition = 'none';
+      isSwiping = true;
+    }, { passive: true });
+
+    ri.addEventListener('touchmove', e => {
+      if (!isSwiping) return;
+      const touch = e.touches[0];
+      const diffX = touch.clientX - startX;
+      const diffY = touch.clientY - startY;
+
+      if (Math.abs(diffX) > Math.abs(diffY)) {
+        currentX = diffX;
+        const translation = Math.max(-120, Math.min(120, diffX));
+        ri.style.transform = `translateX(${translation}px)`;
+        
+        if (diffX > 0) {
+          li.style.background = `linear-gradient(90deg, rgba(16, 185, 129, ${Math.min(0.2, diffX / 300)}) 0%, transparent 100%)`;
+        } else {
+          li.style.background = `linear-gradient(270deg, rgba(245, 158, 11, ${Math.min(0.2, -diffX / 300)}) 0%, transparent 100%)`;
+        }
+      }
+    }, { passive: true });
+
+    ri.addEventListener('touchend', () => {
+      if (!isSwiping) return;
+      isSwiping = false;
+      ri.style.transition = 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
+      
+      const threshold = 80;
+      if (currentX > threshold) {
+        ri.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+          completeTask(taskId, ri);
+        }, 300);
+      } else if (currentX < -threshold) {
+        ri.style.transform = 'translateX(-100%)';
+        setTimeout(() => {
+          deferTaskToTomorrow(taskId, li);
+        }, 300);
+      } else {
+        ri.style.transform = 'translateX(0)';
+        li.style.background = '';
+      }
+      currentX = 0;
+    });
+  }
+
 
   function toggleSubs(sec, btn) {
     sec.classList.toggle('open');
