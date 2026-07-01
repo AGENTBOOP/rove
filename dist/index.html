@@ -3346,7 +3346,7 @@ transition: all var(--tr);
   }
 
   /* ══ Reusable Task Actions ════════════════════════════════════ */
-  function completeTask(taskId, targetElement) {
+  function completeTaskFromSwipe(taskId, targetElement) {
     const task = tasks.find(t => t.id == taskId);
     if (!task) return;
     
@@ -3394,9 +3394,6 @@ transition: all var(--tr);
   function getFamilyList() { return []; }
   function syncFamilyTasks() {}
   function renderFamilySheet() {}
-  function renderParentView() {}
-  function setTarget() {}
-  function pushChore() {}
 function formatTime(timeStr) {
     if (!timeStr) return '';
     try {
@@ -3820,7 +3817,7 @@ function formatTime(timeStr) {
       if (currentX > threshold) {
         ri.style.transform = 'translateX(100%)';
         setTimeout(() => {
-          completeTask(taskId, ri);
+          completeTaskFromSwipe(taskId, ri);
         }, 300);
       } else if (currentX < -threshold) {
         ri.style.transform = 'translateX(-100%)';
