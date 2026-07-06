@@ -3002,9 +3002,9 @@ transition: all var(--tr);
 
   /* ══ Date strings ════════════════════════════════════════════ */
   const dateStr = new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
-  $('review-date').textContent = dateStr;
-  $('focus-date').textContent  = dateStr;
-  $('parent-date').textContent = dateStr;
+  const rvDate = $('review-date'); if (rvDate) rvDate.textContent = dateStr;
+  const fcDate = $('focus-date');  if (fcDate) fcDate.textContent  = dateStr;
+  const prDate = $('parent-date'); if (prDate) prDate.textContent = dateStr;
 
   /* ══ Escape helper ═══════════════════════════════════════════ */
   function esc(s) {
@@ -4444,7 +4444,7 @@ function formatTime(timeStr) {
     }, 3000);
   }
 
-  $('chore-card').addEventListener('click', () => {
+  const choreCard = $('chore-card'); if (choreCard) choreCard.addEventListener('click', () => {
     hideChore(); choreActive = true;
     const chore = { id: Date.now(), name: pendingChore, assignedTo: 'You', subtasks: [] };
     tasks.push(chore); saveTasks();
@@ -4544,7 +4544,7 @@ function formatTime(timeStr) {
     });
   }
 
-  $('reset-btn').addEventListener('click', () => {
+  const resetBtn = $('reset-btn'); if (resetBtn) resetBtn.addEventListener('click', () => {
     choreActive = false; hideChore(); clearTimeout(choreTimer);
     setRing(0, true);
     syncFamilyTasks();
@@ -4646,8 +4646,8 @@ function formatTime(timeStr) {
     renderParentView();
   }
 
-  $('push-send').addEventListener('click', pushChore);
-  $('push-input').addEventListener('keydown', e => { if (e.key==='Enter') pushChore(); });
+  const pushSend = $('push-send'); if (pushSend) pushSend.addEventListener('click', pushChore);
+  const pushInput = $('push-input'); if (pushInput) pushInput.addEventListener('keydown', e => { if (e.key==='Enter') pushChore(); });
 
   /* ══ Family Sheet ════════════════════════════════════════════ */
   (function initSheet() {
