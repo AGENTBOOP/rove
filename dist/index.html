@@ -1945,6 +1945,63 @@ transition: all var(--tr);
       transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
       will-change: transform;
     }
+    /* ── Dev Mode Toggle ─────────────────────────── */
+    #dev-pro-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      box-sizing: border-box;
+      background: rgba(245, 158, 11, 0.07);
+      border: 1px solid rgba(245, 158, 11, 0.22);
+      border-radius: 12px;
+      padding: 11px 14px;
+      margin-top: 16px;
+      cursor: pointer;
+      transition: background 0.2s ease, border-color 0.2s ease;
+      font-family: 'Inter', sans-serif;
+    }
+    #dev-pro-toggle:hover {
+      background: rgba(245, 158, 11, 0.13);
+      border-color: rgba(245, 158, 11, 0.4);
+    }
+    #dev-pro-toggle .dev-label {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      text-align: left;
+    }
+    #dev-pro-toggle .dev-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: #f59e0b;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    #dev-pro-toggle .dev-subtitle {
+      font-size: 10px;
+      color: rgba(245, 158, 11, 0.6);
+      font-weight: 500;
+    }
+    #dev-pro-toggle .dev-pill {
+      font-size: 10px;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 20px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      transition: background 0.2s, color 0.2s;
+    }
+    #dev-pro-toggle .dev-pill.is-pro {
+      background: rgba(245, 158, 11, 0.2);
+      color: #f59e0b;
+      border: 1px solid rgba(245, 158, 11, 0.4);
+    }
+    #dev-pro-toggle .dev-pill.is-free {
+      background: rgba(255, 255, 255, 0.05);
+      color: #8e8e9f;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
   </style>
 </head>
 <body>
@@ -2363,6 +2420,14 @@ transition: all var(--tr);
           </div>
         </div>
       </div>
+      <!-- Dev Mode Pro Toggle -->
+      <button id="dev-pro-toggle" aria-label="Dev: Toggle Pro Status">
+        <div class="dev-label">
+          <span class="dev-title">⚙️ Dev Mode</span>
+          <span class="dev-subtitle">Toggle isPro for testing</span>
+        </div>
+        <span class="dev-pill is-free" id="dev-pro-pill">FREE</span>
+      </button>
     </div>
   </div>
 
@@ -4635,6 +4700,68 @@ function formatTime(timeStr) {
         renderAnalyticsGraph();
       });
     }
+  })();
+
+  /* ══ Dev: isPro Toggle ════════════════════════════════════════ */
+  (function initDevProToggle() {
+    const btn  = $('dev-pro-toggle');
+    const pill = $('dev-pro-pill');
+    if (!btn || !pill) return;
+
+    function refreshPill() {
+      if (isPro) {
+        pill.textContent = 'PRO ✓';
+        pill.className = 'dev-pill is-pro';
+      } else {
+        pill.textContent = 'FREE';
+        pill.className = 'dev-pill is-free';
+      }
+    }
+    refreshPill();
+
+    btn.addEventListener('click', async () => {
+      isPro     = !isPro;
+      isPremium = isPro;
+
+      // Persist to localStorage for session survival
+      localStorage.setItem('focus_premium', isPro ? 'true' : 'false');
+      localStorage.setItem('rove_premium_tier', isPro ? 'lifetime' : 'free');
+
+      // Also update Firestore so it survives re-auth
+      try {
+        const currentUser = auth.currentUser;
+        if (currentUser) {
+          await updateDoc(doc(db, 'users', currentUser.uid), {
+            isPro:       isPro,
+            premiumTier: isPro ? 'lifetime' : 'free'
+          });
+        }
+      } catch (e) {
+        console.warn('Dev toggle Firestore update failed (offline?):', e);
+      }
+
+      refreshPill();
+      updatePremiumUI();
+
+      // Toast feedback
+      const toast = document.createElement('div');
+      toast.textContent = isPro ? '🔓 Pro Mode ON' : '🔒 Free Mode ON';
+      Object.assign(toast.style, {
+        position: 'fixed', bottom: '90px', left: '50%',
+        transform: 'translateX(-50%)',
+        background: isPro ? 'rgba(245,158,11,0.95)' : 'rgba(30,30,40,0.95)',
+        color: isPro ? '#000' : '#fff',
+        padding: '7px 18px', borderRadius: '20px',
+        fontSize: '12px', fontWeight: '700',
+        zIndex: '99999', pointerEvents: 'none',
+        fontFamily: "'Inter', sans-serif",
+        boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
+        transition: 'opacity 0.3s ease'
+      });
+      document.body.appendChild(toast);
+      setTimeout(() => { toast.style.opacity = '0'; }, 1500);
+      setTimeout(() => toast.remove(), 1800);
+    });
   })();
 
   /* ══ Ambient Particles ═══════════════════════════════════════ */
