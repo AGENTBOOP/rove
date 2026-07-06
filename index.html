@@ -2530,8 +2530,6 @@ transition: all var(--tr);
     <div style="width: 24px; height: 24px; border: 2.5px solid rgba(255,255,255,0.08); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
     <span style="font-size: 11px; font-weight: 500; color: var(--muted); font-family: 'Inter', sans-serif;">Checking auth...</span>
   </div>
-  <div id="diagnostic-log" style="position: absolute; bottom: 12px; left: 12px; z-index: 10005; color: #10b981; font-family: monospace; font-size: 8px; line-height: 1.3; pointer-events: none; text-align: left; background: rgba(0,0,0,0.75); padding: 6px; border-radius: 6px; max-width: 90%; max-height: 120px; overflow-y: auto; border: 1px solid rgba(16, 185, 129, 0.2); word-break: break-all;">[Debug Log]</div>
-
   </div><!-- #phone-content -->
   </div><!-- #phone-wrapper -->
 
@@ -2540,16 +2538,6 @@ transition: all var(--tr);
   import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
   import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteField, collection, onSnapshot, runTransaction, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  // Define logger
-  window.logDebug = function(msg) {
-    console.log("DEBUG:", msg);
-    const el = document.getElementById('diagnostic-log');
-    if (el) {
-      el.innerHTML += "<br>• " + msg;
-      el.scrollTop = el.scrollHeight;
-    }
-  };
-  window.logDebug("ES Module initialization started");
 
   const firebaseConfig = {
     apiKey:            'AIzaSyDm-vZtrXWiLEDOjAG_O5RB5zbeUQDg0xg',
@@ -2558,13 +2546,7 @@ transition: all var(--tr);
     storageBucket:     'studio-6455201864-cf8cb.firebasestorage.app',
     messagingSenderId: '965652912843',
     appId:             '1:965652912843:web:70c06397a1b7d250d6994e',
-  };
-
-  window.logDebug("Initializing Firebase..."); const app = initializeApp(firebaseConfig); window.logDebug("Firebase App initialized.");
-  const auth = getAuth(app); window.logDebug("Auth service fetched.");
-  const db = getFirestore(app); window.logDebug("Firestore service fetched.");
-
-  /* ══ Constants ═══════════════════════════════════════════════ */
+  }; const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app); /* ══ Constants ═══════════════════════════════════════════════ */
   const RING_R  = 86;
   const RING_C  = 2 * Math.PI * RING_R;
   const TODAY   = new Date().toISOString().slice(0, 10);
@@ -3232,10 +3214,7 @@ transition: all var(--tr);
     const b2 = $('acct-premium-badge');
     if (b1) b1.style.display = isPro ? 'flex' : 'none';
     if (b2) b2.style.display = isPro ? 'flex' : 'none';
-  }
-
-  window.logDebug("Binding paywall event listeners...");
-  if ($('close-paywall-btn')) $('close-paywall-btn').addEventListener('click', closePaywall);
+  } if ($('close-paywall-btn')) $('close-paywall-btn').addEventListener('click', closePaywall);
   if (paywallOverlay) paywallOverlay.addEventListener('click', closePaywall);
 
   document.querySelectorAll('.pw-tier').forEach(el => {
@@ -3266,10 +3245,7 @@ transition: all var(--tr);
     btn.textContent = 'Pro Activated! \uD83C\uDF89';
     updatePremiumUI();
     setTimeout(closePaywall, 1200);
-  });
-  window.logDebug("Paywall listeners bound.");
-
-    /* ══ Weekly scores ═══════════════════════════════════════════ */
+  }); /* ══ Weekly scores ═══════════════════════════════════════════ */
   function getWeeklyScores() {
     try { return JSON.parse(localStorage.getItem(WEEKLY_KEY)) || {}; } catch(_) { return {}; }
   }
@@ -3285,9 +3261,7 @@ transition: all var(--tr);
     });
   }
 
-  /* ══ Ring ════════════════════════════════════════════════════ */
-  window.logDebug("Setting up ring SVG...");
-  if (ringFillEl) {
+  /* ══ Ring ════════════════════════════════════════════════════ */ if (ringFillEl) {
     ringFillEl.style.strokeDasharray = `${RING_C}`;
     ringFillEl.style.strokeDashoffset = `${RING_C}`;
   }
@@ -4008,10 +3982,7 @@ function formatTime(timeStr) {
         });
       });
     }
-  })();
-
-  window.logDebug("Binding addInput keydown...");
-  if (addInput) addInput.addEventListener('keydown', e => {
+  })(); if (addInput) addInput.addEventListener('keydown', e => {
     if (e.key !== 'Enter') return;
     const name = addInput.value.trim();
     if (!name) {
@@ -4091,10 +4062,7 @@ function formatTime(timeStr) {
     $('add-options-tray').style.display = 'none';
 
     syncStart(); addInput.value = ''; addInput.focus();
-  });
-
-  window.logDebug("Binding focusToggleBtn click...");
-  if (focusToggleBtn) focusToggleBtn.addEventListener('click', () => {
+  }); if (focusToggleBtn) focusToggleBtn.addEventListener('click', () => {
     const state = getCurrentState();
     if (state === 'focus') {
       focusOnMe = false;
@@ -4120,10 +4088,7 @@ function formatTime(timeStr) {
       setRing(0, true);
       renderFocusCard();
     });
-  }
-
-  window.logDebug("Binding startDayBtn click...");
-  if (startDayBtn) startDayBtn.addEventListener('click', () => {
+  } if (startDayBtn) startDayBtn.addEventListener('click', () => {
     let visibleTasks = tasks.filter(t => focusOnMe ? t.assignedTo === 'You' : true);
     visibleTasks = filterTasksByTimeline(visibleTasks, activeTimelineFilter);
     visibleTasks = visibleTasks.filter(t => !t.done);
@@ -4399,10 +4364,7 @@ function formatTime(timeStr) {
 
     if (isSessionDone()) animCard('completing', endSession);
     else animCard('completing', renderFocusCard);
-  }
-
-  window.logDebug("Binding focusCard and skipBtn...");
-  if (focusCard) {
+  } if (focusCard) {
     focusCard.addEventListener('click', () => {
       if (focusCard.classList.contains('done') || focusCard.style.pointerEvents === 'none') return;
       completeTask();
@@ -4417,10 +4379,7 @@ function formatTime(timeStr) {
   if (skipBtn) skipBtn.addEventListener('click', () => {
     if (focusCard && (focusCard.classList.contains('done') || focusCard.style.pointerEvents === 'none')) return;
     skipTask();
-  });
-  window.logDebug("All top-level event listeners bound.");
-
-  /* ══ Chore card ══════════════════════════════════════════════ */
+  }); /* ══ Chore card ══════════════════════════════════════════════ */
   function showChore(name, sender) {
     pendingChore = name;
     $('chore-detail').textContent = `— ${name}`;
@@ -5137,13 +5096,11 @@ function formatTime(timeStr) {
     window.history.replaceState({}, document.title, cleanUrl);
   }
 
-  // Firebase Auth State listener
-  window.logDebug("Registering onAuthStateChanged..."); onAuthStateChanged(auth, async user => { window.logDebug("onAuthStateChanged callback triggered. User: " + (user ? user.uid : "null"));
+  onAuthStateChanged(auth, async user => {
     const loader = $('auth-loading-overlay');
     
     // Helper to hide loader safely
-    const hideLoader = () => { window.logDebug("hideLoader function called");
-      if (loader) {
+    const hideLoader = () => { if (loader) {
         loader.style.opacity = '0';
         setTimeout(() => {
           loader.style.display = 'none';
@@ -5177,8 +5134,7 @@ function formatTime(timeStr) {
 
         // 2. Fetch and sync user profile (defensive)
         try {
-          const userDocRef = doc(db, 'users', user.uid);
-          window.logDebug("Fetching user doc..."); const userDoc = await getDoc(userDocRef); window.logDebug("User doc fetched. exists: " + userDoc.exists());
+          const userDocRef = doc(db, 'users', user.uid); const userDoc = await getDoc(userDocRef);
           
           if (userDoc.exists()) {
             const data = userDoc.data();
