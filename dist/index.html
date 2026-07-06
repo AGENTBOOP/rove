@@ -3234,14 +3234,16 @@ transition: all var(--tr);
     if (b2) b2.style.display = isPro ? 'flex' : 'none';
   }
 
-  $('close-paywall-btn').addEventListener('click', closePaywall);
-  paywallOverlay.addEventListener('click', closePaywall);
+  window.logDebug("Binding paywall event listeners...");
+  if ($('close-paywall-btn')) $('close-paywall-btn').addEventListener('click', closePaywall);
+  if (paywallOverlay) paywallOverlay.addEventListener('click', closePaywall);
 
   document.querySelectorAll('.pw-tier').forEach(el => {
     el.addEventListener('click', () => selectPaywallTier(el.dataset.tier));
   });
 
-  $('paywall-upgrade-btn').addEventListener('click', async () => {
+  const paywallUpgradeBtn = $('paywall-upgrade-btn');
+  if (paywallUpgradeBtn) paywallUpgradeBtn.addEventListener('click', async () => {
     const btn = $('paywall-upgrade-btn');
     btn.disabled = true;
     btn.innerHTML = `<span class="spinner"></span> Processing...`;
@@ -3265,6 +3267,7 @@ transition: all var(--tr);
     updatePremiumUI();
     setTimeout(closePaywall, 1200);
   });
+  window.logDebug("Paywall listeners bound.");
 
     /* ══ Weekly scores ═══════════════════════════════════════════ */
   function getWeeklyScores() {
@@ -3283,8 +3286,11 @@ transition: all var(--tr);
   }
 
   /* ══ Ring ════════════════════════════════════════════════════ */
-  ringFillEl.style.strokeDasharray = `${RING_C}`;
-  ringFillEl.style.strokeDashoffset = `${RING_C}`;
+  window.logDebug("Setting up ring SVG...");
+  if (ringFillEl) {
+    ringFillEl.style.strokeDasharray = `${RING_C}`;
+    ringFillEl.style.strokeDashoffset = `${RING_C}`;
+  }
   let currentRingPct = 0;
   function animatePercentText(targetPct) {
     const startPct = currentRingPct;
@@ -4004,7 +4010,8 @@ function formatTime(timeStr) {
     }
   })();
 
-  addInput.addEventListener('keydown', e => {
+  window.logDebug("Binding addInput keydown...");
+  if (addInput) addInput.addEventListener('keydown', e => {
     if (e.key !== 'Enter') return;
     const name = addInput.value.trim();
     if (!name) {
@@ -4086,7 +4093,8 @@ function formatTime(timeStr) {
     syncStart(); addInput.value = ''; addInput.focus();
   });
 
-  focusToggleBtn.addEventListener('click', () => {
+  window.logDebug("Binding focusToggleBtn click...");
+  if (focusToggleBtn) focusToggleBtn.addEventListener('click', () => {
     const state = getCurrentState();
     if (state === 'focus') {
       focusOnMe = false;
@@ -4114,7 +4122,8 @@ function formatTime(timeStr) {
     });
   }
 
-  startDayBtn.addEventListener('click', () => {
+  window.logDebug("Binding startDayBtn click...");
+  if (startDayBtn) startDayBtn.addEventListener('click', () => {
     let visibleTasks = tasks.filter(t => focusOnMe ? t.assignedTo === 'You' : true);
     visibleTasks = filterTasksByTimeline(visibleTasks, activeTimelineFilter);
     visibleTasks = visibleTasks.filter(t => !t.done);
@@ -4392,20 +4401,24 @@ function formatTime(timeStr) {
     else animCard('completing', renderFocusCard);
   }
 
-  focusCard.addEventListener('click', () => {
-    if (focusCard.classList.contains('done') || focusCard.style.pointerEvents === 'none') return;
-    completeTask();
-  });
-  focusCard.addEventListener('keydown', e => {
-    if (e.key !== 'Enter' && e.key !== ' ') return;
-    e.preventDefault();
-    if (focusCard.classList.contains('done') || focusCard.style.pointerEvents === 'none') return;
-    completeTask();
-  });
-  skipBtn.addEventListener('click', () => {
-    if (focusCard.classList.contains('done') || focusCard.style.pointerEvents === 'none') return;
+  window.logDebug("Binding focusCard and skipBtn...");
+  if (focusCard) {
+    focusCard.addEventListener('click', () => {
+      if (focusCard.classList.contains('done') || focusCard.style.pointerEvents === 'none') return;
+      completeTask();
+    });
+    focusCard.addEventListener('keydown', e => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      e.preventDefault();
+      if (focusCard.classList.contains('done') || focusCard.style.pointerEvents === 'none') return;
+      completeTask();
+    });
+  }
+  if (skipBtn) skipBtn.addEventListener('click', () => {
+    if (focusCard && (focusCard.classList.contains('done') || focusCard.style.pointerEvents === 'none')) return;
     skipTask();
   });
+  window.logDebug("All top-level event listeners bound.");
 
   /* ══ Chore card ══════════════════════════════════════════════ */
   function showChore(name, sender) {
