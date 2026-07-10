@@ -1945,6 +1945,128 @@ transition: all var(--tr);
       transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
       will-change: transform;
     }
+    /* ══ Skill Tree Badge System ══════════════════════════════════ */
+    .skill-badge-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      width: 100%;
+    }
+    .skill-badge {
+      position: relative;
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 1px;
+      background: rgba(18, 18, 22, 0.9);
+      transition: transform 0.3s ease, box-shadow 0.4s ease;
+      cursor: default;
+      flex-shrink: 0;
+    }
+    .skill-badge:hover { transform: scale(1.05); }
+    /* Tier 1: Bronze (lvl 1-5) */
+    .skill-badge.tier-bronze {
+      border: 2.5px solid #a97c50;
+      box-shadow: 0 0 10px rgba(169, 124, 80, 0.25), inset 0 0 10px rgba(169,124,80,0.07);
+    }
+    /* Tier 2: Neon Blue (lvl 6-10) */
+    .skill-badge.tier-neon {
+      border: 2.5px solid #38bdf8;
+      box-shadow: 0 0 18px rgba(56, 189, 248, 0.55), 0 0 40px rgba(56,189,248,0.2), inset 0 0 10px rgba(56,189,248,0.1);
+      animation: neonPulse 2.5s ease-in-out infinite;
+    }
+    @keyframes neonPulse {
+      0%, 100% { box-shadow: 0 0 18px rgba(56,189,248,0.55), 0 0 40px rgba(56,189,248,0.2); }
+      50%       { box-shadow: 0 0 28px rgba(56,189,248,0.85), 0 0 60px rgba(56,189,248,0.35); }
+    }
+    /* Tier 3: Purple/Gold Gradient Aura (lvl 11+) */
+    .skill-badge.tier-aura {
+      border: 2.5px solid transparent;
+      background-clip: padding-box;
+      animation: auraSpin 4s linear infinite;
+    }
+    .skill-badge.tier-aura::before {
+      content: '';
+      position: absolute;
+      inset: -3px;
+      border-radius: 50%;
+      background: conic-gradient(from var(--angle,0deg), #a855f7, #f59e0b, #ec4899, #a855f7);
+      animation: auraRotate 3s linear infinite;
+      z-index: -1;
+    }
+    .skill-badge.tier-aura::after {
+      content: '';
+      position: absolute;
+      inset: -6px;
+      border-radius: 50%;
+      background: conic-gradient(from var(--angle,0deg), #a855f7, #f59e0b, #ec4899, #a855f7);
+      opacity: 0.35;
+      filter: blur(8px);
+      animation: auraRotate 3s linear infinite;
+      z-index: -2;
+    }
+    @property --angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+    @keyframes auraRotate { to { --angle: 360deg; } }
+    /* Level-up badge flash */
+    .skill-badge.lvl-up-badge {
+      animation: badgeFlash 0.7s ease forwards !important;
+    }
+    @keyframes badgeFlash {
+      0%   { transform: scale(1); }
+      30%  { transform: scale(1.18); filter: brightness(1.6); }
+      60%  { transform: scale(0.96); filter: brightness(1); }
+      100% { transform: scale(1); }
+    }
+    /* XP Progress Bar */
+    .sk-bar-track {
+      width: 100%;
+      height: 6px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    .sk-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 0.6s cubic-bezier(0.16,1,0.3,1);
+    }
+    .sk-bar-fill.endurance { background: linear-gradient(90deg, #2563eb, #60a5fa); box-shadow: 0 0 8px rgba(59,130,246,0.5); }
+    .sk-bar-fill.focus     { background: linear-gradient(90deg, #7c3aed, #a78bfa); box-shadow: 0 0 8px rgba(139,92,246,0.5); }
+    .sk-bar-fill.mindset   { background: linear-gradient(90deg, #059669, #34d399); box-shadow: 0 0 8px rgba(16,185,129,0.5); }
+    /* Skill card container */
+    .skill-card {
+      background: rgba(16,16,20,0.7);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 18px;
+      padding: 18px 16px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      min-width: 0;
+      transition: border-color 0.3s;
+    }
+    .skill-card:hover { border-color: rgba(255,255,255,0.12); }
+    .sk-emoji { font-size: 22px; line-height: 1; }
+    .sk-attr-name { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-family: 'Inter', sans-serif; }
+    .sk-level-text { font-size: 15px; font-weight: 800; color: #fff; font-family: 'Outfit', sans-serif; }
+    .sk-xp-text { font-size: 9px; font-weight: 500; color: var(--muted); font-family: 'Inter', sans-serif; text-align: center; }
+    .sk-tier-label { font-size: 8px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 2px 8px; border-radius: 20px; }
+    .sk-tier-label.bronze { color: #a97c50; background: rgba(169,124,80,0.12); border: 1px solid rgba(169,124,80,0.25); }
+    .sk-tier-label.neon   { color: #38bdf8; background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.3); }
+    .sk-tier-label.aura   { color: #c084fc; background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.3); }
+    /* Milestone ticks */
+    .sk-milestones { display: flex; gap: 4px; margin-top: 2px; }
+    .sk-milestone { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.08); transition: background 0.3s, box-shadow 0.3s; }
+    .sk-milestone.done { background: var(--accent); box-shadow: 0 0 4px var(--accent-glow); }
+
     /* ── Dev Mode Toggle ─────────────────────────── */
     #dev-pro-toggle {
       display: flex;
@@ -2355,71 +2477,102 @@ transition: all var(--tr);
 
   <!-- ══════════ SKILL TREE SCREEN ══════════ -->
   <div id="screen-profile" class="screen">
-    <div class="wrap">
-      <div style="text-align: center; margin-bottom: 24px;">
-        <h2 style="font-family: 'Outfit', sans-serif; font-size: 24px; font-weight: 800; color: #fff;">Skill Tree &amp; Profile</h2>
-        <p style="font-size: 12px; color: var(--muted); margin-top: 4px;">Level up your attributes by staying disciplined.</p>
+    <div class="wrap" style="padding-bottom: 100px;">
+
+      <!-- Header -->
+      <div style="text-align: center; margin-bottom: 20px;">
+        <h2 style="font-family: 'Outfit', sans-serif; font-size: 22px; font-weight: 800; color: #fff; margin: 0;">Skill Tree</h2>
+        <p style="font-size: 11px; color: var(--muted); margin-top: 5px;">Complete tasks to level up your attributes.</p>
       </div>
-      
-      <!-- RPG Card -->
-      <div class="rpg-card" style="background: rgba(20, 20, 25, 0.5); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 16px 18px; width: 100%; box-sizing: border-box;">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+
+      <!-- Streak Row -->
+      <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 10px 14px; margin-bottom: 16px;">
+        <span id="rpg-streak-count" style="font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 700; color: #fff;">
+          <span style="color:#8e8e9f; margin-right:4px;">🔥</span>0 Day Streak
+        </span>
+        <button id="rpg-freeze-btn" class="streak-freeze-btn" style="background: transparent; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 5px 10px; font-family: 'Outfit', sans-serif; font-size: 9.5px; font-weight: 700; color: #8e8e9f; cursor: not-allowed;" disabled>
+          🥶 Streak Freeze (Pro)
+        </button>
+      </div>
+
+      <!-- ═══ SKILL BADGE CARDS ═══ -->
+      <div style="display: flex; gap: 10px; width: 100%; margin-bottom: 16px;">
+
+        <!-- ENDURANCE -->
+        <div class="skill-card" id="skill-card-endurance">
+          <div class="skill-badge tier-bronze" id="attr-endurance-badge">
+            <span class="sk-emoji">🏃</span>
+            <span class="sk-level-text" id="attr-endurance-lvl">1</span>
+          </div>
+          <span class="sk-attr-name">Endurance</span>
+          <span class="sk-tier-label bronze" id="attr-endurance-tier">Bronze</span>
+          <div class="sk-milestones" id="attr-endurance-milestones"></div>
+          <div class="sk-bar-track" style="width:100%;">
+            <div class="sk-bar-fill endurance" id="attr-endurance-bar" style="width:0%;"></div>
+          </div>
+          <span class="sk-xp-text" id="attr-endurance-xp">0 / 100 XP</span>
+        </div>
+
+        <!-- FOCUS -->
+        <div class="skill-card" id="skill-card-focus">
+          <div class="skill-badge tier-bronze" id="attr-focus-badge">
+            <span class="sk-emoji">⚡</span>
+            <span class="sk-level-text" id="attr-focus-lvl">1</span>
+          </div>
+          <span class="sk-attr-name">Focus</span>
+          <span class="sk-tier-label bronze" id="attr-focus-tier">Bronze</span>
+          <div class="sk-milestones" id="attr-focus-milestones"></div>
+          <div class="sk-bar-track" style="width:100%;">
+            <div class="sk-bar-fill focus" id="attr-focus-bar" style="width:0%;"></div>
+          </div>
+          <span class="sk-xp-text" id="attr-focus-xp">0 / 100 XP</span>
+        </div>
+
+        <!-- MINDSET -->
+        <div class="skill-card" id="skill-card-mindset">
+          <div class="skill-badge tier-bronze" id="attr-mindset-badge">
+            <span class="sk-emoji">🧠</span>
+            <span class="sk-level-text" id="attr-mindset-lvl">1</span>
+          </div>
+          <span class="sk-attr-name">Mindset</span>
+          <span class="sk-tier-label bronze" id="attr-mindset-tier">Bronze</span>
+          <div class="sk-milestones" id="attr-mindset-milestones"></div>
+          <div class="sk-bar-track" style="width:100%;">
+            <div class="sk-bar-fill mindset" id="attr-mindset-bar" style="width:0%;"></div>
+          </div>
+          <span class="sk-xp-text" id="attr-mindset-xp">0 / 100 XP</span>
+        </div>
+
+      </div>
+
+      <!-- Tier Legend -->
+      <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 12px 14px; margin-bottom: 16px;">
+        <span style="font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 9px;">Tier Progression</span>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
           <div style="display: flex; align-items: center; gap: 8px;">
-            <span id="rpg-streak-count" style="font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 700; color: #fff;">
-              <span style="color:#8e8e9f; margin-right:4px;">🔥</span>0 Day Streak
-            </span>
+            <div style="width: 10px; height: 10px; border-radius: 50%; border: 2px solid #a97c50; flex-shrink: 0;"></div>
+            <span style="font-size: 10px; color: #a97c50; font-weight: 600;">Bronze</span>
+            <span style="font-size: 10px; color: var(--muted); margin-left: auto;">Levels 1–5</span>
           </div>
-          <!-- Locked Streak Freeze Button -->
-          <button id="rpg-freeze-btn" class="streak-freeze-btn" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 6px 10px; font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 700; color: #8e8e9f; cursor: not-allowed; transition: all 0.2s;" disabled>
-            🥶 Buy Streak Freeze (Premium Only)
-          </button>
-        </div>
-
-        <!-- Character Stats Attributes Section -->
-        <div style="margin-top: 10px; margin-bottom: 14px; padding: 12px 0; border-top: 1px solid rgba(255, 255, 255, 0.04); display: flex; flex-direction: column; gap: 10px;">
-          <span style="font-size: 9.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);">Character Stats</span>
-          
-          <!-- Endurance Track -->
-          <div class="attribute-row" style="display: flex; flex-direction: column; gap: 4px;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <span style="font-size: 11px; font-weight: 600; color: #fff; font-family: 'Outfit', sans-serif;">🏃 Endurance <span id="attr-endurance-lvl" style="color: #60a5fa; font-weight: 700; margin-left: 2px;">Lvl. 1</span></span>
-              <span id="attr-endurance-xp" style="font-size: 9px; color: var(--muted); font-family: 'Inter', sans-serif;">0 / 100 XP</span>
-            </div>
-            <div style="height: 4px; background: rgba(255, 255, 255, 0.05); border-radius: 4px; overflow: hidden; position: relative;">
-              <div id="attr-endurance-bar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%); transition: width 0.3s ease; box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);"></div>
-            </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="width: 10px; height: 10px; border-radius: 50%; border: 2px solid #38bdf8; box-shadow: 0 0 6px rgba(56,189,248,0.7); flex-shrink: 0;"></div>
+            <span style="font-size: 10px; color: #38bdf8; font-weight: 600;">Electric</span>
+            <span style="font-size: 10px; color: var(--muted); margin-left: auto;">Levels 6–10</span>
           </div>
-
-          <!-- Focus Track -->
-          <div class="attribute-row" style="display: flex; flex-direction: column; gap: 4px;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <span style="font-size: 11px; font-weight: 600; color: #fff; font-family: 'Outfit', sans-serif;">⚡ Focus <span id="attr-focus-lvl" style="color: #a78bfa; font-weight: 700; margin-left: 2px;">Lvl. 1</span></span>
-              <span id="attr-focus-xp" style="font-size: 9px; color: var(--muted); font-family: 'Inter', sans-serif;">0 / 100 XP</span>
-            </div>
-            <div style="height: 4px; background: rgba(255, 255, 255, 0.05); border-radius: 4px; overflow: hidden; position: relative;">
-              <div id="attr-focus-bar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #8b5cf6 0%, #a78bfa 100%); transition: width 0.3s ease; box-shadow: 0 0 8px rgba(139, 92, 246, 0.4);"></div>
-            </div>
-          </div>
-
-          <!-- Mindset Track -->
-          <div class="attribute-row" style="display: flex; flex-direction: column; gap: 4px;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <span style="font-size: 11px; font-weight: 600; color: #fff; font-family: 'Outfit', sans-serif;">🧠 Mindset <span id="attr-mindset-lvl" style="color: #34d399; font-weight: 700; margin-left: 2px;">Lvl. 1</span></span>
-              <span id="attr-mindset-xp" style="font-size: 9px; color: var(--muted); font-family: 'Inter', sans-serif;">0 / 100 XP</span>
-            </div>
-            <div style="height: 4px; background: rgba(255, 255, 255, 0.05); border-radius: 4px; overflow: hidden; position: relative;">
-              <div id="attr-mindset-bar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #10b981 0%, #34d399 100%); transition: width 0.3s ease; box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);"></div>
-            </div>
-          </div>
-        </div>
-        
-        <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.04);">
-          <span style="font-size: 9.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);">Weekly Tracker</span>
-          <div id="rpg-weekly-dots" style="display: flex; justify-content: space-between; align-items: center; padding: 4px 6px;">
-            <!-- Rendered by JS -->
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="width: 10px; height: 10px; border-radius: 50%; background: conic-gradient(#a855f7, #f59e0b, #ec4899, #a855f7); flex-shrink: 0;"></div>
+            <span style="font-size: 10px; background: linear-gradient(90deg,#a855f7,#f59e0b); -webkit-background-clip:text; -webkit-text-fill-color:transparent; font-weight: 700;">Legendary Aura</span>
+            <span style="font-size: 10px; color: var(--muted); margin-left: auto;">Level 11+</span>
           </div>
         </div>
       </div>
+
+      <!-- Weekly Dots -->
+      <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 12px 14px; margin-bottom: 16px;">
+        <span style="font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 9px;">This Week</span>
+        <div id="rpg-weekly-dots" style="display: flex; justify-content: space-between; align-items: center;"></div>
+      </div>
+
       <!-- Dev Mode Pro Toggle -->
       <button id="dev-pro-toggle" aria-label="Dev: Toggle Pro Status">
         <div class="dev-label">
@@ -2749,19 +2902,51 @@ transition: all var(--tr);
     bar.classList.add('xp-bar-pulse');
   }
 
+  function getAttrTier(level) {
+    if (level >= 11) return 'aura';
+    if (level >= 6)  return 'neon';
+    return 'bronze';
+  }
+
   function updateAttributesUI() {
     const tracks = ['endurance', 'focus', 'mindset'];
     tracks.forEach(trackName => {
       const track = attributes[trackName] || { level: 1, xp: 0, nextLevelXp: 100 };
-      const lvlEl = $(`attr-${trackName}-lvl`);
-      const xpEl = $(`attr-${trackName}-xp`);
-      const barEl = $(`attr-${trackName}-bar`);
-      
-      if (lvlEl) lvlEl.textContent = `Lvl. ${track.level}`;
-      if (xpEl) xpEl.textContent = `${track.xp} / ${track.nextLevelXp} XP`;
+      const lvlEl    = $(`attr-${trackName}-lvl`);
+      const xpEl     = $(`attr-${trackName}-xp`);
+      const barEl    = $(`attr-${trackName}-bar`);
+      const badgeEl  = $(`attr-${trackName}-badge`);
+      const tierEl   = $(`attr-${trackName}-tier`);
+      const msEl     = $(`attr-${trackName}-milestones`);
+
+      if (lvlEl) lvlEl.textContent = track.level;
+      if (xpEl)  xpEl.textContent  = `${track.xp} / ${track.nextLevelXp} XP`;
       if (barEl) {
         const pct = Math.min(100, Math.round((track.xp / track.nextLevelXp) * 100));
         barEl.style.width = `${pct}%`;
+      }
+
+      const tier = getAttrTier(track.level);
+      const tierLabels = { bronze: 'Bronze', neon: 'Electric', aura: 'Legendary' };
+      if (badgeEl) {
+        badgeEl.className = `skill-badge tier-${tier}`;
+      }
+      if (tierEl) {
+        tierEl.className = `sk-tier-label ${tier}`;
+        tierEl.textContent = tierLabels[tier];
+      }
+
+      // Milestone dots: 5 dots showing progress within tier
+      if (msEl) {
+        const tierStart = tier === 'bronze' ? 1 : tier === 'neon' ? 6 : 11;
+        const dotsCount = 5;
+        const posInTier = ((track.level - tierStart) % dotsCount);
+        let html = '';
+        for (let i = 0; i < dotsCount; i++) {
+          const done = tier === 'aura' ? true : i <= posInTier - 1;
+          html += `<div class="sk-milestone${done ? ' done' : ''}"></div>`;
+        }
+        msEl.innerHTML = html;
       }
     });
   }
@@ -2779,7 +2964,8 @@ transition: all var(--tr);
     while (track.xp >= track.nextLevelXp) {
       track.xp -= track.nextLevelXp;
       track.level += 1;
-      track.nextLevelXp = Math.round(track.nextLevelXp * 1.2);
+      // Dynamic formula: next level requires level * 100 XP
+      track.nextLevelXp = track.level * 100;
       leveledUp = true;
     }
     
@@ -2800,6 +2986,11 @@ transition: all var(--tr);
         void barEl.offsetWidth;
         barEl.classList.add('lvl-up-flash');
         setTimeout(() => barEl.classList.remove('lvl-up-flash'), 600);
+      }
+      const badgeEl = $(`attr-${trackName}-badge`);
+      if (badgeEl) {
+        badgeEl.classList.add('lvl-up-badge');
+        setTimeout(() => badgeEl.classList.remove('lvl-up-badge'), 750);
       }
     }
     
