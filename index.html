@@ -2067,6 +2067,143 @@ transition: all var(--tr);
     .sk-milestone { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.08); transition: background 0.3s, box-shadow 0.3s; }
     .sk-milestone.done { background: var(--accent); box-shadow: 0 0 4px var(--accent-glow); }
 
+
+    /* ══ Premium Task Creator Card ══════════════════════════════════ */
+    .ptc-card {
+      background: rgba(12, 12, 17, 0.85);
+      border: 1px solid rgba(139, 92, 246, 0.25);
+      box-shadow: 0 0 0 1px rgba(139,92,246,0.08), 0 4px 30px rgba(139,92,246,0.12), inset 0 1px 0 rgba(255,255,255,0.04);
+      border-radius: 20px;
+      padding: 18px 16px 14px;
+      width: 100%;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+    .ptc-label {
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      font-family: 'Inter', sans-serif;
+      display: block;
+      margin-bottom: 7px;
+    }
+    .ptc-sublabel {
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-transform: none;
+      color: rgba(255,255,255,0.2);
+    }
+    .ptc-field-group { display: flex; flex-direction: column; }
+    .ptc-input {
+      width: 100%;
+      box-sizing: border-box;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #fff;
+      font-family: 'Outfit', sans-serif;
+      outline: none;
+      transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
+    }
+    .ptc-input:focus {
+      border-color: rgba(139,92,246,0.55);
+      box-shadow: 0 0 0 3px rgba(139,92,246,0.15);
+      background: rgba(139,92,246,0.05);
+    }
+    .ptc-input::placeholder { color: rgba(255,255,255,0.2); }
+    /* Emoji matrix */
+    .ptc-emoji-section { display: flex; flex-direction: column; gap: 4px; }
+    .ptc-emoji-group-label { font-size: 9.5px; font-weight: 700; color: rgba(255,255,255,0.3); font-family: 'Inter', sans-serif; letter-spacing: 0.06em; text-transform: uppercase; }
+    .ptc-emoji-row { display: flex; gap: 6px; flex-wrap: nowrap; }
+    .ptc-emoji-btn {
+      width: 42px; height: 42px;
+      border-radius: 11px;
+      border: 1.5px solid rgba(255,255,255,0.07);
+      background: rgba(255,255,255,0.04);
+      font-size: 20px;
+      line-height: 1;
+      cursor: pointer;
+      transition: transform 0.2s, border-color 0.2s, background 0.2s, box-shadow 0.2s;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .ptc-emoji-btn:hover { transform: scale(1.12); border-color: rgba(139,92,246,0.4); }
+    .ptc-emoji-btn.selected {
+      border-color: #8b5cf6;
+      background: rgba(139,92,246,0.18);
+      box-shadow: 0 0 10px rgba(139,92,246,0.35);
+      transform: scale(1.08);
+    }
+    /* Pill inputs */
+    .ptc-inline-row { display: flex; gap: 8px; align-items: center; }
+    .ptc-pill-select {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 12px;
+      font-family: 'Inter', sans-serif;
+      padding: 8px 12px;
+      outline: none;
+      cursor: pointer;
+      display: flex; align-items: center; gap: 4px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .ptc-pill-select:focus { border-color: rgba(139,92,246,0.5); box-shadow: 0 0 0 2px rgba(139,92,246,0.12); }
+    select.ptc-pill-select option { background: #1a1a1f; }
+    /* Check pills */
+    .ptc-check-pill { cursor: pointer; }
+    .ptc-check-label {
+      display: inline-flex; align-items: center;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 5px 12px;
+      font-size: 10.5px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.5);
+      font-family: 'Inter', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .ptc-check-pill input:checked + .ptc-check-label {
+      background: rgba(139,92,246,0.18);
+      border-color: rgba(139,92,246,0.5);
+      color: #a78bfa;
+      box-shadow: 0 0 8px rgba(139,92,246,0.2);
+    }
+    /* Add button */
+    .ptc-add-btn {
+      width: 100%;
+      padding: 13px;
+      border-radius: 12px;
+      border: none;
+      background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      font-family: 'Outfit', sans-serif;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+      box-shadow: 0 4px 18px rgba(109,40,217,0.4);
+      letter-spacing: 0.04em;
+    }
+    .ptc-add-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(109,40,217,0.55); }
+    .ptc-add-btn:active { transform: scale(0.98); }
+
     /* ── Dev Mode Toggle ─────────────────────────── */
     #dev-pro-toggle {
       display: flex;
@@ -2326,90 +2463,117 @@ transition: all var(--tr);
       <button class="timeline-pill active" data-filter="today">Today</button>
       <button class="timeline-pill" data-filter="tomorrow">Tomorrow</button>
       <button class="timeline-pill" data-filter="week">This Week</button>
-      <button class="timeline-pill" data-filter="later">Later</button>
     </div>
 
     <ul class="review-list" id="review-list" role="list" aria-label="Today's tasks"></ul>
     
-    <div class="add-card" onclick="if(event.target.tagName !== 'INPUT' && event.target.tagName !== 'BUTTON') document.getElementById('add-input').focus()">
-      <div class="add-main-row" style="width: 100%; display: flex; align-items: center; gap: 12px;">
-        <span class="add-icon">+</span>
-        <input class="add-input" id="add-input" type="text" placeholder="Add a task..."
+    <!-- ══ PREMIUM TASK CREATOR CARD ══ -->
+    <div class="ptc-card" id="ptc-card">
+
+      <!-- Task Name -->
+      <div class="ptc-field-group">
+        <label class="ptc-label">TASK NAME <span style="color:var(--accent);">*</span></label>
+        <input class="ptc-input add-input" id="add-input" type="text"
+               placeholder="What do you need to crush today?"
                maxlength="120" autocomplete="off" spellcheck="false" aria-label="Add a task" />
-        <button id="add-options-toggle-btn" type="button" title="Task scheduling & duration options" style="display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); color: var(--muted); cursor: pointer; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); padding: 0;">
-          <svg class="plus-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
-            <line x1="12" y1="5" x2="12" y2="19"></line>
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-          </svg>
-        </button>
       </div>
-      <div id="add-options-tray">
-        <div class="add-options-row">
-          <div class="add-option-field" style="position: relative;">
-            <label>Date</label>
-            <button type="button" id="add-task-date-btn" class="add-option-input" style="text-align: left; min-width: 90px; height: 24px; font-size: 11px; padding: 3px 6px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 6px; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: space-between; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-family: 'Inter', sans-serif;">
-              <span id="add-task-date-text">Select Date</span>
-              <span style="font-size: 8px; color: var(--muted); margin-left: 4px;">▼</span>
-            </button>
-            <div id="calendar-popup" style="display: none; position: absolute; bottom: 28px; left: 0; z-index: 1000; width: 230px; background: #18181C; border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.5); padding: 12px; font-family: 'Inter', sans-serif;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <button type="button" id="cal-prev-btn" style="background:none; border:none; color:#fff; cursor:pointer; font-weight:bold; font-size:12px; padding:2px 6px;">&lt;</button>
-                <span id="cal-month-year" style="color:#fff; font-size:11px; font-weight:700;"></span>
-                <button type="button" id="cal-next-btn" style="background:none; border:none; color:#fff; cursor:pointer; font-weight:bold; font-size:12px; padding:2px 6px;">&gt;</button>
-              </div>
-              <div style="display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 9px; font-weight: 700; color: var(--muted); margin-bottom: 4px;">
-                <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
-              </div>
-              <div id="cal-days-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center;"></div>
-              <div style="display: flex; justify-content: space-between; margin-top: 8px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 8px;">
-                <button type="button" id="cal-clear-btn" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; color:#fff; font-size:9px; padding:4px 8px; cursor:pointer; font-weight:600;">Clear</button>
-                <button type="button" id="cal-close-btn" style="background: var(--accent); border:none; border-radius:6px; color:#fff; font-size:9px; padding:4px 8px; cursor:pointer; font-weight:700;">Done</button>
-              </div>
-            </div>
+
+      <!-- Emoji Picker Matrix -->
+      <div class="ptc-field-group">
+        <label class="ptc-label">PICK AN EMOJI <span class="ptc-sublabel">— auto-selects attribute</span></label>
+        <div class="ptc-emoji-section">
+          <div class="ptc-emoji-group-label">🧠 Focus</div>
+          <div class="ptc-emoji-row" id="ptc-emoji-focus">
+            <button type="button" class="ptc-emoji-btn" data-emoji="📚" data-attr="focus">📚</button>
+            <button type="button" class="ptc-emoji-btn" data-emoji="💻" data-attr="focus">💻</button>
+            <button type="button" class="ptc-emoji-btn" data-emoji="🎯" data-attr="focus">🎯</button>
+            <button type="button" class="ptc-emoji-btn" data-emoji="📝" data-attr="focus">📝</button>
+            <button type="button" class="ptc-emoji-btn" data-emoji="🧠" data-attr="focus">🧠</button>
           </div>
-          <div class="add-option-field">
-            <label for="add-task-time">Time</label>
-            <input type="time" id="add-task-time" class="add-option-input" />
+          <div class="ptc-emoji-group-label" style="margin-top:8px;">🏃 Endurance</div>
+          <div class="ptc-emoji-row" id="ptc-emoji-endurance">
+            <button type="button" class="ptc-emoji-btn" data-emoji="🏃" data-attr="endurance">🏃</button>
+            <button type="button" class="ptc-emoji-btn" data-emoji="💪" data-attr="endurance">💪</button>
+            <button type="button" class="ptc-emoji-btn" data-emoji="⚡" data-attr="endurance">⚡</button>
+            <button type="button" class="ptc-emoji-btn" data-emoji="🚴" data-attr="endurance">🚴</button>
+            <button type="button" class="ptc-emoji-btn" data-emoji="🏊" data-attr="endurance">🏊</button>
           </div>
-          <div class="add-option-field">
-            <label for="add-task-duration">Min</label>
-            <input type="number" id="add-task-duration" class="add-option-input" placeholder="Min" min="1" style="width: 54px;" />
-          </div>
-          <div id="repeating-options-container" style="display: flex; align-items: center; gap: 8px;">
-            <div class="add-option-field" style="display: flex; align-items: center; gap: 4px;">
-              <input type="checkbox" id="add-task-everyday" style="accent-color: var(--accent); cursor: pointer;" />
-              <label for="add-task-everyday" style="font-size: 10.5px; color: var(--muted); font-weight: 600; text-transform: uppercase; cursor: pointer;">Everyday</label>
-            </div>
-            <div class="add-option-field" style="display: flex; align-items: center; gap: 4px;">
-              <input type="checkbox" id="add-task-weekly" style="accent-color: var(--accent); cursor: pointer;" />
-              <label for="add-task-weekly" style="font-size: 10.5px; color: var(--muted); font-weight: 600; text-transform: uppercase; cursor: pointer;">Weekly</label>
-            </div>
-            <div class="add-option-field" style="display: flex; align-items: center; gap: 4px;">
-              <input type="checkbox" id="add-task-monthly" style="accent-color: var(--accent); cursor: pointer;" />
-              <label for="add-task-monthly" style="font-size: 10.5px; color: var(--muted); font-weight: 600; text-transform: uppercase; cursor: pointer;">Monthly</label>
-            </div>
-          </div>
-          <div class="add-option-field" style="display: flex; align-items: center; gap: 4px;">
-            <label for="add-task-category" style="font-size: 10.5px; color: var(--muted); font-weight: 600; text-transform: uppercase; cursor: pointer; margin-right: 4px;">Category</label>
-            <select id="add-task-category" class="add-option-input" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 6px; color: #fff; font-size: 11px; padding: 3px 6px; outline: none; font-family: 'Inter', sans-serif;">
-              <option value="General" style="background: #1C1C20; color: #fff;">General</option>
-              <option value="Health" style="background: #1C1C20; color: #fff;">Health</option>
-              <option value="Work" style="background: #1C1C20; color: #fff;">Work</option>
-              <option value="Fitness" style="background: #1C1C20; color: #fff;">Fitness</option>
-              <option value="Education" style="background: #1C1C20; color: #fff;">Education</option>
-              <option value="Sports" style="background: #1C1C20; color: #fff;">Sports</option>
-            </select>
-          </div>
-          <div class="add-option-field" style="display: flex; align-items: center; gap: 4px;">
-            <label style="font-size: 10.5px; color: var(--muted); font-weight: 600; text-transform: uppercase; margin-right: 4px;">Attribute</label>
-            <div id="add-task-attribute-container" style="display: flex; gap: 4px;">
-              <button type="button" class="attr-pill active" data-val="focus">Focus</button>
-              <button type="button" class="attr-pill" data-val="endurance">Endurance</button>
-              <button type="button" class="attr-pill" data-val="mindset">Mindset</button>
-            </div>
+          <div class="ptc-emoji-group-label" style="margin-top:8px;">🧘 Mindset</div>
+          <div class="ptc-emoji-row" id="ptc-emoji-mindset">
+            <button type="button" class="ptc-emoji-btn" data-emoji="🧘" data-attr="mindset">🧘</button>
+            <button type="button" class="ptc-emoji-btn" data-emoji="🌅" data-attr="mindset">🌅</button>
+            <button type="button" class="ptc-emoji-btn" data-emoji="🌙" data-attr="mindset">🌙</button>
+            <button type="button" class="ptc-emoji-btn" data-emoji="🏆" data-attr="mindset">🏆</button>
+            <button type="button" class="ptc-emoji-btn" data-emoji="🌟" data-attr="mindset">🌟</button>
           </div>
         </div>
       </div>
+
+      <!-- Row: Time + Duration -->
+      <div class="ptc-field-group">
+        <label class="ptc-label">TIME & DURATION</label>
+        <div class="ptc-inline-row">
+          <div style="position:relative; flex:1;">
+            <button type="button" id="add-task-date-btn" class="ptc-pill-select" style="width:100%;">
+              <span style="font-size:13px; margin-right:5px;">📅</span>
+              <span id="add-task-date-text">Select Date</span>
+              <span style="margin-left:auto; font-size:9px; opacity:.5;">▼</span>
+            </button>
+            <div id="calendar-popup" style="display:none; position:absolute; bottom:44px; left:0; z-index:1000; width:230px; background:#18181C; border:1px solid rgba(255,255,255,0.12); border-radius:12px; box-shadow:0 8px 30px rgba(0,0,0,0.5); padding:12px; font-family:'Inter',sans-serif;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <button type="button" id="cal-prev-btn" style="background:none;border:none;color:#fff;cursor:pointer;font-weight:bold;font-size:12px;padding:2px 6px;">&lt;</button>
+                <span id="cal-month-year" style="color:#fff;font-size:11px;font-weight:700;"></span>
+                <button type="button" id="cal-next-btn" style="background:none;border:none;color:#fff;cursor:pointer;font-weight:bold;font-size:12px;padding:2px 6px;">&gt;</button>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:9px;font-weight:700;color:var(--muted);margin-bottom:4px;">
+                <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+              </div>
+              <div id="cal-days-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;"></div>
+              <div style="display:flex;justify-content:space-between;margin-top:8px;border-top:1px solid rgba(255,255,255,0.06);padding-top:8px;">
+                <button type="button" id="cal-clear-btn" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:6px;color:#fff;font-size:9px;padding:4px 8px;cursor:pointer;font-weight:600;">Clear</button>
+                <button type="button" id="cal-close-btn" style="background:var(--accent);border:none;border-radius:6px;color:#fff;font-size:9px;padding:4px 8px;cursor:pointer;font-weight:700;">Done</button>
+              </div>
+            </div>
+          </div>
+          <input type="time" id="add-task-time" class="ptc-pill-select" style="flex:0 0 auto; min-width:100px;" />
+          <input type="number" id="add-task-duration" class="ptc-pill-select" placeholder="Min" min="1" style="flex:0 0 60px; text-align:center;" />
+        </div>
+      </div>
+
+      <!-- Row: Category + Repeat -->
+      <div class="ptc-field-group">
+        <label class="ptc-label">CATEGORY & REPEAT</label>
+        <div class="ptc-inline-row" style="flex-wrap:wrap;">
+          <select id="add-task-category" class="ptc-pill-select">
+            <option value="General">General</option>
+            <option value="Health">Health</option>
+            <option value="Work">Work</option>
+            <option value="Fitness">Fitness</option>
+            <option value="Education">Education</option>
+            <option value="Sports">Sports</option>
+          </select>
+          <div id="repeating-options-container" style="display:flex; gap:6px; flex-wrap:wrap;">
+            <label class="ptc-check-pill">
+              <input type="checkbox" id="add-task-everyday" style="display:none;" />
+              <span class="ptc-check-label" data-for="add-task-everyday">Every Day</span>
+            </label>
+            <label class="ptc-check-pill">
+              <input type="checkbox" id="add-task-weekly" style="display:none;" />
+              <span class="ptc-check-label" data-for="add-task-weekly">Weekly</span>
+            </label>
+            <label class="ptc-check-pill">
+              <input type="checkbox" id="add-task-monthly" style="display:none;" />
+              <span class="ptc-check-label" data-for="add-task-monthly">Monthly</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add Button -->
+      <button id="ptc-add-btn" class="ptc-add-btn" type="button">
+        <span style="font-size:16px; line-height:1;">+</span> Add Task
+      </button>
+
     </div>
     <button class="start-btn" id="start-day-btn" style="margin-top: 12px; width: 100%; max-width: 440px;" disabled>Start My Day →</button>
   </div>
@@ -2735,6 +2899,7 @@ transition: all var(--tr);
   let currentViewMode = 'daily'; // daily vs long-term
   let selectedDates = [];
   let selectedAttribute = 'focus';
+  let selectedEmoji     = '';
   let calCurrentDate = new Date();
 
   /* ══ RPG State ═══════════════════════════════════════════════ */
@@ -4150,36 +4315,34 @@ function formatTime(timeStr) {
   }
 
   /* ══ Add task input ══════════════════════════════════════════ */
-  // Toggle Options Tray
   (function initAddOptions() {
-    const toggle = $('add-options-toggle-btn');
-    const tray = $('add-options-tray');
-    if (!toggle || !tray) return;
-    toggle.addEventListener('click', e => {
-      e.stopPropagation();
-      const isHidden = tray.style.display === 'none' || !tray.style.display;
-      tray.style.display = isHidden ? 'flex' : 'none';
+    // Wire emoji picker
+    const allEmojibtns = document.querySelectorAll('.ptc-emoji-btn');
+    allEmojibtns.forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        allEmojibtns.forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedAttribute = btn.dataset.attr || 'focus';
+        selectedEmoji     = btn.dataset.emoji || '';
+      });
     });
 
-    const container = $('add-task-attribute-container');
-    if (container) {
-      const pills = container.querySelectorAll('.attr-pill');
-      pills.forEach(pill => {
-        pill.addEventListener('click', e => {
-          e.stopPropagation();
-          pills.forEach(p => p.classList.remove('active'));
-          pill.classList.add('active');
-          selectedAttribute = pill.dataset.val;
-        });
-      });
-    }
+    // Wire the big Add Task button
+    const ptcAddBtn = $('ptc-add-btn');
+    if (ptcAddBtn) ptcAddBtn.addEventListener('click', () => doAddTask());
   })(); if (addInput) addInput.addEventListener('keydown', e => {
-    if (e.key !== 'Enter') return;
-    const name = addInput.value.trim();
+    if (e.key === 'Enter') doAddTask();
+  });
+
+  function doAddTask() {
+    const name = addInput ? addInput.value.trim() : '';
     if (!name) {
-      addInput.classList.remove('shake'); void addInput.offsetWidth;
-      addInput.classList.add('shake');
-      addInput.addEventListener('animationend', () => addInput.classList.remove('shake'), { once: true });
+      if (addInput) {
+        addInput.classList.remove('shake'); void addInput.offsetWidth;
+        addInput.classList.add('shake');
+        addInput.addEventListener('animationend', () => addInput.classList.remove('shake'), { once: true });
+      }
       return;
     }
     if (!isPremium && tasks.filter(t => t.assignedTo === 'You').length >= 3) {
@@ -4214,6 +4377,7 @@ function formatTime(timeStr) {
     const task = {
       id: Date.now(),
       name,
+      emoji: selectedEmoji || undefined,
       assignedTo,
       subtasks: [],
       scheduledDates: finalScheduledDates,
@@ -4235,25 +4399,20 @@ function formatTime(timeStr) {
     // Clear inputs
     selectedDates = [];
     selectedAttribute = 'focus';
-    const container = $('add-task-attribute-container');
-    if (container) {
-      const pills = container.querySelectorAll('.attr-pill');
-      pills.forEach(p => {
-        if (p.dataset.val === 'focus') p.classList.add('active');
-        else p.classList.remove('active');
-      });
-    }
+    selectedEmoji     = '';
+    // Reset emoji picker selection
+    document.querySelectorAll('.ptc-emoji-btn').forEach(b => b.classList.remove('selected'));
     updateDateText();
-    $('add-task-time').value = '';
-    $('add-task-duration').value = '';
-    $('add-task-everyday').checked = false;
-    $('add-task-weekly').checked = false;
-    $('add-task-monthly').checked = false;
-    $('add-task-category').value = 'General';
-    $('add-options-tray').style.display = 'none';
+    const addTaskTimeEl = $('add-task-time');     if (addTaskTimeEl) addTaskTimeEl.value = '';
+    const addTaskDurEl  = $('add-task-duration'); if (addTaskDurEl)  addTaskDurEl.value  = '';
+    const addTaskEd    = $('add-task-everyday');  if (addTaskEd)    addTaskEd.checked   = false;
+    const addTaskWk    = $('add-task-weekly');    if (addTaskWk)    addTaskWk.checked    = false;
+    const addTaskMo    = $('add-task-monthly');   if (addTaskMo)    addTaskMo.checked    = false;
+    const addTaskCat   = $('add-task-category');  if (addTaskCat)   addTaskCat.value     = 'General';
 
-    syncStart(); addInput.value = ''; addInput.focus();
-  }); if (focusToggleBtn) focusToggleBtn.addEventListener('click', () => {
+    syncStart();
+    if (addInput) { addInput.value = ''; addInput.focus(); }
+  } if (focusToggleBtn) focusToggleBtn.addEventListener('click', () => {
     const state = getCurrentState();
     if (state === 'focus') {
       focusOnMe = false;
