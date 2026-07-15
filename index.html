@@ -5967,18 +5967,16 @@ function formatTime(timeStr) {
         if (initialEl) initialEl.textContent = name.charAt(0).toUpperCase();
         if (acctAvEl) acctAvEl.textContent = name.charAt(0).toUpperCase();
 
-        // 1. Sync Pro status from Firestore (defensive)
-        try {
-          await checkProStatus(user.uid);
+        // 1. Sync Pro status from Firestore in background (defensive)
+        checkProStatus(user.uid).then(() => {
           updatePremiumUI();
-        } catch (proErr) {
+        }).catch(proErr => {
           console.error("Pro status check failed:", proErr);
-        }
+        });
 
-        // 2. Fetch and sync user profile (defensive)
-        try {
-          const userDocRef = doc(db, 'users', user.uid); const userDoc = await getDoc(userDocRef);
-          
+        // 2. Fetch and sync user profile in background (defensive)
+        const userDocRef = doc(db, 'users', user.uid);
+        getDoc(userDocRef).then(async userDoc => {
           if (userDoc.exists()) {
             const data = userDoc.data();
             if (data.rpgStats) {
