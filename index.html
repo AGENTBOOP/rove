@@ -2337,39 +2337,63 @@ transition: all var(--tr);
     .ptc-add-btn:hover     { opacity: 0.9; }
     .svg-action:hover      { opacity: 0.75; }
 
-    /* ── Tier rank tokens — solid borders, no glow/animation ────── */
-    /* T1 INITIATE — Slate Iron */
-    .rt1 { --rank-color: #6b7280; }
-    .rt1 .rank-badge { border: 1.5px solid #6b7280; }
-    /* T2 CONTENDER — Clean Silver */
-    .rt2 { --rank-color: #94a3b8; }
-    .rt2 .rank-badge { border: 1.5px solid #94a3b8; }
-    /* T3 VANGUARD — Solid Gold */
-    .rt3 { --rank-color: #d97706; }
-    .rt3 .rank-badge { border: 1.5px solid #d97706; }
-    /* T4 ELITE — Muted Cyan */
-    .rt4 { --rank-color: #0891b2; }
-    .rt4 .rank-badge { border: 1.5px solid #0891b2; }
-    /* T5 CHAMPION — Muted Purple */
-    .rt5 { --rank-color: #7c3aed; }
-    .rt5 .rank-badge { border: 1.5px solid #7c3aed; }
-    /* T6 MASTER — Clean Crimson */
-    .rt6 { --rank-color: #dc2626; }
-    .rt6 .rank-badge { border: 1.5px solid #dc2626; }
-    /* T7 LEGEND — Clean Green */
-    .rt7 { --rank-color: #059669; }
-    .rt7 .rank-badge { border: 1.5px solid #059669; }
-    /* T8 IMMORTAL — Deep Charcoal highlight */
-    .rt8 { --rank-color: #e2e8f0; }
-    .rt8 .rank-badge { border: 1.5px solid #e2e8f0; background: rgba(226,232,240,0.04); }
-    /* T9 CELESTIAL — Platinum line */
-    .rt9 { --rank-color: #f1f5f9; }
-    .rt9 .rank-badge { border: 2px solid #f1f5f9; }
-    /* T10 ETERNAL MYTH — High-contrast monochrome */
-    .rt10 { --rank-color: #ffffff; }
-    .rt10 .rank-badge { border: 2px solid #fff; background: rgba(255,255,255,0.06); }
+    /* ── 18-Tier rank tokens — solid borders only ──────────────── */
+    /* T1 CARDBOARD */
+    .rt1 { --rank-color: #C19A6B; }
+    .rt1 .rank-badge { border: 1.5px solid #C19A6B; }
+    /* T2 SCRAP IRON */
+    .rt2 { --rank-color: #708090; }
+    .rt2 .rank-badge { border: 1.5px solid #708090; }
+    /* T3 BRONZE */
+    .rt3 { --rank-color: #CD7F32; }
+    .rt3 .rank-badge { border: 1.5px solid #CD7F32; }
+    /* T4 SILVER */
+    .rt4 { --rank-color: #C0C0C0; }
+    .rt4 .rank-badge { border: 1.5px solid #C0C0C0; }
+    /* T5 GOLD */
+    .rt5 { --rank-color: #FFD700; }
+    .rt5 .rank-badge { border: 1.5px solid #FFD700; }
+    /* T6 PLATINUM */
+    .rt6 { --rank-color: #E5E4E2; }
+    .rt6 .rank-badge { border: 1.5px solid #E5E4E2; }
+    /* T7 JADE */
+    .rt7 { --rank-color: #00A86B; }
+    .rt7 .rank-badge { border: 1.5px solid #00A86B; }
+    /* T8 EMERALD */
+    .rt8 { --rank-color: #046307; }
+    .rt8 .rank-badge { border: 1.5px solid #046307; background: rgba(4,99,7,0.04); }
+    /* T9 TOPAZ */
+    .rt9 { --rank-color: #FFC87C; }
+    .rt9 .rank-badge { border: 1.5px solid #FFC87C; }
+    /* T10 SAPPHIRE */
+    .rt10 { --rank-color: #0F52BA; }
+    .rt10 .rank-badge { border: 1.5px solid #0F52BA; }
+    /* T11 AMETHYST */
+    .rt11 { --rank-color: #9966CC; }
+    .rt11 .rank-badge { border: 1.5px solid #9966CC; }
+    /* T12 RUBY */
+    .rt12 { --rank-color: #E0115F; }
+    .rt12 .rank-badge { border: 1.5px solid #E0115F; }
+    /* T13 DIAMOND */
+    .rt13 { --rank-color: #B9F2FF; }
+    .rt13 .rank-badge { border: 1.5px solid #B9F2FF; }
+    /* T14 OBSIDIAN */
+    .rt14 { --rank-color: #8B8B8B; }
+    .rt14 .rank-badge { border: 1.5px solid #8B8B8B; background: #0a0a0a; }
+    /* T15 TITANIUM */
+    .rt15 { --rank-color: #878681; }
+    .rt15 .rank-badge { border: 1.5px solid #878681; }
+    /* T16 SOVEREIGN */
+    .rt16 { --rank-color: #4B0082; }
+    .rt16 .rank-badge { border: 1.5px solid #4B0082; }
+    /* T17 APEX */
+    .rt17 { --rank-color: #FF4500; }
+    .rt17 .rank-badge { border: 2px solid #FF4500; }
+    /* T18 ZENITH */
+    .rt18 { --rank-color: #FFFFFF; }
+    .rt18 .rank-badge { border: 2px solid #FFFFFF; background: rgba(255,255,255,0.04); }
 
-    /* Rank text color (applied to header rank text) */
+    /* Rank text color */
     .rank-label { color: var(--rank-color, rgba(255,255,255,0.6)); font-weight: 700; letter-spacing: 0.08em; }
 
     /* Level-up overlay — clean, no glow */
@@ -3203,17 +3227,26 @@ transition: all var(--tr);
   }
 
   // 10-Tier Global Level System (level = cumulative XP / (level*100) formula)
+  // 18-Tier Rank Ladder
   const RANK_TIERS = [
-    { min:  1, max:  5, rank: 'INITIATE',     cls: 'rt1' },
-    { min:  6, max: 15, rank: 'CONTENDER',    cls: 'rt2' },
-    { min: 16, max: 30, rank: 'VANGUARD',     cls: 'rt3' },
-    { min: 31, max: 45, rank: 'ELITE',        cls: 'rt4' },
-    { min: 46, max: 60, rank: 'CHAMPION',     cls: 'rt5' },
-    { min: 61, max: 75, rank: 'MASTER',       cls: 'rt6' },
-    { min: 76, max: 90, rank: 'LEGEND',       cls: 'rt7' },
-    { min: 91, max:100, rank: 'IMMORTAL',     cls: 'rt8' },
-    { min:101, max:150, rank: 'CELESTIAL',    cls: 'rt9' },
-    { min:151, max:Infinity, rank: 'ETERNAL MYTH', cls: 'rt10' }
+    { min:  1, max:  5, rank: 'CARDBOARD', cls: 'rt1', color: '#C19A6B' },
+    { min:  6, max: 12, rank: 'SCRAP IRON', cls: 'rt2', color: '#708090' },
+    { min: 13, max: 20, rank: 'BRONZE', cls: 'rt3', color: '#CD7F32' },
+    { min: 21, max: 30, rank: 'SILVER', cls: 'rt4', color: '#C0C0C0' },
+    { min: 31, max: 42, rank: 'GOLD', cls: 'rt5', color: '#FFD700' },
+    { min: 43, max: 55, rank: 'PLATINUM', cls: 'rt6', color: '#E5E4E2' },
+    { min: 56, max: 70, rank: 'JADE', cls: 'rt7', color: '#00A86B' },
+    { min: 71, max: 85, rank: 'EMERALD', cls: 'rt8', color: '#046307' },
+    { min: 86, max:100, rank: 'TOPAZ', cls: 'rt9', color: '#FFC87C' },
+    { min:101, max:115, rank: 'SAPPHIRE', cls: 'rt10', color: '#0F52BA' },
+    { min:116, max:130, rank: 'AMETHYST', cls: 'rt11', color: '#9966CC' },
+    { min:131, max:145, rank: 'RUBY', cls: 'rt12', color: '#E0115F' },
+    { min:146, max:160, rank: 'DIAMOND', cls: 'rt13', color: '#B9F2FF' },
+    { min:161, max:180, rank: 'OBSIDIAN', cls: 'rt14', color: '#8B8B8B' },
+    { min:181, max:200, rank: 'TITANIUM', cls: 'rt15', color: '#878681' },
+    { min:201, max:225, rank: 'SOVEREIGN', cls: 'rt16', color: '#4B0082' },
+    { min:226, max:250, rank: 'APEX', cls: 'rt17', color: '#FF4500' },
+    { min:251, max:Infinity, rank: 'ZENITH', cls: 'rt18', color: '#FFFFFF' }
   ];
   function getTierForLevel(lvl) {
     return RANK_TIERS.find(t => lvl >= t.min && lvl <= t.max) || RANK_TIERS[0];
@@ -3276,9 +3309,24 @@ transition: all var(--tr);
       headerProgress.style.width = `${details.pct}%`;
       // Color bar by tier
       const tierColors = {
-        rt1:'#6b7280', rt2:'#94a3b8', rt3:'#d97706', rt4:'#0891b2',
-        rt5:'#7c3aed', rt6:'#dc2626', rt7:'#059669', rt8:'#e2e8f0',
-        rt9:'#f1f5f9', rt10:'#ffffff'
+        rt1:'#C19A6B',
+        rt2:'#708090',
+        rt3:'#CD7F32',
+        rt4:'#C0C0C0',
+        rt5:'#FFD700',
+        rt6:'#E5E4E2',
+        rt7:'#00A86B',
+        rt8:'#046307',
+        rt9:'#FFC87C',
+        rt10:'#0F52BA',
+        rt11:'#9966CC',
+        rt12:'#E0115F',
+        rt13:'#B9F2FF',
+        rt14:'#8B8B8B',
+        rt15:'#878681',
+        rt16:'#4B0082',
+        rt17:'#FF4500',
+        rt18:'#FFFFFF'
       };
       const tc = tierColors[details.tierCls] || '#6b7280';
       headerProgress.style.background = tc;
@@ -3411,7 +3459,7 @@ transition: all var(--tr);
   }
 
   /* ══ Level-Up Overlay ════════════════════════════════════════ */
-  const TIER_EMOJIS = { rt1:'⚔️', rt2:'🛡️', rt3:'🏅', rt4:'💎', rt5:'🔮', rt6:'🔴', rt7:'🍃', rt8:'🌌', rt9:'🌈', rt10:'🌟' };
+  const TIER_EMOJIS = { rt1:'📦', rt2:'🔩', rt3:'🥉', rt4:'🥈', rt5:'🥇', rt6:'💠', rt7:'🟢', rt8:'💚', rt9:'🔶', rt10:'💙', rt11:'🔮', rt12:'💎', rt13:'🌊', rt14:'🌑', rt15:'⚙️', rt16:'👑', rt17:'🔥', rt18:'✦' };
   function showLevelUpOverlay(details) {
     const overlay = $('lvlup-overlay');
     if (!overlay) return;
