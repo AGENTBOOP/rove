@@ -2338,60 +2338,60 @@ transition: all var(--tr);
     .svg-action:hover      { opacity: 0.75; }
 
     /* ── 18-Tier rank tokens — solid borders only ──────────────── */
-    /* T1 CARDBOARD */
+    /* T1 NOVICE */
     .rt1 { --rank-color: #C19A6B; }
-    .rt1 .rank-badge { border: 1.5px solid #C19A6B; }
-    /* T2 SCRAP IRON */
+    .rt1 .rank-badge { border: 1.5px solid #C19A6B; background: rgba(193,154,107,0.04); }
+    /* T2 APPRENTICE */
     .rt2 { --rank-color: #708090; }
-    .rt2 .rank-badge { border: 1.5px solid #708090; }
-    /* T3 BRONZE */
+    .rt2 .rank-badge { border: 1.5px solid #708090; background: rgba(112,128,144,0.04); }
+    /* T3 CHALLENGER */
     .rt3 { --rank-color: #CD7F32; }
     .rt3 .rank-badge { border: 1.5px solid #CD7F32; }
-    /* T4 SILVER */
+    /* T4 SPECIALIST */
     .rt4 { --rank-color: #C0C0C0; }
-    .rt4 .rank-badge { border: 1.5px solid #C0C0C0; }
-    /* T5 GOLD */
+    .rt4 .rank-badge { border: 1.5px solid #C0C0C0; background: rgba(192,192,192,0.04); }
+    /* T5 ELITE */
     .rt5 { --rank-color: #FFD700; }
     .rt5 .rank-badge { border: 1.5px solid #FFD700; }
-    /* T6 PLATINUM */
+    /* T6 VANGUARD */
     .rt6 { --rank-color: #E5E4E2; }
     .rt6 .rank-badge { border: 1.5px solid #E5E4E2; }
-    /* T7 JADE */
+    /* T7 WARRIOR */
     .rt7 { --rank-color: #00A86B; }
-    .rt7 .rank-badge { border: 1.5px solid #00A86B; }
-    /* T8 EMERALD */
+    .rt7 .rank-badge { border: 1.5px solid #00A86B; background: rgba(0,168,107,0.04); }
+    /* T8 CHAMPION */
     .rt8 { --rank-color: #046307; }
-    .rt8 .rank-badge { border: 1.5px solid #046307; background: rgba(4,99,7,0.04); }
-    /* T9 TOPAZ */
+    .rt8 .rank-badge { border: 1.5px solid #046307; }
+    /* T9 GLADIATOR */
     .rt9 { --rank-color: #FFC87C; }
-    .rt9 .rank-badge { border: 1.5px solid #FFC87C; }
-    /* T10 SAPPHIRE */
+    .rt9 .rank-badge { border: 1.5px solid #FFC87C; background: rgba(255,200,124,0.04); }
+    /* T10 COMMANDER */
     .rt10 { --rank-color: #0F52BA; }
-    .rt10 .rank-badge { border: 1.5px solid #0F52BA; }
-    /* T11 AMETHYST */
+    .rt10 .rank-badge { border: 1.5px solid #0F52BA; background: rgba(15,82,186,0.06); }
+    /* T11 MASTER */
     .rt11 { --rank-color: #9966CC; }
-    .rt11 .rank-badge { border: 1.5px solid #9966CC; }
-    /* T12 RUBY */
+    .rt11 .rank-badge { border: 1.5px solid #9966CC; background: rgba(153,102,204,0.06); }
+    /* T12 GRANDMASTER */
     .rt12 { --rank-color: #E0115F; }
     .rt12 .rank-badge { border: 1.5px solid #E0115F; }
-    /* T13 DIAMOND */
+    /* T13 WARLORD */
     .rt13 { --rank-color: #B9F2FF; }
     .rt13 .rank-badge { border: 1.5px solid #B9F2FF; }
-    /* T14 OBSIDIAN */
-    .rt14 { --rank-color: #8B8B8B; }
-    .rt14 .rank-badge { border: 1.5px solid #8B8B8B; background: #0a0a0a; }
-    /* T15 TITANIUM */
+    /* T14 OVERLORD */
+    .rt14 { --rank-color: #1A1A1A; }
+    .rt14 .rank-badge { border: 1.5px solid #1A1A1A; background: #0a0a0a; border-color: #1a1a1a !important; }
+    /* T15 IMMORTAL */
     .rt15 { --rank-color: #878681; }
     .rt15 .rank-badge { border: 1.5px solid #878681; }
-    /* T16 SOVEREIGN */
+    /* T16 CELESTIAL */
     .rt16 { --rank-color: #4B0082; }
-    .rt16 .rank-badge { border: 1.5px solid #4B0082; }
+    .rt16 .rank-badge { border: 1.5px solid #4B0082; background: rgba(75,0,130,0.08); }
     /* T17 APEX */
     .rt17 { --rank-color: #FF4500; }
     .rt17 .rank-badge { border: 2px solid #FF4500; }
     /* T18 ZENITH */
     .rt18 { --rank-color: #FFFFFF; }
-    .rt18 .rank-badge { border: 2px solid #FFFFFF; background: rgba(255,255,255,0.04); }
+    .rt18 .rank-badge { border: 2px solid #FFFFFF; background: #000000; border-color: #ffffff !important; }
 
     /* Rank text color */
     .rank-label { color: var(--rank-color, rgba(255,255,255,0.6)); font-weight: 700; letter-spacing: 0.08em; }
@@ -2487,8 +2487,8 @@ transition: all var(--tr);
 
   <!-- Rove Sub-Header with XP Bar & Streak Badge -->
   <div id="rove-sub-header" style="position: absolute; top: 74px; left: 0; right: 0; height: 36px; background: rgba(10, 10, 12, 0.6); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.04); display: flex; align-items: center; justify-content: space-between; padding: 0 16px; z-index: 200; box-sizing: border-box;">
-    <span id="header-level-text" style="font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.05em;">Lv.1 INITIATE</span>
-      <span id="header-xp-detail" style="font-family: 'Inter', sans-serif; font-size: 9px; font-weight: 500; color: rgba(255,255,255,0.35); margin-left: 6px;">0 / 100 XP · INITIATE</span>
+    <span id="header-level-text" style="font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.05em;">Lv.1 NOVICE</span>
+      <span id="header-xp-detail" style="font-family: 'Inter', sans-serif; font-size: 9px; font-weight: 500; color: rgba(255,255,255,0.35); margin-left: 6px;">0 / 100 XP · NOVICE</span>
     <div style="flex: 1; margin: 0 12px; height: 3px; background: rgba(255, 255, 255, 0.06); border-radius: 99px; overflow: hidden; position: relative;">
       <div id="header-level-progress" style="height: 100%; width: 0%; background: linear-gradient(90deg, #a855f7 0%, #6366f1 100%); transition: width 0.3s ease, transform 0.3s ease;"></div>
     </div>
@@ -2694,58 +2694,46 @@ transition: all var(--tr);
 
             <div class="ptc-emoji-group-label">🧠 Focus</div>
             <div class="ptc-emoji-row">
-              <button type="button" class="ptc-emoji-btn" data-emoji="📚" data-attr="focus" data-tip="READING & LEARNING">📚</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="💻" data-attr="focus" data-tip="CODING & TECH">💻</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="🎯" data-attr="focus" data-tip="DEEP WORK">🎯</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="📝" data-attr="focus" data-tip="WRITING & NOTES">📝</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="🧠" data-attr="focus" data-tip="BRAIN TRAINING">🧠</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="💡" data-attr="focus" data-tip="IDEAS & CREATIVITY">💡</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="🔬" data-attr="focus" data-tip="RESEARCH">🔬</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="📊" data-attr="focus" data-tip="ANALYTICS">📊</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="🗂️" data-attr="focus" data-tip="PLANNING">🗂️</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="🎧" data-attr="focus" data-tip="FOCUSED LISTENING">🎧</button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="🧠" data-attr="focus" data-tip="DEEP WORK">🧠</button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="💻" data-attr="focus" data-tip="DEV MODE">💻</button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="📈" data-attr="focus" data-tip="GROWTH">📈</button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="📚" data-attr="focus" data-tip="STUDY GRIND">📚</button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="🎯" data-attr="focus" data-tip="PRECISION FOCUS">🎯</button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="🔍" data-attr="focus" data-tip="ANALYSIS">🔍</button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="⚡" data-attr="focus" data-tip="FLOW STATE">⚡</button>
             </div>
 
             <div class="ptc-emoji-group-label" style="margin-top:10px;">🏃 Endurance</div>
             <div class="ptc-emoji-row">
-              <button type="button" class="ptc-emoji-btn" data-emoji="🏃" data-attr="endurance" data-tip="RUNNING">🏃</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="💪" data-attr="endurance" data-tip="STRENGTH TRAINING">💪</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="⚡" data-attr="endurance" data-tip="HIGH INTENSITY">⚡</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="🚴" data-attr="endurance" data-tip="CYCLING">🚴</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="🏊" data-attr="endurance" data-tip="SWIMMING">🏊</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="🧗" data-attr="endurance" data-tip="CLIMBING">🧗</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="🥊" data-attr="endurance" data-tip="BOXING & COMBAT">🥊</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="🏋️" data-attr="endurance" data-tip="WEIGHT LIFTING">🏋️</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="🤸" data-attr="endurance" data-tip="FLEXIBILITY">🤸</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="⛷️" data-attr="endurance" data-tip="CARDIO & SPORT">⛷️</button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="🔥" data-attr="endurance" data-tip="PURE GRIND">🔥</button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="💪" data-attr="endurance" data-tip="PHYSICAL POWER">💪</button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="🏃" data-attr="endurance" data-tip="SPEED &amp; CARDIO">🏃</button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="🏆" data-attr="endurance" data-tip="VICTORY">🏆</button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="⚽" data-attr="endurance" data-tip="ATHLETIC TRAINING">⚽</button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="🔋" data-attr="endurance" data-tip="ENERGY RECHARGE">🔋</button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="🏋️" data-attr="endurance" data-tip="HEAVY SESSION">🏋️</button>
             </div>
 
             <div class="ptc-emoji-group-label" style="margin-top:10px;">🧘 Mindset</div>
             <div class="ptc-emoji-row">
-              <button type="button" class="ptc-emoji-btn" data-emoji="🧘" data-attr="mindset" data-tip="MEDITATION">🧘</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="🌅" data-attr="mindset" data-tip="MORNING RITUAL">🌅</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="🌙" data-attr="mindset" data-tip="EVENING WIND-DOWN">🌙</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="🏆" data-attr="mindset" data-tip="GOALS & WINS">🏆</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="🌟" data-attr="mindset" data-tip="GRATITUDE">🌟</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="📿" data-attr="mindset" data-tip="BREATHWORK">📿</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="🌿" data-attr="mindset" data-tip="NATURE & CALM">🌿</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="💭" data-attr="mindset" data-tip="JOURNALING">💭</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="❤️" data-attr="mindset" data-tip="SELF-CARE">❤️</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="☕" data-attr="mindset" data-tip="SLOW MORNING">☕</button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="🧘" data-attr="mindset" data-tip="ZEN CONTROL">🧘</button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="🌅" data-attr="mindset" data-tip="MORNING ROUTINE">🌅</button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="🌌" data-attr="mindset" data-tip="VISION PLANNING">🌌</button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="💎" data-attr="mindset" data-tip="UNBREAKABLE RESILIENCE">💎</button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="👑" data-attr="mindset" data-tip="HIGH STATUS">👑</button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="🌟" data-attr="mindset" data-tip="APEX INTENT">🌟</button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="🕊️" data-attr="mindset" data-tip="MENTAL CLARITY">🕊️</button>
             </div>
 
-            <div class="ptc-emoji-group-label" style="margin-top:10px;">🏠 Personal</div>
+            <div class="ptc-emoji-group-label" style="margin-top:10px;">💼 Personal</div>
             <div class="ptc-emoji-row">
-              <button type="button" class="ptc-emoji-btn" data-emoji="🍳" data-attr="personal" data-tip="COOKING & MEAL PREP">🍳</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="🧹" data-attr="personal" data-tip="CLEANING & CHORES">🧹</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="👨‍👩‍👧" data-attr="personal" data-tip="FAMILY TIME">👨‍👩‍👧</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="💰" data-attr="personal" data-tip="FINANCE & MONEY">💰</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="🎮" data-attr="personal" data-tip="LEISURE & GAMING">🎮</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="🎨" data-attr="personal" data-tip="ART & HOBBIES">🎨</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="🚗" data-attr="personal" data-tip="ERRANDS">🚗</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="🛒" data-attr="personal" data-tip="SHOPPING">🛒</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="📞" data-attr="personal" data-tip="CALLS & SOCIAL">📞</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="✈️" data-attr="personal" data-tip="TRAVEL & ADVENTURE">✈️</button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="🎨" data-attr="personal" data-tip="CREATIVE BUILD">🎨</button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="🎸" data-attr="personal" data-tip="SKILL PRACTICE">🎸</button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="🍏" data-attr="personal" data-tip="PREMIUM FUEL">🍏</button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="💧" data-attr="personal" data-tip="HYDRATION LOCK">💧</button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="🤝" data-attr="personal" data-tip="NETWORKING">🤝</button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="💵" data-attr="personal" data-tip="FINANCIAL ASSETS">💵</button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="⏰" data-attr="personal" data-tip="TIME MANAGEMENT">⏰</button>
             </div>
 
           </div>
@@ -3242,7 +3230,7 @@ transition: all var(--tr);
     { min:116, max:130, rank: 'MASTER', cls: 'rt11', color: '#9966CC' },
     { min:131, max:145, rank: 'GRANDMASTER', cls: 'rt12', color: '#E0115F' },
     { min:146, max:160, rank: 'WARLORD', cls: 'rt13', color: '#B9F2FF' },
-    { min:161, max:180, rank: 'OVERLORD', cls: 'rt14', color: '#8B8B8B' },
+    { min:161, max:180, rank: 'OVERLORD', cls: 'rt14', color: '#1A1A1A' },
     { min:181, max:200, rank: 'IMMORTAL', cls: 'rt15', color: '#878681' },
     { min:201, max:225, rank: 'CELESTIAL', cls: 'rt16', color: '#4B0082' },
     { min:226, max:250, rank: 'APEX', cls: 'rt17', color: '#FF4500' },
@@ -3302,7 +3290,7 @@ transition: all var(--tr);
     const details = getLevelDetails(rpgStats.currentXP);
     
     const headerText = $('header-level-text');
-    if (headerText) headerText.textContent = `Lv.${details.level} ${details.rank}`;
+    if (headerText) { if (details.rank === 'ZENITH') { headerText.innerHTML = `👑 Lv.${details.level} <span style="font-weight:900;">${details.rank}</span> 👑`; } else { headerText.textContent = `Lv.${details.level} ${details.rank}`; } }
 
     const headerProgress = $('header-level-progress');
     if (headerProgress) {
@@ -3322,7 +3310,7 @@ transition: all var(--tr);
         rt11:'#9966CC',
         rt12:'#E0115F',
         rt13:'#B9F2FF',
-        rt14:'#8B8B8B',
+        rt14:'#1A1A1A',
         rt15:'#878681',
         rt16:'#4B0082',
         rt17:'#FF4500',
@@ -3459,7 +3447,7 @@ transition: all var(--tr);
   }
 
   /* ══ Level-Up Overlay ════════════════════════════════════════ */
-  const TIER_EMOJIS = { rt1:'📦', rt2:'🔩', rt3:'🥉', rt4:'🥈', rt5:'🥇', rt6:'💠', rt7:'🟢', rt8:'💚', rt9:'🔶', rt10:'💙', rt11:'🔮', rt12:'💎', rt13:'🌊', rt14:'🌑', rt15:'⚙️', rt16:'👑', rt17:'🔥', rt18:'✦' };
+  const TIER_EMOJIS = { rt1:'📦', rt2:'🔩', rt3:'🏅', rt4:'🥈', rt5:'🥇', rt6:'💠', rt7:'🟢', rt8:'💚', rt9:'🔶', rt10:'💙', rt11:'🔮', rt12:'💎', rt13:'🌊', rt14:'🌑', rt15:'⚙️', rt16:'👑', rt17:'🔥', rt18:'👑' };
   function showLevelUpOverlay(details) {
     const overlay = $('lvlup-overlay');
     if (!overlay) return;
