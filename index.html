@@ -1974,21 +1974,15 @@ transition: all var(--tr);
       border: 2.5px solid #a97c50;
       box-shadow: 0 0 10px rgba(169, 124, 80, 0.25), inset 0 0 10px rgba(169,124,80,0.07);
     }
-    /* Tier 2: Neon Blue (lvl 6-10) */
+    /* Tier 2: Silver (lvl 6-10) */
     .skill-badge.tier-neon {
-      border: 2.5px solid #38bdf8;
-      box-shadow: 0 0 18px rgba(56, 189, 248, 0.55), 0 0 40px rgba(56,189,248,0.2), inset 0 0 10px rgba(56,189,248,0.1);
-      animation: neonPulse 2.5s ease-in-out infinite;
-    }
-    @keyframes neonPulse {
-      0%, 100% { box-shadow: 0 0 18px rgba(56,189,248,0.55), 0 0 40px rgba(56,189,248,0.2); }
-      50%       { box-shadow: 0 0 28px rgba(56,189,248,0.85), 0 0 60px rgba(56,189,248,0.35); }
+      border: 2px solid #94a3b8;
     }
     /* Tier 3: Purple/Gold Gradient Aura (lvl 11+) */
     .skill-badge.tier-aura {
       border: 2.5px solid transparent;
       background-clip: padding-box;
-      animation: auraSpin 4s linear infinite;
+      /* animation removed */ 4s linear infinite;
     }
     .skill-badge.tier-aura::before {
       content: '';
@@ -1996,7 +1990,7 @@ transition: all var(--tr);
       inset: -3px;
       border-radius: 50%;
       background: conic-gradient(from var(--angle,0deg), #a855f7, #f59e0b, #ec4899, #a855f7);
-      animation: auraRotate 3s linear infinite;
+      /* animation removed */ 3s linear infinite;
       z-index: -1;
     }
     .skill-badge.tier-aura::after {
@@ -2007,11 +2001,11 @@ transition: all var(--tr);
       background: conic-gradient(from var(--angle,0deg), #a855f7, #f59e0b, #ec4899, #a855f7);
       opacity: 0.35;
       filter: blur(8px);
-      animation: auraRotate 3s linear infinite;
+      /* animation removed */ 3s linear infinite;
       z-index: -2;
     }
     @property --angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
-    @keyframes auraRotate { to { --angle: 360deg; } }
+    /* @keyframes auraRotate removed */
     /* Level-up badge flash */
     .skill-badge.lvl-up-badge {
       animation: badgeFlash 0.7s ease forwards !important;
@@ -2071,8 +2065,8 @@ transition: all var(--tr);
     /* ══ Premium Task Creator Card ══════════════════════════════════ */
     .ptc-card {
       background: rgba(12, 12, 17, 0.85);
-      border: 1px solid rgba(139, 92, 246, 0.25);
-      box-shadow: 0 0 0 1px rgba(139,92,246,0.08), 0 4px 30px rgba(139,92,246,0.12), inset 0 1px 0 rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.3);
       border-radius: 20px;
       padding: 18px 16px 14px;
       width: 100%;
@@ -2116,9 +2110,9 @@ transition: all var(--tr);
       transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
     }
     .ptc-input:focus {
-      border-color: rgba(139,92,246,0.55);
-      box-shadow: 0 0 0 3px rgba(139,92,246,0.15);
-      background: rgba(139,92,246,0.05);
+      border-color: rgba(255,255,255,0.25);
+      box-shadow: none;
+      background: rgba(255,255,255,0.04);
     }
     .ptc-input::placeholder { color: rgba(255,255,255,0.2); }
     /* Emoji matrix */
@@ -2139,10 +2133,9 @@ transition: all var(--tr);
     }
     .ptc-emoji-btn:hover { transform: scale(1.12); border-color: rgba(139,92,246,0.4); }
     .ptc-emoji-btn.selected {
-      border-color: #8b5cf6;
-      background: rgba(139,92,246,0.18);
-      box-shadow: 0 0 10px rgba(139,92,246,0.35);
-      transform: scale(1.08);
+      border-color: rgba(255,255,255,0.35);
+      background: rgba(255,255,255,0.08);
+      box-shadow: none;
     }
     /* Pill inputs */
     .ptc-inline-row { display: flex; gap: 8px; align-items: center; }
@@ -2159,7 +2152,7 @@ transition: all var(--tr);
       display: flex; align-items: center; gap: 4px;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
-    .ptc-pill-select:focus { border-color: rgba(139,92,246,0.5); box-shadow: 0 0 0 2px rgba(139,92,246,0.12); }
+    .ptc-pill-select:focus { border-color: rgba(255,255,255,0.25); box-shadow: none; }
     select.ptc-pill-select option { background: #1a1a1f; }
     /* Check pills */
     .ptc-check-pill { cursor: pointer; }
@@ -2179,10 +2172,10 @@ transition: all var(--tr);
       cursor: pointer;
     }
     .ptc-check-pill input:checked + .ptc-check-label {
-      background: rgba(139,92,246,0.18);
-      border-color: rgba(139,92,246,0.5);
-      color: #a78bfa;
-      box-shadow: 0 0 8px rgba(139,92,246,0.2);
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.3);
+      color: #fff;
+      box-shadow: none;
     }
     /* Add button */
     .ptc-add-btn {
@@ -2190,26 +2183,27 @@ transition: all var(--tr);
       padding: 13px;
       border-radius: 12px;
       border: none;
-      background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+      background: rgba(255,255,255,0.1);
       color: #fff;
       font-size: 14px;
       font-weight: 700;
       font-family: 'Outfit', sans-serif;
       cursor: pointer;
       display: flex; align-items: center; justify-content: center; gap: 8px;
-      transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
-      box-shadow: 0 4px 18px rgba(109,40,217,0.4);
+      transition: opacity 0.2s;
+      border: 1px solid rgba(255,255,255,0.15);
+      box-shadow: none;
       letter-spacing: 0.04em;
     }
-    .ptc-add-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(109,40,217,0.55); }
-    .ptc-add-btn:active { transform: scale(0.98); }
+    .ptc-add-btn:hover { opacity: 0.88; }
+    .ptc-add-btn:active { opacity: 0.75; }
 
     /* ══ Task Creator Trigger Bar ════════════════════════════════ */
     .ptc-trigger-bar {
       width: 100%;
       display: flex; align-items: center; gap: 10px;
       background: linear-gradient(135deg, rgba(109,40,217,0.22) 0%, rgba(109,40,217,0.1) 100%);
-      border: 1px solid rgba(139,92,246,0.35);
+      border: 1px solid rgba(255,255,255,0.1);
       border-radius: 14px;
       padding: 13px 16px;
       cursor: pointer;
@@ -2218,13 +2212,13 @@ transition: all var(--tr);
     }
     .ptc-trigger-bar:hover {
       background: linear-gradient(135deg, rgba(109,40,217,0.35) 0%, rgba(109,40,217,0.18) 100%);
-      border-color: rgba(139,92,246,0.6);
-      box-shadow: 0 4px 20px rgba(139,92,246,0.2);
+      border-color: rgba(255,255,255,0.2);
+      box-shadow: none;
     }
     .ptc-trigger-bar[aria-expanded="true"] {
       border-radius: 14px 14px 0 0;
       border-bottom-color: transparent;
-      background: linear-gradient(135deg, rgba(109,40,217,0.3) 0%, rgba(109,40,217,0.15) 100%);
+      background: rgba(255,255,255,0.04);
     }
     .ptc-trigger-plus {
       font-size: 18px; font-weight: 300; color: #a78bfa; line-height: 1;
@@ -2303,8 +2297,8 @@ transition: all var(--tr);
     .ptc-color-swatch:hover { transform: scale(1.15); }
     .ptc-color-swatch.selected {
       border-color: #fff;
-      box-shadow: 0 0 0 3px rgba(255,255,255,0.18), 0 0 12px rgba(255,255,255,0.12);
-      transform: scale(1.12);
+      box-shadow: none;
+      transform: scale(1.08);
     }
     .ptc-color-swatch.selected::before { content: '✓'; font-size: 12px; font-weight: 900; }
     /* Cancel button */
@@ -2322,117 +2316,69 @@ transition: all var(--tr);
     }
     .ptc-cancel-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
 
-        /* ══ 10-Tier Rank Badge CSS ════════════════════════════════════ */
-    /* Base task card glassmorphism polish */
+        /* ══ 10-Tier Rank System — Minimalist Tokens ══════════════════ */
+    /* Task card — clean surface, no backdrop blur, subtle border transition */
     .ri {
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      transition: transform 0.2s cubic-bezier(0.16,1,0.3,1),
-                  box-shadow 0.25s ease,
-                  border-color 0.25s ease !important;
+      transition: border-color 0.2s ease, background 0.2s ease !important;
     }
-    .ri:hover { transform: translateY(-1px); }
+    .ri:hover { background: rgba(255,255,255,0.025); }
     .ri-wrap { contain: layout style; }
 
-    /* Task color glow */
-    .ri[data-color] { transition: box-shadow 0.3s ease !important; }
-
-    /* Task completion burst animation */
+    /* Task completion fade-slide */
     @keyframes taskComplete {
-      0%   { transform: scale(1);    opacity: 1; }
-      40%  { transform: scale(1.04); opacity: 0.8; }
-      100% { transform: scale(0.92); opacity: 0; }
+      0%   { opacity:1; transform:translateX(0); }
+      100% { opacity:0; transform:translateX(12px); }
     }
-    .ri-wrap.completing { animation: taskComplete 0.38s cubic-bezier(0.4,0,0.6,1) forwards; }
+    .ri-wrap.completing { animation: taskComplete 0.32s ease forwards; }
 
-    /* Micro-animations on interactive elements */
-    .ptc-emoji-btn, .ptc-color-swatch, .ptc-add-btn, .ptc-cancel-btn,
-    .timeline-pill, .ptc-trigger-bar, .svg-action {
-      will-change: transform;
-    }
-    .ptc-emoji-btn:hover   { transform: scale(1.12) !important; }
-    .ptc-color-swatch:hover { transform: scale(1.18) !important; }
-    .ptc-add-btn:hover     { transform: translateY(-2px) scale(1.01) !important; }
-    .svg-action:hover      { transform: scale(1.08); }
+    /* Subtle hover on interactive elements */
+    .ptc-emoji-btn:hover   { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.18); }
+    .ptc-color-swatch:hover { transform: scale(1.1); }
+    .ptc-add-btn:hover     { opacity: 0.9; }
+    .svg-action:hover      { opacity: 0.75; }
 
-    /* Tier 1 — Matte Iron */
-    .rt1 .rank-badge { border: 3px solid #6b7280; box-shadow: 0 0 8px rgba(107,114,128,0.2); }
-    /* Tier 2 — Brushed Silver */
-    .rt2 .rank-badge { border: 3px solid #cbd5e1; box-shadow: 0 0 14px rgba(203,213,225,0.35); }
-    /* Tier 3 — Amber Gold */
-    .rt3 .rank-badge { border: 3px solid #f59e0b; box-shadow: 0 0 20px rgba(245,158,11,0.5), 0 0 40px rgba(245,158,11,0.18); }
-    /* Tier 4 — Neon Cyan pulse */
-    .rt4 .rank-badge { border: 3px solid #22d3ee; animation: rt4Pulse 2.2s ease-in-out infinite; }
-    @keyframes rt4Pulse {
-      0%,100% { box-shadow: 0 0 18px rgba(34,211,238,0.6), 0 0 40px rgba(34,211,238,0.2); }
-      50%     { box-shadow: 0 0 32px rgba(34,211,238,0.9), 0 0 65px rgba(34,211,238,0.35); }
-    }
-    /* Tier 5 — Amethyst Purple */
-    .rt5 .rank-badge { border: 3px solid #a855f7; animation: rt5Pulse 2.5s ease-in-out infinite; }
-    @keyframes rt5Pulse {
-      0%,100% { box-shadow: 0 0 20px rgba(168,85,247,0.65), 0 0 50px rgba(168,85,247,0.25); }
-      50%     { box-shadow: 0 0 36px rgba(168,85,247,0.95), 0 0 80px rgba(168,85,247,0.4); }
-    }
-    /* Tier 6 — Ruby Crimson */
-    .rt6 .rank-badge { border: 3px solid #ef4444; animation: rt6Pulse 2s ease-in-out infinite; }
-    @keyframes rt6Pulse {
-      0%,100% { box-shadow: 0 0 20px rgba(239,68,68,0.65), 0 0 50px rgba(239,68,68,0.2); }
-      50%     { box-shadow: 0 0 34px rgba(239,68,68,0.9),  0 0 75px rgba(239,68,68,0.35); }
-    }
-    /* Tier 7 — Shifting Emerald */
-    .rt7 .rank-badge { border: 3px solid #10b981; animation: rt7Flow 3s ease-in-out infinite; }
-    @keyframes rt7Flow {
-      0%,100% { box-shadow: 0 0 22px rgba(16,185,129,0.7), 0 0 55px rgba(16,185,129,0.3); filter: hue-rotate(0deg); }
-      50%     { box-shadow: 0 0 36px rgba(16,185,129,0.95),0 0 80px rgba(16,185,129,0.5); filter: hue-rotate(30deg); }
-    }
-    /* Tier 8 — Obsidian / Cosmic white leaks */
-    .rt8 .rank-badge { border: 3px solid #e2e8f0; animation: rt8Cosmic 4s ease-in-out infinite; background: radial-gradient(ellipse at center, rgba(255,255,255,0.06) 0%, transparent 70%) !important; }
-    @keyframes rt8Cosmic {
-      0%,100% { box-shadow: 0 0 24px rgba(226,232,240,0.6), 0 0 60px rgba(226,232,240,0.15); }
-      33%     { box-shadow: 0 0 40px rgba(226,232,240,0.9), 0 0 90px rgba(226,232,240,0.35), inset 0 0 20px rgba(255,255,255,0.08); }
-      66%     { box-shadow: 0 0 28px rgba(226,232,240,0.7), 0 0 70px rgba(226,232,240,0.2); }
-    }
-    /* Tier 9 — Iridescent Rainbow */
-    .rt9 .rank-badge { border: 3px solid transparent; background-clip: padding-box; }
-    .rt9 .rank-badge::before {
-      content:''; position:absolute; inset:-4px; border-radius:50%;
-      background: conic-gradient(from var(--rb-angle,0deg),#f43f5e,#f97316,#eab308,#22c55e,#3b82f6,#8b5cf6,#ec4899,#f43f5e);
-      animation: rbSpin 2.5s linear infinite; z-index:-1;
-    }
-    .rt9 .rank-badge::after {
-      content:''; position:absolute; inset:-8px; border-radius:50%;
-      background: conic-gradient(from var(--rb-angle,0deg),#f43f5e,#f97316,#eab308,#22c55e,#3b82f6,#8b5cf6,#ec4899,#f43f5e);
-      opacity:0.35; filter:blur(10px); animation: rbSpin 2.5s linear infinite; z-index:-2;
-    }
-    @property --rb-angle { syntax:'<angle>'; initial-value:0deg; inherits:false; }
-    @keyframes rbSpin { to { --rb-angle: 360deg; } }
-    /* Tier 10 — Eternal Myth — Plasma gradient */
-    .rt10 .rank-badge { border: 3px solid transparent; }
-    .rt10 .rank-badge::before {
-      content:''; position:absolute; inset:-5px; border-radius:50%;
-      background: conic-gradient(from var(--pm-angle,0deg),#a855f7,#f59e0b,#ec4899,#3b82f6,#10b981,#f43f5e,#a855f7);
-      animation: plasmaSpin 1.8s linear infinite; z-index:-1;
-    }
-    .rt10 .rank-badge::after {
-      content:''; position:absolute; inset:-12px; border-radius:50%;
-      background: conic-gradient(from var(--pm-angle,0deg),#a855f7,#f59e0b,#ec4899,#3b82f6,#10b981,#f43f5e,#a855f7);
-      opacity:0.45; filter:blur(14px); animation: plasmaSpin 1.8s linear infinite; z-index:-2;
-    }
-    @property --pm-angle { syntax:'<angle>'; initial-value:0deg; inherits:false; }
-    @keyframes plasmaSpin { to { --pm-angle: 360deg; } }
+    /* ── Tier rank tokens — solid borders, no glow/animation ────── */
+    /* T1 INITIATE — Slate Iron */
+    .rt1 { --rank-color: #6b7280; }
+    .rt1 .rank-badge { border: 1.5px solid #6b7280; }
+    /* T2 CONTENDER — Clean Silver */
+    .rt2 { --rank-color: #94a3b8; }
+    .rt2 .rank-badge { border: 1.5px solid #94a3b8; }
+    /* T3 VANGUARD — Solid Gold */
+    .rt3 { --rank-color: #d97706; }
+    .rt3 .rank-badge { border: 1.5px solid #d97706; }
+    /* T4 ELITE — Muted Cyan */
+    .rt4 { --rank-color: #0891b2; }
+    .rt4 .rank-badge { border: 1.5px solid #0891b2; }
+    /* T5 CHAMPION — Muted Purple */
+    .rt5 { --rank-color: #7c3aed; }
+    .rt5 .rank-badge { border: 1.5px solid #7c3aed; }
+    /* T6 MASTER — Clean Crimson */
+    .rt6 { --rank-color: #dc2626; }
+    .rt6 .rank-badge { border: 1.5px solid #dc2626; }
+    /* T7 LEGEND — Clean Green */
+    .rt7 { --rank-color: #059669; }
+    .rt7 .rank-badge { border: 1.5px solid #059669; }
+    /* T8 IMMORTAL — Deep Charcoal highlight */
+    .rt8 { --rank-color: #e2e8f0; }
+    .rt8 .rank-badge { border: 1.5px solid #e2e8f0; background: rgba(226,232,240,0.04); }
+    /* T9 CELESTIAL — Platinum line */
+    .rt9 { --rank-color: #f1f5f9; }
+    .rt9 .rank-badge { border: 2px solid #f1f5f9; }
+    /* T10 ETERNAL MYTH — High-contrast monochrome */
+    .rt10 { --rank-color: #ffffff; }
+    .rt10 .rank-badge { border: 2px solid #fff; background: rgba(255,255,255,0.06); }
 
-    /* Level-up overlay animations */
+    /* Rank text color (applied to header rank text) */
+    .rank-label { color: var(--rank-color, rgba(255,255,255,0.6)); font-weight: 700; letter-spacing: 0.08em; }
+
+    /* Level-up overlay — clean, no glow */
     @keyframes overlayIn {
-      from { opacity:0; transform:scale(0.94); }
-      to   { opacity:1; transform:scale(1); }
+      from { opacity:0; transform:translateY(8px) scale(0.97); }
+      to   { opacity:1; transform:translateY(0) scale(1); }
     }
-    @keyframes rankGlow {
-      0%,100% { text-shadow: 0 0 30px rgba(139,92,246,0.8); }
-      50%     { text-shadow: 0 0 60px rgba(139,92,246,1), 0 0 120px rgba(139,92,246,0.5); }
-    }
-    #lvlup-inner { animation: overlayIn 0.5s cubic-bezier(0.16,1,0.3,1) both; }
-    #lvlup-rank  { animation: rankGlow 2s ease-in-out infinite; }
-    #lvlup-continue-btn:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 8px 28px rgba(109,40,217,0.6); }
+    #lvlup-inner { animation: overlayIn 0.35s cubic-bezier(0.16,1,0.3,1) both; }
+    #lvlup-continue-btn:hover { opacity: 0.85; }
 
         /* ── Dev Mode Toggle ─────────────────────────── */
     #dev-pro-toggle {
@@ -3330,12 +3276,13 @@ transition: all var(--tr);
       headerProgress.style.width = `${details.pct}%`;
       // Color bar by tier
       const tierColors = {
-        rt1:'#6b7280', rt2:'#cbd5e1', rt3:'#f59e0b', rt4:'#22d3ee',
-        rt5:'#a855f7', rt6:'#ef4444', rt7:'#10b981', rt8:'#f0f4ff',
-        rt9:'#e879f9', rt10:'#f97316'
+        rt1:'#6b7280', rt2:'#94a3b8', rt3:'#d97706', rt4:'#0891b2',
+        rt5:'#7c3aed', rt6:'#dc2626', rt7:'#059669', rt8:'#e2e8f0',
+        rt9:'#f1f5f9', rt10:'#ffffff'
       };
-      headerProgress.style.background = tierColors[details.tierCls] || '#8b5cf6';
-      headerProgress.style.boxShadow = `0 0 8px ${tierColors[details.tierCls] || '#8b5cf6'}88`;
+      const tc = tierColors[details.tierCls] || '#6b7280';
+      headerProgress.style.background = tc;
+      headerProgress.style.boxShadow = 'none';
     }
     const xpDetailEl = $('header-xp-detail');
     if (xpDetailEl) xpDetailEl.textContent = `${details.currentInLevel} / ${details.levelXpCost} XP · ${details.rank}`;
@@ -4334,9 +4281,9 @@ function formatTime(timeStr) {
       `;
     }
 
-    const colorGlow = task.color ? `box-shadow: 0 0 0 1px ${task.color}22, 0 4px 24px ${task.color}28; border-left: 3px solid ${task.color};` : '';
+    const colorBorder = task.color ? `border-left: 2px solid ${task.color}; padding-left: 10px;` : '';
     return `
-      <div class="ri ${isCompleted ? 'done-task' : ''} ${streakClass}" data-id="${task.id}" style="${colorGlow}${task.color ? ' padding-left: 10px;' : ''}">
+      <div class="ri ${isCompleted ? 'done-task' : ''} ${streakClass}" data-id="${task.id}" style="${colorBorder}">
         <div class="dh" aria-label="Drag to reorder">
           <svg width="10" height="15" viewBox="0 0 10 15" fill="currentColor">
             <circle cx="2" cy="2" r="1.5"/>
