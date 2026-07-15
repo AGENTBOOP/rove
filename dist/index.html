@@ -2322,6 +2322,118 @@ transition: all var(--tr);
     }
     .ptc-cancel-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
 
+        /* ══ 10-Tier Rank Badge CSS ════════════════════════════════════ */
+    /* Base task card glassmorphism polish */
+    .ri {
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transition: transform 0.2s cubic-bezier(0.16,1,0.3,1),
+                  box-shadow 0.25s ease,
+                  border-color 0.25s ease !important;
+    }
+    .ri:hover { transform: translateY(-1px); }
+    .ri-wrap { contain: layout style; }
+
+    /* Task color glow */
+    .ri[data-color] { transition: box-shadow 0.3s ease !important; }
+
+    /* Task completion burst animation */
+    @keyframes taskComplete {
+      0%   { transform: scale(1);    opacity: 1; }
+      40%  { transform: scale(1.04); opacity: 0.8; }
+      100% { transform: scale(0.92); opacity: 0; }
+    }
+    .ri-wrap.completing { animation: taskComplete 0.38s cubic-bezier(0.4,0,0.6,1) forwards; }
+
+    /* Micro-animations on interactive elements */
+    .ptc-emoji-btn, .ptc-color-swatch, .ptc-add-btn, .ptc-cancel-btn,
+    .timeline-pill, .ptc-trigger-bar, .svg-action {
+      will-change: transform;
+    }
+    .ptc-emoji-btn:hover   { transform: scale(1.12) !important; }
+    .ptc-color-swatch:hover { transform: scale(1.18) !important; }
+    .ptc-add-btn:hover     { transform: translateY(-2px) scale(1.01) !important; }
+    .svg-action:hover      { transform: scale(1.08); }
+
+    /* Tier 1 — Matte Iron */
+    .rt1 .rank-badge { border: 3px solid #6b7280; box-shadow: 0 0 8px rgba(107,114,128,0.2); }
+    /* Tier 2 — Brushed Silver */
+    .rt2 .rank-badge { border: 3px solid #cbd5e1; box-shadow: 0 0 14px rgba(203,213,225,0.35); }
+    /* Tier 3 — Amber Gold */
+    .rt3 .rank-badge { border: 3px solid #f59e0b; box-shadow: 0 0 20px rgba(245,158,11,0.5), 0 0 40px rgba(245,158,11,0.18); }
+    /* Tier 4 — Neon Cyan pulse */
+    .rt4 .rank-badge { border: 3px solid #22d3ee; animation: rt4Pulse 2.2s ease-in-out infinite; }
+    @keyframes rt4Pulse {
+      0%,100% { box-shadow: 0 0 18px rgba(34,211,238,0.6), 0 0 40px rgba(34,211,238,0.2); }
+      50%     { box-shadow: 0 0 32px rgba(34,211,238,0.9), 0 0 65px rgba(34,211,238,0.35); }
+    }
+    /* Tier 5 — Amethyst Purple */
+    .rt5 .rank-badge { border: 3px solid #a855f7; animation: rt5Pulse 2.5s ease-in-out infinite; }
+    @keyframes rt5Pulse {
+      0%,100% { box-shadow: 0 0 20px rgba(168,85,247,0.65), 0 0 50px rgba(168,85,247,0.25); }
+      50%     { box-shadow: 0 0 36px rgba(168,85,247,0.95), 0 0 80px rgba(168,85,247,0.4); }
+    }
+    /* Tier 6 — Ruby Crimson */
+    .rt6 .rank-badge { border: 3px solid #ef4444; animation: rt6Pulse 2s ease-in-out infinite; }
+    @keyframes rt6Pulse {
+      0%,100% { box-shadow: 0 0 20px rgba(239,68,68,0.65), 0 0 50px rgba(239,68,68,0.2); }
+      50%     { box-shadow: 0 0 34px rgba(239,68,68,0.9),  0 0 75px rgba(239,68,68,0.35); }
+    }
+    /* Tier 7 — Shifting Emerald */
+    .rt7 .rank-badge { border: 3px solid #10b981; animation: rt7Flow 3s ease-in-out infinite; }
+    @keyframes rt7Flow {
+      0%,100% { box-shadow: 0 0 22px rgba(16,185,129,0.7), 0 0 55px rgba(16,185,129,0.3); filter: hue-rotate(0deg); }
+      50%     { box-shadow: 0 0 36px rgba(16,185,129,0.95),0 0 80px rgba(16,185,129,0.5); filter: hue-rotate(30deg); }
+    }
+    /* Tier 8 — Obsidian / Cosmic white leaks */
+    .rt8 .rank-badge { border: 3px solid #e2e8f0; animation: rt8Cosmic 4s ease-in-out infinite; background: radial-gradient(ellipse at center, rgba(255,255,255,0.06) 0%, transparent 70%) !important; }
+    @keyframes rt8Cosmic {
+      0%,100% { box-shadow: 0 0 24px rgba(226,232,240,0.6), 0 0 60px rgba(226,232,240,0.15); }
+      33%     { box-shadow: 0 0 40px rgba(226,232,240,0.9), 0 0 90px rgba(226,232,240,0.35), inset 0 0 20px rgba(255,255,255,0.08); }
+      66%     { box-shadow: 0 0 28px rgba(226,232,240,0.7), 0 0 70px rgba(226,232,240,0.2); }
+    }
+    /* Tier 9 — Iridescent Rainbow */
+    .rt9 .rank-badge { border: 3px solid transparent; background-clip: padding-box; }
+    .rt9 .rank-badge::before {
+      content:''; position:absolute; inset:-4px; border-radius:50%;
+      background: conic-gradient(from var(--rb-angle,0deg),#f43f5e,#f97316,#eab308,#22c55e,#3b82f6,#8b5cf6,#ec4899,#f43f5e);
+      animation: rbSpin 2.5s linear infinite; z-index:-1;
+    }
+    .rt9 .rank-badge::after {
+      content:''; position:absolute; inset:-8px; border-radius:50%;
+      background: conic-gradient(from var(--rb-angle,0deg),#f43f5e,#f97316,#eab308,#22c55e,#3b82f6,#8b5cf6,#ec4899,#f43f5e);
+      opacity:0.35; filter:blur(10px); animation: rbSpin 2.5s linear infinite; z-index:-2;
+    }
+    @property --rb-angle { syntax:'<angle>'; initial-value:0deg; inherits:false; }
+    @keyframes rbSpin { to { --rb-angle: 360deg; } }
+    /* Tier 10 — Eternal Myth — Plasma gradient */
+    .rt10 .rank-badge { border: 3px solid transparent; }
+    .rt10 .rank-badge::before {
+      content:''; position:absolute; inset:-5px; border-radius:50%;
+      background: conic-gradient(from var(--pm-angle,0deg),#a855f7,#f59e0b,#ec4899,#3b82f6,#10b981,#f43f5e,#a855f7);
+      animation: plasmaSpin 1.8s linear infinite; z-index:-1;
+    }
+    .rt10 .rank-badge::after {
+      content:''; position:absolute; inset:-12px; border-radius:50%;
+      background: conic-gradient(from var(--pm-angle,0deg),#a855f7,#f59e0b,#ec4899,#3b82f6,#10b981,#f43f5e,#a855f7);
+      opacity:0.45; filter:blur(14px); animation: plasmaSpin 1.8s linear infinite; z-index:-2;
+    }
+    @property --pm-angle { syntax:'<angle>'; initial-value:0deg; inherits:false; }
+    @keyframes plasmaSpin { to { --pm-angle: 360deg; } }
+
+    /* Level-up overlay animations */
+    @keyframes overlayIn {
+      from { opacity:0; transform:scale(0.94); }
+      to   { opacity:1; transform:scale(1); }
+    }
+    @keyframes rankGlow {
+      0%,100% { text-shadow: 0 0 30px rgba(139,92,246,0.8); }
+      50%     { text-shadow: 0 0 60px rgba(139,92,246,1), 0 0 120px rgba(139,92,246,0.5); }
+    }
+    #lvlup-inner { animation: overlayIn 0.5s cubic-bezier(0.16,1,0.3,1) both; }
+    #lvlup-rank  { animation: rankGlow 2s ease-in-out infinite; }
+    #lvlup-continue-btn:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 8px 28px rgba(109,40,217,0.6); }
+
         /* ── Dev Mode Toggle ─────────────────────────── */
     #dev-pro-toggle {
       display: flex;
@@ -2405,7 +2517,8 @@ transition: all var(--tr);
 
   <!-- Rove Sub-Header with XP Bar & Streak Badge -->
   <div id="rove-sub-header" style="position: absolute; top: 74px; left: 0; right: 0; height: 36px; background: rgba(10, 10, 12, 0.6); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.04); display: flex; align-items: center; justify-content: space-between; padding: 0 16px; z-index: 200; box-sizing: border-box;">
-    <span id="header-level-text" style="font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.05em;">Level 1 • Initiate</span>
+    <span id="header-level-text" style="font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.05em;">Lv.1 INITIATE</span>
+      <span id="header-xp-detail" style="font-family: 'Inter', sans-serif; font-size: 9px; font-weight: 500; color: rgba(255,255,255,0.35); margin-left: 6px;">0 / 100 XP · INITIATE</span>
     <div style="flex: 1; margin: 0 12px; height: 3px; background: rgba(255, 255, 255, 0.06); border-radius: 99px; overflow: hidden; position: relative;">
       <div id="header-level-progress" style="height: 100%; width: 0%; background: linear-gradient(90deg, #a855f7 0%, #6366f1 100%); transition: width 0.3s ease, transform 0.3s ease;"></div>
     </div>
@@ -3143,44 +3256,39 @@ transition: all var(--tr);
     }
   }
 
+  // 10-Tier Global Level System (level = cumulative XP / (level*100) formula)
+  const RANK_TIERS = [
+    { min:  1, max:  5, rank: 'INITIATE',     cls: 'rt1' },
+    { min:  6, max: 15, rank: 'CONTENDER',    cls: 'rt2' },
+    { min: 16, max: 30, rank: 'VANGUARD',     cls: 'rt3' },
+    { min: 31, max: 45, rank: 'ELITE',        cls: 'rt4' },
+    { min: 46, max: 60, rank: 'CHAMPION',     cls: 'rt5' },
+    { min: 61, max: 75, rank: 'MASTER',       cls: 'rt6' },
+    { min: 76, max: 90, rank: 'LEGEND',       cls: 'rt7' },
+    { min: 91, max:100, rank: 'IMMORTAL',     cls: 'rt8' },
+    { min:101, max:150, rank: 'CELESTIAL',    cls: 'rt9' },
+    { min:151, max:Infinity, rank: 'ETERNAL MYTH', cls: 'rt10' }
+  ];
+  function getTierForLevel(lvl) {
+    return RANK_TIERS.find(t => lvl >= t.min && lvl <= t.max) || RANK_TIERS[0];
+  }
   function getLevelDetails(xp) {
-    let level = 1;
-    let title = "Initiate";
-    let minXP = 0;
-    let maxXP = 100;
-    
-    if (xp <= 100) {
-      level = 1;
-      title = "Initiate";
-      minXP = 0;
-      maxXP = 100;
-    } else if (xp <= 250) {
-      level = 2;
-      title = "Acolyte";
-      minXP = 101;
-      maxXP = 250;
-    } else if (xp <= 500) {
-      level = 3;
-      title = "Disciple";
-      minXP = 251;
-      maxXP = 500;
-    } else {
-      level = 4;
-      title = "Grandmaster";
-      minXP = 501;
-      maxXP = 501;
+    // Each level N costs N*100 XP to complete
+    let level = 1, spent = 0;
+    while (true) {
+      const cost = level * 100;
+      if (spent + cost > xp) break;
+      spent += cost;
+      level++;
+      if (level > 999) break;
     }
-    
-    let pct = 0;
-    if (level === 4) {
-      pct = 100;
-    } else {
-      const range = maxXP - (minXP === 0 ? 0 : minXP - 1);
-      const progress = xp - (minXP === 0 ? 0 : minXP - 1);
-      pct = Math.min(100, Math.max(0, (progress / range) * 100));
-    }
-    
-    return { level, title, pct, maxXP };
+    const levelXpStart = spent;
+    const levelXpCost  = level * 100;
+    const currentInLevel = xp - levelXpStart;
+    const pct = Math.min(100, (currentInLevel / levelXpCost) * 100);
+    const tier = getTierForLevel(level);
+    return { level, rank: tier.rank, tierCls: tier.cls, pct,
+             currentInLevel, levelXpCost, totalXP: xp };
   }
 
   function renderWeeklyDots() {
@@ -3215,10 +3323,22 @@ transition: all var(--tr);
     const details = getLevelDetails(rpgStats.currentXP);
     
     const headerText = $('header-level-text');
-    if (headerText) headerText.textContent = `Level ${details.level} • ${details.title}`;
-    
+    if (headerText) headerText.textContent = `Lv.${details.level} ${details.rank}`;
+
     const headerProgress = $('header-level-progress');
-    if (headerProgress) headerProgress.style.width = `${details.pct}%`;
+    if (headerProgress) {
+      headerProgress.style.width = `${details.pct}%`;
+      // Color bar by tier
+      const tierColors = {
+        rt1:'#6b7280', rt2:'#cbd5e1', rt3:'#f59e0b', rt4:'#22d3ee',
+        rt5:'#a855f7', rt6:'#ef4444', rt7:'#10b981', rt8:'#f0f4ff',
+        rt9:'#e879f9', rt10:'#f97316'
+      };
+      headerProgress.style.background = tierColors[details.tierCls] || '#8b5cf6';
+      headerProgress.style.boxShadow = `0 0 8px ${tierColors[details.tierCls] || '#8b5cf6'}88`;
+    }
+    const xpDetailEl = $('header-xp-detail');
+    if (xpDetailEl) xpDetailEl.textContent = `${details.currentInLevel} / ${details.levelXpCost} XP · ${details.rank}`;
     
     const headerStreakCount = $('header-streak-count');
     if (headerStreakCount) headerStreakCount.textContent = rpgStats.streakCount;
@@ -3341,6 +3461,68 @@ transition: all var(--tr);
     }
     
     updateAttributesUI();
+  }
+
+  /* ══ Level-Up Overlay ════════════════════════════════════════ */
+  const TIER_EMOJIS = { rt1:'⚔️', rt2:'🛡️', rt3:'🏅', rt4:'💎', rt5:'🔮', rt6:'🔴', rt7:'🍃', rt8:'🌌', rt9:'🌈', rt10:'🌟' };
+  function showLevelUpOverlay(details) {
+    const overlay = $('lvlup-overlay');
+    if (!overlay) return;
+    const em = $('lvlup-emoji'), rank = $('lvlup-rank'), lvl = $('lvlup-level');
+    if (em)   em.textContent   = TIER_EMOJIS[details.tierCls] || '⚔️';
+    if (rank) rank.textContent = details.rank;
+    if (lvl)  lvl.textContent  = `Level ${details.level} achieved`;
+    overlay.style.display = 'flex';
+    overlay.style.animation = 'none';
+    void overlay.offsetWidth;
+    overlay.style.animation = 'overlayIn 0.5s cubic-bezier(0.16,1,0.3,1) both';
+  }
+  const lvlContinueBtn = $('lvlup-continue-btn');
+  if (lvlContinueBtn) lvlContinueBtn.addEventListener('click', () => {
+    const overlay = $('lvlup-overlay');
+    if (overlay) overlay.style.display = 'none';
+  });
+
+  /* ══ Task Complete Canvas Burst ══════════════════════════════ */
+  function taskCompleteBurst(x, y, color) {
+    const canvas = $('burst-canvas');
+    if (!canvas) return;
+    canvas.style.display = 'block';
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const ctx = canvas.getContext('2d');
+    const particles = [];
+    const baseColor = color || '#8b5cf6';
+    for (let i = 0; i < 28; i++) {
+      const angle = (Math.PI * 2 * i) / 28;
+      const speed = Math.random() * 5 + 3;
+      particles.push({
+        x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
+        r: Math.random() * 5 + 3,
+        color: [baseColor, '#fff', '#a78bfa', '#c084fc'][Math.floor(Math.random()*4)],
+        alpha: 1
+      });
+    }
+    let frame;
+    function draw() {
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      let alive = false;
+      particles.forEach(p => {
+        p.x += p.vx; p.y += p.vy;
+        p.vy += 0.18; // gravity
+        p.alpha -= 0.028;
+        if (p.alpha > 0) { alive = true; }
+        ctx.globalAlpha = Math.max(0, p.alpha);
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.globalAlpha = 1;
+      if (alive) { frame = requestAnimationFrame(draw); }
+      else { canvas.style.display = 'none'; cancelAnimationFrame(frame); }
+    }
+    draw();
   }
 
   function triggerLevelUpAnimation(attributeName, newLevel, sourceElement) {
@@ -3931,7 +4113,21 @@ transition: all var(--tr);
   function completeTaskFromSwipe(taskId, targetElement) {
     const task = tasks.find(t => t.id == taskId);
     if (!task) return;
-    
+
+    // Burst animation at click point
+    if (targetElement) {
+      const rect = targetElement.getBoundingClientRect();
+      taskCompleteBurst(rect.left + rect.width/2, rect.top + rect.height/2, task.color);
+    }
+
+    // Slide-out the row first for satisfaction
+    const li = targetElement ? targetElement.closest('.ri-wrap') : null;
+    if (li) {
+      li.classList.add('completing');
+    }
+
+    const prevDetails = getLevelDetails(rpgStats.currentXP || 0);
+
     task.done = true;
     task.completedDate = TODAY;
     saveTasks();
@@ -3946,9 +4142,15 @@ transition: all var(--tr);
     saveRpgStats();
     awardAttributeXP(task.attributeType || 'focus', 10, targetElement);
     updateRpgUI();
-    triggerConfetti(targetElement);
     pulseXPBar();
-    renderReview();
+
+    const newDetails = getLevelDetails(rpgStats.currentXP);
+    // Show level-up overlay if tier changed
+    if (newDetails.tierCls !== prevDetails.tierCls) {
+      setTimeout(() => showLevelUpOverlay(newDetails), 600);
+    }
+
+    setTimeout(() => renderReview(), li ? 380 : 0);
   }
 
   function deferTaskToTomorrow(taskId, li) {
@@ -4132,8 +4334,9 @@ function formatTime(timeStr) {
       `;
     }
 
+    const colorGlow = task.color ? `box-shadow: 0 0 0 1px ${task.color}22, 0 4px 24px ${task.color}28; border-left: 3px solid ${task.color};` : '';
     return `
-      <div class="ri ${isCompleted ? 'done-task' : ''} ${streakClass}" data-id="${task.id}" style="${task.color ? `border-left: 3px solid ${task.color}; padding-left: 10px;` : ''}">
+      <div class="ri ${isCompleted ? 'done-task' : ''} ${streakClass}" data-id="${task.id}" style="${colorGlow}${task.color ? ' padding-left: 10px;' : ''}">
         <div class="dh" aria-label="Drag to reorder">
           <svg width="10" height="15" viewBox="0 0 10 15" fill="currentColor">
             <circle cx="2" cy="2" r="1.5"/>
@@ -5911,5 +6114,19 @@ function formatTime(timeStr) {
   }
   
 </script>
+  <!-- ══ Level-Up Overlay ══ -->
+  <div id="lvlup-overlay" aria-modal="true" role="dialog" style="display:none; position:fixed; inset:0; z-index:99999; background:rgba(4,4,8,0.88); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); display:none; align-items:center; justify-content:center; flex-direction:column; gap:20px;">
+    <div id="lvlup-inner" style="text-align:center; padding:40px 32px; border-radius:24px; background:rgba(14,14,20,0.9); border:1px solid rgba(255,255,255,0.08); box-shadow:0 0 60px rgba(139,92,246,0.3); max-width:320px; width:90%;">
+      <div id="lvlup-emoji" style="font-size:52px; line-height:1; margin-bottom:12px;">⚔️</div>
+      <div style="font-size:10px; font-weight:800; letter-spacing:0.18em; color:rgba(255,255,255,0.4); text-transform:uppercase; margin-bottom:6px;">RANK UP!</div>
+      <div id="lvlup-rank" style="font-size:32px; font-weight:900; font-family:'Outfit',sans-serif; color:#fff; letter-spacing:0.06em; text-shadow:0 0 30px rgba(139,92,246,0.8);"></div>
+      <div id="lvlup-level" style="font-size:13px; color:rgba(255,255,255,0.5); margin-top:6px; font-family:'Inter',sans-serif;"></div>
+      <button id="lvlup-continue-btn" style="margin-top:22px; padding:12px 32px; border-radius:12px; border:none; background:linear-gradient(135deg,#7c3aed,#6d28d9); color:#fff; font-size:14px; font-weight:700; font-family:'Outfit',sans-serif; cursor:pointer; box-shadow:0 4px 20px rgba(109,40,217,0.45); transition:transform 0.2s,box-shadow 0.2s; letter-spacing:0.04em;">Continue →</button>
+    </div>
+  </div>
+
+  <!-- ══ Task Complete Burst ══ -->
+  <canvas id="burst-canvas" style="position:fixed;inset:0;pointer-events:none;z-index:9998;width:100%;height:100%;display:none;"></canvas>
+
 </body>
 </html>
