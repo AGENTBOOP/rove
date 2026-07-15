@@ -108,7 +108,8 @@
       height: 100%;
       overflow: hidden;
       border-radius: 34px;
-      background: #000;
+      background: var(--tier-bg, #000);
+      transition: background 0.4s ease;
     }
     .dynamic-island {
       position: absolute;
@@ -217,7 +218,7 @@
     }
     #account-btn {
       width: 36px; height: 36px; border-radius: 50%;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border: 1.5px solid var(--tier-border, rgba(255, 255, 255, 0.1)) !important;
       background: rgba(255, 255, 255, 0.05); cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       transition: all 0.25s var(--ease);
@@ -652,9 +653,9 @@
     .ri-wrap { animation: fadeUp 0.3s var(--ease) both; }
     .ri {
       display: flex; align-items: center; gap: 12px;
-      background: rgba(20, 20, 25, 0.6);
+      background: var(--tier-card-bg, rgba(20, 20, 25, 0.6));
       backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--tier-border, rgba(255, 255, 255, 0.05));
       border-radius: 14px; padding: 14px 16px;
       transition: all var(--tr);
       cursor: default;
@@ -2339,59 +2340,131 @@ transition: all var(--tr);
 
     /* ── 18-Tier rank tokens — solid borders only ──────────────── */
     /* T1 NOVICE */
-    .rt1 { --rank-color: #C19A6B; }
-    .rt1 .rank-badge { border: 1.5px solid #C19A6B; background: rgba(193,154,107,0.04); }
+    #phone-content.rt1 {
+      --tier-bg: #171513;
+      --tier-border: rgba(193, 154, 107, 0.25);
+      --tier-card-bg: rgba(193, 154, 107, 0.04);
+      --rank-color: #C19A6B;
+    }
     /* T2 APPRENTICE */
-    .rt2 { --rank-color: #708090; }
-    .rt2 .rank-badge { border: 1.5px solid #708090; background: rgba(112,128,144,0.04); }
+    #phone-content.rt2 {
+      --tier-bg: #121417;
+      --tier-border: rgba(112, 128, 144, 0.25);
+      --tier-card-bg: rgba(112, 128, 144, 0.04);
+      --rank-color: #708090;
+    }
     /* T3 CHALLENGER */
-    .rt3 { --rank-color: #CD7F32; }
-    .rt3 .rank-badge { border: 1.5px solid #CD7F32; }
+    #phone-content.rt3 {
+      --tier-bg: #191410;
+      --tier-border: rgba(205, 127, 50, 0.25);
+      --tier-card-bg: rgba(205, 127, 50, 0.04);
+      --rank-color: #CD7F32;
+    }
     /* T4 SPECIALIST */
-    .rt4 { --rank-color: #C0C0C0; }
-    .rt4 .rank-badge { border: 1.5px solid #C0C0C0; background: rgba(192,192,192,0.04); }
+    #phone-content.rt4 {
+      --tier-bg: #0f172a;
+      --tier-border: rgba(192, 192, 192, 0.25);
+      --tier-card-bg: rgba(192, 192, 192, 0.04);
+      --rank-color: #C0C0C0;
+    }
     /* T5 ELITE */
-    .rt5 { --rank-color: #FFD700; }
-    .rt5 .rank-badge { border: 1.5px solid #FFD700; }
+    #phone-content.rt5 {
+      --tier-bg: #1a1608;
+      --tier-border: rgba(255, 215, 0, 0.25);
+      --tier-card-bg: rgba(255, 215, 0, 0.04);
+      --rank-color: #FFD700;
+    }
     /* T6 VANGUARD */
-    .rt6 { --rank-color: #E5E4E2; }
-    .rt6 .rank-badge { border: 1.5px solid #E5E4E2; }
+    #phone-content.rt6 {
+      --tier-bg: #1c1c1e;
+      --tier-border: rgba(229, 228, 226, 0.25);
+      --tier-card-bg: rgba(229, 228, 226, 0.04);
+      --rank-color: #E5E4E2;
+    }
     /* T7 WARRIOR */
-    .rt7 { --rank-color: #00A86B; }
-    .rt7 .rank-badge { border: 1.5px solid #00A86B; background: rgba(0,168,107,0.04); }
+    #phone-content.rt7 {
+      --tier-bg: #08140e;
+      --tier-border: rgba(0, 168, 107, 0.25);
+      --tier-card-bg: rgba(0, 168, 107, 0.04);
+      --rank-color: #00A86B;
+    }
     /* T8 CHAMPION */
-    .rt8 { --rank-color: #046307; }
-    .rt8 .rank-badge { border: 1.5px solid #046307; }
+    #phone-content.rt8 {
+      --tier-bg: #051206;
+      --tier-border: rgba(4, 99, 7, 0.25);
+      --tier-card-bg: rgba(4, 99, 7, 0.04);
+      --rank-color: #046307;
+    }
     /* T9 GLADIATOR */
-    .rt9 { --rank-color: #FFC87C; }
-    .rt9 .rank-badge { border: 1.5px solid #FFC87C; background: rgba(255,200,124,0.04); }
+    #phone-content.rt9 {
+      --tier-bg: #1f1a14;
+      --tier-border: rgba(255, 200, 124, 0.25);
+      --tier-card-bg: rgba(255, 200, 124, 0.04);
+      --rank-color: #FFC87C;
+    }
     /* T10 COMMANDER */
-    .rt10 { --rank-color: #0F52BA; }
-    .rt10 .rank-badge { border: 1.5px solid #0F52BA; background: rgba(15,82,186,0.06); }
+    #phone-content.rt10 {
+      --tier-bg: #080f1d;
+      --tier-border: rgba(15, 82, 186, 0.25);
+      --tier-card-bg: rgba(15, 82, 186, 0.04);
+      --rank-color: #0F52BA;
+    }
     /* T11 MASTER */
-    .rt11 { --rank-color: #9966CC; }
-    .rt11 .rank-badge { border: 1.5px solid #9966CC; background: rgba(153,102,204,0.06); }
+    #phone-content.rt11 {
+      --tier-bg: #110b1a;
+      --tier-border: rgba(153, 102, 204, 0.25);
+      --tier-card-bg: rgba(153, 102, 204, 0.04);
+      --rank-color: #9966CC;
+    }
     /* T12 GRANDMASTER */
-    .rt12 { --rank-color: #E0115F; }
-    .rt12 .rank-badge { border: 1.5px solid #E0115F; }
+    #phone-content.rt12 {
+      --tier-bg: #1a070f;
+      --tier-border: rgba(224, 17, 95, 0.25);
+      --tier-card-bg: rgba(224, 17, 95, 0.04);
+      --rank-color: #E0115F;
+    }
     /* T13 WARLORD */
-    .rt13 { --rank-color: #B9F2FF; }
-    .rt13 .rank-badge { border: 1.5px solid #B9F2FF; }
+    #phone-content.rt13 {
+      --tier-bg: #02080f;
+      --tier-border: rgba(185, 242, 255, 0.25);
+      --tier-card-bg: rgba(185, 242, 255, 0.04);
+      --rank-color: #B9F2FF;
+    }
     /* T14 OVERLORD */
-    .rt14 { --rank-color: #1A1A1A; }
-    .rt14 .rank-badge { border: 1.5px solid #1A1A1A; background: #0a0a0a; border-color: #1a1a1a !important; }
+    #phone-content.rt14 {
+      --tier-bg: #000000;
+      --tier-border: rgba(26, 26, 26, 0.65);
+      --tier-card-bg: rgba(26, 26, 26, 0.08);
+      --rank-color: #1A1A1A;
+    }
     /* T15 IMMORTAL */
-    .rt15 { --rank-color: #878681; }
-    .rt15 .rank-badge { border: 1.5px solid #878681; }
+    #phone-content.rt15 {
+      --tier-bg: #161616;
+      --tier-border: rgba(135, 134, 129, 0.25);
+      --tier-card-bg: rgba(135, 134, 129, 0.04);
+      --rank-color: #878681;
+    }
     /* T16 CELESTIAL */
-    .rt16 { --rank-color: #4B0082; }
-    .rt16 .rank-badge { border: 1.5px solid #4B0082; background: rgba(75,0,130,0.08); }
+    #phone-content.rt16 {
+      --tier-bg: #0a0212;
+      --tier-border: rgba(75, 0, 130, 0.25);
+      --tier-card-bg: rgba(75, 0, 130, 0.04);
+      --rank-color: #4B0082;
+    }
     /* T17 APEX */
-    .rt17 { --rank-color: #FF4500; }
-    .rt17 .rank-badge { border: 2px solid #FF4500; }
+    #phone-content.rt17 {
+      --tier-bg: #160602;
+      --tier-border: rgba(255, 69, 0, 0.35);
+      --tier-card-bg: rgba(255, 69, 0, 0.05);
+      --rank-color: #FF4500;
+    }
     /* T18 ZENITH */
-    .rt18 { --rank-color: #FFFFFF; }
-    .rt18 .rank-badge { border: 2px solid #FFFFFF; background: #000000; border-color: #ffffff !important; }
+    #phone-content.rt18 {
+      --tier-bg: #000000;
+      --tier-border: #FFFFFF;
+      --tier-card-bg: rgba(255, 255, 255, 0.02);
+      --rank-color: #FFFFFF;
+    }
 
     /* Rank text color */
     .rank-label { color: var(--rank-color, rgba(255,255,255,0.6)); font-weight: 700; letter-spacing: 0.08em; }
@@ -3288,6 +3361,14 @@ transition: all var(--tr);
   function updateRpgUI() {
     loadRpgStats();
     const details = getLevelDetails(rpgStats.currentXP);
+
+    const phoneContent = $('phone-content');
+    if (phoneContent) {
+      for (let i = 1; i <= 18; i++) {
+        phoneContent.classList.remove(`rt${i}`);
+      }
+      phoneContent.classList.add(details.tierCls);
+    }
     
     const headerText = $('header-level-text');
     if (headerText) { if (details.rank === 'ZENITH') { headerText.innerHTML = `👑 Lv.${details.level} <span style="font-weight:900;">${details.rank}</span> 👑`; } else { headerText.textContent = `Lv.${details.level} ${details.rank}`; } }
