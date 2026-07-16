@@ -2888,7 +2888,7 @@ transition: all var(--tr);
             <div class="ptc-emoji-row">
               <button type="button" class="ptc-emoji-btn" data-emoji="flame" data-attr="endurance" data-tip="PURE GRIND"><i data-lucide="flame"></i></button>
               <button type="button" class="ptc-emoji-btn" data-emoji="activity" data-attr="endurance" data-tip="PHYSICAL POWER"><i data-lucide="activity"></i></button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="zap-off" data-attr="endurance" data-tip="CARDIO/SPEED"><i data-lucide="zap-off"></i></button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="shield-alert" data-attr="endurance" data-tip="CARDIO EDGE"><i data-lucide="shield-alert"></i></button>
               <button type="button" class="ptc-emoji-btn" data-emoji="trophy" data-attr="endurance" data-tip="VICTORY"><i data-lucide="trophy"></i></button>
               <button type="button" class="ptc-emoji-btn" data-emoji="dribbble" data-attr="endurance" data-tip="ATHLETIC TRAINING"><i data-lucide="dribbble"></i></button>
               <button type="button" class="ptc-emoji-btn" data-emoji="battery-charging" data-attr="endurance" data-tip="ENERGY"><i data-lucide="battery-charging"></i></button>
@@ -2901,7 +2901,7 @@ transition: all var(--tr);
               <button type="button" class="ptc-emoji-btn" data-emoji="sunrise" data-attr="mindset" data-tip="MORNING ROUTINE"><i data-lucide="sunrise"></i></button>
               <button type="button" class="ptc-emoji-btn" data-emoji="moon" data-attr="mindset" data-tip="VISION PLANNING"><i data-lucide="moon"></i></button>
               <button type="button" class="ptc-emoji-btn" data-emoji="shield" data-attr="mindset" data-tip="UNBREAKABLE RESILIENCE"><i data-lucide="shield"></i></button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="crown" data-attr="mindset" data-tip="HIGH STATUS"><i data-lucide="crown"></i></button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="user-check" data-attr="mindset" data-tip="HIGH STATUS"><i data-lucide="user-check"></i></button>
               <button type="button" class="ptc-emoji-btn" data-emoji="sparkles" data-attr="mindset" data-tip="APEX INTENT"><i data-lucide="sparkles"></i></button>
               <button type="button" class="ptc-emoji-btn" data-emoji="eye" data-attr="mindset" data-tip="MENTAL CLARITY"><i data-lucide="eye"></i></button>
             </div>
@@ -5156,8 +5156,6 @@ function formatTime(timeStr) {
           isTimelineMatch = (sDate === TOMORROW);
         } else if (activeTimelineFilter === 'week') {
           isTimelineMatch = (datesOfWeek.includes(sDate) && sDate > TODAY);
-        } else if (activeTimelineFilter === 'later') {
-          isTimelineMatch = (sDate > lastDateOfWeek);
         }
       } else {
         isTimelineMatch = ((t.scheduledDate || TODAY) > TODAY && !t.isEveryday && !t.done);
@@ -6050,13 +6048,22 @@ function formatTime(timeStr) {
     const loader = $('auth-loading-overlay');
     
     // Helper to hide loader safely
-    const hideLoader = () => { if (loader) {
-        loader.style.opacity = '0';
-        setTimeout(() => {
-          loader.style.display = 'none';
-        }, 350);
+    const setLoading = (loading) => {
+      if (!loading) {
+        if (loader) {
+          loader.style.opacity = '0';
+          setTimeout(() => {
+            loader.style.display = 'none';
+          }, 350);
+        }
+      } else {
+        if (loader) {
+          loader.style.display = 'flex';
+          loader.style.opacity = '1';
+        }
       }
     };
+    const hideLoader = () => setLoading(false);
 
     try {
       if (user) {
@@ -6263,7 +6270,7 @@ function formatTime(timeStr) {
       localStorage.removeItem('rove_logged_in');
       checkAuthStatus();
     } finally {
-      hideLoader();
+      setLoading(false);
     }
   });
 

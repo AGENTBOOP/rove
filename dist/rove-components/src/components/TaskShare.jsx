@@ -1951,7 +1951,7 @@ export default function TaskShare({ familyId }) {
                 color: rpgStats.streakCount >= 8 ? '#a855f7' : (rpgStats.streakCount >= 3 ? '#fb923c' : '#8e8e9f')
               }}
             >
-              <span>🔥</span>
+              <svg className="w-3.5 h-3.5 stroke-[1.5] mr-0.5 inline-block align-middle" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
               <span>{rpgStats.streakCount}</span>
             </span>
           </div>
@@ -1962,7 +1962,7 @@ export default function TaskShare({ familyId }) {
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <span className="text-sm font-bold text-white flex items-center gap-1.5" style={{ fontFamily: "'Outfit', sans-serif" }}>
-                <span style={{ color: rpgStats.streakCount >= 8 ? '#a855f7' : (rpgStats.streakCount >= 3 ? '#fb923c' : '#8e8e9f') }}>🔥</span>
+                <svg className="w-4 h-4 stroke-[1.5] inline-block align-middle" style={{ color: rpgStats.streakCount >= 8 ? '#a855f7' : (rpgStats.streakCount >= 3 ? '#fb923c' : '#8e8e9f') }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
                 {rpgStats.streakCount} Day Streak
               </span>
             </div>
@@ -1970,10 +1970,11 @@ export default function TaskShare({ familyId }) {
             <button
               type="button"
               disabled
-              className="text-[10px] font-bold text-[#8e8e9f] bg-white/[0.03] border border-white/[0.06] rounded-lg px-2.5 py-1.5 cursor-not-allowed transition-all duration-200"
+              className="text-[10px] font-bold text-[#8e8e9f] bg-white/[0.03] border border-white/[0.06] rounded-lg px-2.5 py-1.5 cursor-not-allowed transition-all duration-200 flex items-center gap-1.5"
               style={{ fontFamily: "'Outfit', sans-serif" }}
             >
-              🥶 Buy Streak Freeze (Premium Only)
+              <svg className="w-3.5 h-3.5 stroke-[1.5] text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/><path d="m20 16-4-4 4-4"/><path d="m4 8 4 4-4 4"/><path d="m16 4-4 4-4-4"/><path d="m8 20 4-4 4 4"/><line x1="4.3" y1="4.3" x2="19.7" y2="19.7"/><line x1="19.7" y1="4.3" x2="4.3" y2="19.7"/></svg>
+              Buy Streak Freeze (Premium Only)
             </button>
           </div>
 
@@ -1984,8 +1985,9 @@ export default function TaskShare({ familyId }) {
             {/* Endurance Track */}
             <div className="flex flex-col gap-1">
               <div className="flex justify-between items-center">
-                <span className="text-xs font-semibold text-white" style={{ fontFamily: "'Outfit', sans-serif" }}>
-                  🏃 Endurance <span className="text-[#60a5fa] font-bold ml-0.5">Lvl. {rpgStats.attributes?.endurance?.level || 1}</span>
+                <span className="text-xs font-semibold text-white flex items-center gap-1.5" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                  <svg className="w-3.5 h-3.5 stroke-[1.5] text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                  Endurance <span className="text-[#60a5fa] font-bold ml-0.5">Lvl. {rpgStats.attributes?.endurance?.level || 1}</span>
                 </span>
                 <span className="text-[9px] text-[#8e8e9f]" style={{ fontFamily: "'Inter', sans-serif" }}>
                   {rpgStats.attributes?.endurance?.xp || 0} / {rpgStats.attributes?.endurance?.nextLevelXp || 100} XP
@@ -2002,8 +2004,9 @@ export default function TaskShare({ familyId }) {
             {/* Focus Track */}
             <div className="flex flex-col gap-1">
               <div className="flex justify-between items-center">
-                <span className="text-xs font-semibold text-white" style={{ fontFamily: "'Outfit', sans-serif" }}>
-                  ⚡ Focus <span className="text-[#a78bfa] font-bold ml-0.5">Lvl. {rpgStats.attributes?.focus?.level || 1}</span>
+                <span className="text-xs font-semibold text-white flex items-center gap-1.5" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                  <svg className="w-3.5 h-3.5 stroke-[1.5] text-[#a78bfa]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                  Focus <span className="text-[#a78bfa] font-bold ml-0.5">Lvl. {rpgStats.attributes?.focus?.level || 1}</span>
                 </span>
                 <span className="text-[9px] text-[#8e8e9f]" style={{ fontFamily: "'Inter', sans-serif" }}>
                   {rpgStats.attributes?.focus?.xp || 0} / {rpgStats.attributes?.focus?.nextLevelXp || 100} XP
@@ -2020,8 +2023,9 @@ export default function TaskShare({ familyId }) {
             {/* Mindset Track */}
             <div className="flex flex-col gap-1">
               <div className="flex justify-between items-center">
-                <span className="text-xs font-semibold text-white" style={{ fontFamily: "'Outfit', sans-serif" }}>
-                  🧠 Mindset <span className="text-[#34d399] font-bold ml-0.5">Lvl. {rpgStats.attributes?.mindset?.level || 1}</span>
+                <span className="text-xs font-semibold text-white flex items-center gap-1.5" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                  <svg className="w-3.5 h-3.5 stroke-[1.5] text-[#34d399]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1 0-3.12 3 3 0 0 1 0-4.88 2.5 2.5 0 0 1 0-3.12A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 0-3.12 3 3 0 0 0 0-4.88 2.5 2.5 0 0 0 0-3.12A2.5 2.5 0 0 0 14.5 2Z"/></svg>
+                  Mindset <span className="text-[#34d399] font-bold ml-0.5">Lvl. {rpgStats.attributes?.mindset?.level || 1}</span>
                 </span>
                 <span className="text-[9px] text-[#8e8e9f]" style={{ fontFamily: "'Inter', sans-serif" }}>
                   {rpgStats.attributes?.mindset?.xp || 0} / {rpgStats.attributes?.mindset?.nextLevelXp || 100} XP
