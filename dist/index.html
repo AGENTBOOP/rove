@@ -2787,7 +2787,7 @@ transition: all var(--tr);
       <h1 class="greeting">Ready for the day?</h1>
       <p class="review-date" id="review-date"></p>
       <div style="display: inline-flex; gap: 8px; justify-content: center; margin-bottom: 24px;">
-        <button id="focus-toggle-btn" class="header-pill-btn" style="margin: 0; display: inline-block;">Focus</button>
+        <button id="focus-toggle-btn" class="header-pill-btn" style="margin: 0; display: none !important;">Focus</button>
       </div>
     </div>
     
@@ -2993,7 +2993,7 @@ transition: all var(--tr);
     <div class="focus-header">
       <p class="focus-title">Focus</p>
       <p class="focus-sub" id="focus-date"></p>
-      <button id="focus-screen-toggle-btn" class="header-pill-btn" style="margin-top: 8px; display: inline-block;">Focus</button>
+      <button id="focus-screen-toggle-btn" class="header-pill-btn" style="margin-top: 8px; display: none !important;">Focus</button>
     </div>
     <div class="ring-wrap" id="ring-wrap" aria-label="Task completion progress">
       <svg class="ring-svg" viewBox="0 0 192 192" aria-hidden="true">
@@ -3295,7 +3295,7 @@ transition: all var(--tr);
   let choreTimer   = null;
   let choreActive  = false;
   let pendingChore = 'Clean Room';
-  let focusOnMe    = false;
+  let focusOnMe    = true;
   let isPremium         = false;
   let isPro             = false;        // true when premiumTier !== 'free'
   let premiumTier       = 'free';       // 'free' | 'monthly' | 'annual' | 'lifetime'
@@ -4888,6 +4888,15 @@ function formatTime(timeStr) {
       triggerBar.setAttribute('aria-expanded', 'true');
       const inp = $('add-input');
       if (inp) setTimeout(() => inp.focus(), 80);
+      const phoneContent = $('phone-content');
+      if (phoneContent) {
+        setTimeout(() => {
+          phoneContent.scrollTo({
+            top: phoneContent.scrollHeight,
+            behavior: 'smooth'
+          });
+        }, 150);
+      }
     }
     function closeModal() {
       if (!modal || !triggerBar) return;
