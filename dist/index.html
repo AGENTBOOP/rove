@@ -3267,7 +3267,14 @@ transition: all var(--tr);
     storageBucket:     'studio-6455201864-cf8cb.firebasestorage.app',
     messagingSenderId: '965652912843',
     appId:             '1:965652912843:web:70c06397a1b7d250d6994e',
-  }; const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app); /* ══ Constants ═══════════════════════════════════════════════ */
+  }; const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app); 
+  
+  // DOM helper selector
+  function $(id) {
+    return document.getElementById(id);
+  }
+
+  /* ══ Constants ═══════════════════════════════════════════════ */
   const RING_R  = 86;
   const RING_C  = 2 * Math.PI * RING_R;
   const TODAY   = new Date().toISOString().slice(0, 10);
@@ -3842,7 +3849,6 @@ transition: all var(--tr);
   ];
 
   /* ══ DOM refs ════════════════════════════════════════════════ */
-  const $   = id => document.getElementById(id);
   const sReview    = $('screen-review');
   const sFocus     = $('screen-focus');
   const sComplete  = $('screen-complete');
