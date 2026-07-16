@@ -45,6 +45,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest"></script>
   <style>
     /* ─── Tokens ─────────────────────────────────────── */
     :root {
@@ -1913,7 +1914,7 @@ transition: all var(--tr);
       position: relative;
     }
     .streak-at-risk::before {
-      content: '🔥 Streak At Risk!';
+      content: 'Streak At Risk!';
       position: absolute;
       right: 64px;
       top: -6px;
@@ -2138,6 +2139,17 @@ transition: all var(--tr);
       background: rgba(255,255,255,0.08);
       box-shadow: none;
     }
+    .ptc-emoji-btn svg {
+      width: 18px;
+      height: 18px;
+      stroke: rgba(255,255,255,0.7);
+      stroke-width: 2px;
+      transition: stroke 0.2s, transform 0.2s;
+    }
+    .ptc-emoji-btn.selected svg {
+      stroke: var(--accent);
+      transform: scale(1.1);
+    }
     /* Pill inputs */
     .ptc-inline-row { display: flex; gap: 8px; align-items: center; }
     .ptc-pill-select {
@@ -2321,8 +2333,12 @@ transition: all var(--tr);
     /* Task card — clean surface, no backdrop blur, subtle border transition */
     .ri {
       transition: border-color 0.2s ease, background 0.2s ease !important;
+      box-shadow: none !important;
     }
-    .ri:hover { background: rgba(255,255,255,0.025); }
+    .ri:hover {
+      background: rgba(255,255,255,0.025);
+      box-shadow: none !important;
+    }
     .ri-wrap { contain: layout style; }
 
     /* Task completion fade-slide */
@@ -2333,7 +2349,50 @@ transition: all var(--tr);
     .ri-wrap.completing { animation: taskComplete 0.32s ease forwards; }
 
     /* Subtle hover on interactive elements */
-    .ptc-emoji-btn:hover   { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.18); }
+    .ptc-emoji-btn {
+      position: relative;
+    }
+    .ptc-emoji-btn:hover {
+      background: rgba(255,255,255,0.07);
+      border-color: rgba(255,255,255,0.18);
+    }
+    /* Icon picker hover tooltip */
+    .ptc-emoji-btn::after {
+      content: attr(data-tip);
+      position: absolute;
+      bottom: calc(100% + 5px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(14,14,20,0.97);
+      color: rgba(255,255,255,0.92);
+      font-family: 'Inter', sans-serif;
+      font-size: 7.5px;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      padding: 3px 6px;
+      border-radius: 4px;
+      border: 1px solid rgba(255,255,255,0.1);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.12s ease;
+      z-index: 9999;
+    }
+    .ptc-emoji-btn:hover::after {
+      opacity: 1;
+    }
+    /* Color swatch checkmark */
+    .ptc-color-swatch .swatch-check {
+      opacity: 0;
+      width: 11px;
+      height: 11px;
+      transition: opacity 0.15s ease;
+      flex-shrink: 0;
+    }
+    .ptc-color-swatch.selected .swatch-check {
+      opacity: 1;
+    }
     .ptc-color-swatch:hover { transform: scale(1.1); }
     .ptc-add-btn:hover     { opacity: 0.9; }
     .svg-action:hover      { opacity: 0.75; }
@@ -2550,7 +2609,7 @@ transition: all var(--tr);
 
   <!-- Top Navigation Header -->
   <header id="app-header">
-    <button id="shop-btn" aria-label="Style Shop">🎨</button>
+    <button id="shop-btn" aria-label="Style Shop"><i data-lucide="palette"></i></button>
     <span class="header-title" id="header-title">Rove</span>
     <button id="account-btn" aria-label="Account & Family">
       <span class="account-initial">—</span>
@@ -2567,7 +2626,7 @@ transition: all var(--tr);
     </div>
     <div style="display: flex; align-items: center; gap: 6px;">
       <span id="header-streak-badge" style="font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 700; color: #8e8e9f; display: flex; align-items: center; gap: 2px;">
-        <span id="header-streak-fire">🔥</span> <span id="header-streak-count">0</span>
+        <i data-lucide="flame" id="header-streak-fire" style="width: 12px; height: 12px; vertical-align: middle; margin-right: 2px;"></i> <span id="header-streak-count">0</span>
       </span>
     </div>
   </div>
@@ -2606,7 +2665,7 @@ transition: all var(--tr);
   <div id="paywall-overlay"></div>
   <div id="paywall-sheet" role="dialog" aria-modal="true" aria-label="Premium Paywall" aria-hidden="true">
     <div class="pw-handle"></div>
-    <div class="pw-headline">Unlock Rove Pro &#x26A1;</div>
+    <div class="pw-headline" style="display: flex; align-items: center; justify-content: center; gap: 6px;">Unlock Rove Pro <i data-lucide="zap" style="width: 16px; height: 16px; color: #eab308; fill: #eab308;"></i></div>
     <div class="pw-sub">Everything you need to build elite-level habits.</div>
 
     <!-- Comparison Table -->
@@ -2760,82 +2819,24 @@ transition: all var(--tr);
                  maxlength="120" autocomplete="off" spellcheck="false" aria-label="Add a task" />
         </div>
 
-        <!-- Emoji Picker Matrix -->
+        <!-- Inline Time & Duration -->
         <div class="ptc-field-group">
-          <label class="ptc-label">PICK AN ICON <span class="ptc-sublabel">— sets attribute</span></label>
-          <div class="ptc-emoji-section">
-
-            <div class="ptc-emoji-group-label">🧠 Focus</div>
-            <div class="ptc-emoji-row">
-              <button type="button" class="ptc-emoji-btn" data-emoji="🧠" data-attr="focus" data-tip="DEEP WORK">🧠</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="💻" data-attr="focus" data-tip="DEV MODE">💻</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="📈" data-attr="focus" data-tip="GROWTH">📈</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="📚" data-attr="focus" data-tip="STUDY GRIND">📚</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="🎯" data-attr="focus" data-tip="PRECISION FOCUS">🎯</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="🔍" data-attr="focus" data-tip="ANALYSIS">🔍</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="⚡" data-attr="focus" data-tip="FLOW STATE">⚡</button>
-            </div>
-
-            <div class="ptc-emoji-group-label" style="margin-top:10px;">🏃 Endurance</div>
-            <div class="ptc-emoji-row">
-              <button type="button" class="ptc-emoji-btn" data-emoji="🔥" data-attr="endurance" data-tip="PURE GRIND">🔥</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="💪" data-attr="endurance" data-tip="PHYSICAL POWER">💪</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="🏃" data-attr="endurance" data-tip="SPEED &amp; CARDIO">🏃</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="🏆" data-attr="endurance" data-tip="VICTORY">🏆</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="⚽" data-attr="endurance" data-tip="ATHLETIC TRAINING">⚽</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="🔋" data-attr="endurance" data-tip="ENERGY RECHARGE">🔋</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="🏋️" data-attr="endurance" data-tip="HEAVY SESSION">🏋️</button>
-            </div>
-
-            <div class="ptc-emoji-group-label" style="margin-top:10px;">🧘 Mindset</div>
-            <div class="ptc-emoji-row">
-              <button type="button" class="ptc-emoji-btn" data-emoji="🧘" data-attr="mindset" data-tip="ZEN CONTROL">🧘</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="🌅" data-attr="mindset" data-tip="MORNING ROUTINE">🌅</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="🌌" data-attr="mindset" data-tip="VISION PLANNING">🌌</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="💎" data-attr="mindset" data-tip="UNBREAKABLE RESILIENCE">💎</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="👑" data-attr="mindset" data-tip="HIGH STATUS">👑</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="🌟" data-attr="mindset" data-tip="APEX INTENT">🌟</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="🕊️" data-attr="mindset" data-tip="MENTAL CLARITY">🕊️</button>
-            </div>
-
-            <div class="ptc-emoji-group-label" style="margin-top:10px;">💼 Personal</div>
-            <div class="ptc-emoji-row">
-              <button type="button" class="ptc-emoji-btn" data-emoji="🎨" data-attr="personal" data-tip="CREATIVE BUILD">🎨</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="🎸" data-attr="personal" data-tip="SKILL PRACTICE">🎸</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="🍏" data-attr="personal" data-tip="PREMIUM FUEL">🍏</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="💧" data-attr="personal" data-tip="HYDRATION LOCK">💧</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="🤝" data-attr="personal" data-tip="NETWORKING">🤝</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="💵" data-attr="personal" data-tip="FINANCIAL ASSETS">💵</button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="⏰" data-attr="personal" data-tip="TIME MANAGEMENT">⏰</button>
-            </div>
-
+          <label class="ptc-label">TIME / DURATION</label>
+          <div style="display: flex; gap: 8px;">
+            <input type="time" id="add-task-time" class="ptc-pill-select" style="flex: 1;" />
+            <input type="number" id="add-task-duration" class="ptc-pill-select" placeholder="Duration (min)" min="1" style="flex: 1; text-align: center;" />
           </div>
         </div>
 
-        <!-- Color Palette -->
+        <!-- Target Date & Category side-by-side -->
         <div class="ptc-field-group">
-          <label class="ptc-label">ACCENT COLOR</label>
-          <div class="ptc-color-row" id="ptc-color-row">
-            <button type="button" class="ptc-color-swatch selected" data-color="#8b5cf6" style="background:#8b5cf6;" data-tip="Purple"></button>
-            <button type="button" class="ptc-color-swatch" data-color="#14b8a6" style="background:#14b8a6;" data-tip="Teal"></button>
-            <button type="button" class="ptc-color-swatch" data-color="#ec4899" style="background:#ec4899;" data-tip="Pink"></button>
-            <button type="button" class="ptc-color-swatch" data-color="#22c55e" style="background:#22c55e;" data-tip="Green"></button>
-            <button type="button" class="ptc-color-swatch" data-color="#f97316" style="background:#f97316;" data-tip="Orange"></button>
-            <button type="button" class="ptc-color-swatch" data-color="#eab308" style="background:#eab308;" data-tip="Yellow"></button>
-            <button type="button" class="ptc-color-swatch" data-color="#3b82f6" style="background:#3b82f6;" data-tip="Blue"></button>
-            <button type="button" class="ptc-color-swatch" data-color="#f43f5e" style="background:#f43f5e;" data-tip="Red"></button>
-          </div>
-        </div>
-
-        <!-- Row: Time + Duration -->
-        <div class="ptc-field-group">
-          <label class="ptc-label">TIME & DURATION</label>
-          <div class="ptc-inline-row">
-            <div style="position:relative; flex:1;">
+          <div style="display: flex; gap: 8px; width: 100%;">
+            <div style="position:relative; flex: 1; display: flex; flex-direction: column;">
+              <label class="ptc-label">TARGET DATE</label>
               <button type="button" id="add-task-date-btn" class="ptc-pill-select" style="width:100%;">
-                <span style="font-size:13px; margin-right:5px;">📅</span>
+                <i data-lucide="calendar" style="width: 13px; height: 13px; margin-right: 5px; color: var(--accent); vertical-align: middle;"></i>
                 <span id="add-task-date-text">Select Date</span>
-                <span style="margin-left:auto; font-size:9px; opacity:.5;">▼</span>
+                <i data-lucide="chevron-down" style="margin-left:auto; width: 10px; height: 10px; opacity:.5; vertical-align: middle;"></i>
               </button>
               <div id="calendar-popup" style="display:none; position:absolute; bottom:44px; left:0; z-index:1000; width:230px; background:#18181C; border:1px solid rgba(255,255,255,0.12); border-radius:12px; box-shadow:0 8px 30px rgba(0,0,0,0.5); padding:12px; font-family:'Inter',sans-serif;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
@@ -2853,37 +2854,116 @@ transition: all var(--tr);
                 </div>
               </div>
             </div>
-            <input type="time" id="add-task-time" class="ptc-pill-select" style="flex:0 0 auto; min-width:100px;" />
-            <input type="number" id="add-task-duration" class="ptc-pill-select" placeholder="Min" min="1" style="flex:0 0 60px; text-align:center;" />
+            <div style="flex: 1; display: flex; flex-direction: column;">
+              <label class="ptc-label">CATEGORY</label>
+              <select id="add-task-category" class="ptc-pill-select" style="width: 100%; height: 38px; box-sizing: border-box;">
+                <option value="General">General</option>
+                <option value="Health">Health</option>
+                <option value="Work">Work</option>
+                <option value="Fitness">Fitness</option>
+                <option value="Education">Education</option>
+                <option value="Sports">Sports</option>
+              </select>
+            </div>
           </div>
         </div>
 
-        <!-- Row: Category + Repeat -->
+        <!-- Icon Picker Matrix (Lucide) -->
         <div class="ptc-field-group">
-          <label class="ptc-label">CATEGORY & REPEAT</label>
-          <div class="ptc-inline-row" style="flex-wrap:wrap;">
-            <select id="add-task-category" class="ptc-pill-select">
-              <option value="General">General</option>
-              <option value="Health">Health</option>
-              <option value="Work">Work</option>
-              <option value="Fitness">Fitness</option>
-              <option value="Education">Education</option>
-              <option value="Sports">Sports</option>
-            </select>
-            <div id="repeating-options-container" style="display:flex; gap:6px; flex-wrap:wrap;">
-              <label class="ptc-check-pill">
-                <input type="checkbox" id="add-task-everyday" style="display:none;" />
-                <span class="ptc-check-label" data-for="add-task-everyday">Every Day</span>
-              </label>
-              <label class="ptc-check-pill">
-                <input type="checkbox" id="add-task-weekly" style="display:none;" />
-                <span class="ptc-check-label" data-for="add-task-weekly">Weekly</span>
-              </label>
-              <label class="ptc-check-pill">
-                <input type="checkbox" id="add-task-monthly" style="display:none;" />
-                <span class="ptc-check-label" data-for="add-task-monthly">Monthly</span>
-              </label>
+          <label class="ptc-label">PICK AN ICON <span class="ptc-sublabel">— sets attribute</span></label>
+          <div class="ptc-emoji-section">
+
+            <div class="ptc-emoji-group-label"><i data-lucide="brain" style="width: 10px; height: 10px; margin-right: 4px; display: inline-block; vertical-align: middle;"></i>Focus</div>
+            <div class="ptc-emoji-row">
+              <button type="button" class="ptc-emoji-btn" data-emoji="brain" data-attr="focus" data-tip="DEEP WORK"><i data-lucide="brain"></i></button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="terminal" data-attr="focus" data-tip="DEV MODE"><i data-lucide="terminal"></i></button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="trending-up" data-attr="focus" data-tip="GROWTH"><i data-lucide="trending-up"></i></button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="book-open" data-attr="focus" data-tip="STUDY GRIND"><i data-lucide="book-open"></i></button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="target" data-attr="focus" data-tip="PRECISION FOCUS"><i data-lucide="target"></i></button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="search" data-attr="focus" data-tip="ANALYSIS"><i data-lucide="search"></i></button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="zap" data-attr="focus" data-tip="FLOW STATE"><i data-lucide="zap"></i></button>
             </div>
+
+            <div class="ptc-emoji-group-label" style="margin-top:10px;"><i data-lucide="activity" style="width: 10px; height: 10px; margin-right: 4px; display: inline-block; vertical-align: middle;"></i>Endurance</div>
+            <div class="ptc-emoji-row">
+              <button type="button" class="ptc-emoji-btn" data-emoji="flame" data-attr="endurance" data-tip="PURE GRIND"><i data-lucide="flame"></i></button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="activity" data-attr="endurance" data-tip="PHYSICAL POWER"><i data-lucide="activity"></i></button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="zap-off" data-attr="endurance" data-tip="CARDIO/SPEED"><i data-lucide="zap-off"></i></button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="trophy" data-attr="endurance" data-tip="VICTORY"><i data-lucide="trophy"></i></button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="dribbble" data-attr="endurance" data-tip="ATHLETIC TRAINING"><i data-lucide="dribbble"></i></button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="battery-charging" data-attr="endurance" data-tip="ENERGY"><i data-lucide="battery-charging"></i></button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="dumbbell" data-attr="endurance" data-tip="HEAVY SESSION"><i data-lucide="dumbbell"></i></button>
+            </div>
+
+            <div class="ptc-emoji-group-label" style="margin-top:10px;"><i data-lucide="compass" style="width: 10px; height: 10px; margin-right: 4px; display: inline-block; vertical-align: middle;"></i>Mindset</div>
+            <div class="ptc-emoji-row">
+              <button type="button" class="ptc-emoji-btn" data-emoji="compass" data-attr="mindset" data-tip="ZEN CONTROL"><i data-lucide="compass"></i></button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="sunrise" data-attr="mindset" data-tip="MORNING ROUTINE"><i data-lucide="sunrise"></i></button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="moon" data-attr="mindset" data-tip="VISION PLANNING"><i data-lucide="moon"></i></button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="shield" data-attr="mindset" data-tip="UNBREAKABLE RESILIENCE"><i data-lucide="shield"></i></button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="crown" data-attr="mindset" data-tip="HIGH STATUS"><i data-lucide="crown"></i></button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="sparkles" data-attr="mindset" data-tip="APEX INTENT"><i data-lucide="sparkles"></i></button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="eye" data-attr="mindset" data-tip="MENTAL CLARITY"><i data-lucide="eye"></i></button>
+            </div>
+
+            <div class="ptc-emoji-group-label" style="margin-top:10px;"><i data-lucide="palette" style="width: 10px; height: 10px; margin-right: 4px; display: inline-block; vertical-align: middle;"></i>Personal</div>
+            <div class="ptc-emoji-row">
+              <button type="button" class="ptc-emoji-btn" data-emoji="palette" data-attr="personal" data-tip="CREATIVE BUILD"><i data-lucide="palette"></i></button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="music" data-attr="personal" data-tip="SKILL PRACTICE"><i data-lucide="music"></i></button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="heart" data-attr="personal" data-tip="PREMIUM FUEL"><i data-lucide="heart"></i></button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="droplet" data-attr="personal" data-tip="HYDRATION LOCK"><i data-lucide="droplet"></i></button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="users" data-attr="personal" data-tip="NETWORKING"><i data-lucide="users"></i></button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="dollar-sign" data-attr="personal" data-tip="FINANCIAL ASSETS"><i data-lucide="dollar-sign"></i></button>
+              <button type="button" class="ptc-emoji-btn" data-emoji="clock" data-attr="personal" data-tip="TIME MANAGEMENT"><i data-lucide="clock"></i></button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Color Palette -->
+        <div class="ptc-field-group">
+          <label class="ptc-label">ACCENT COLOR</label>
+          <div class="ptc-color-row" id="ptc-color-row">
+            <button type="button" class="ptc-color-swatch selected" data-color="#8b5cf6" style="background:#8b5cf6;" data-tip="Purple">
+              <svg class="swatch-check" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button type="button" class="ptc-color-swatch" data-color="#14b8a6" style="background:#14b8a6;" data-tip="Teal">
+              <svg class="swatch-check" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button type="button" class="ptc-color-swatch" data-color="#ec4899" style="background:#ec4899;" data-tip="Pink">
+              <svg class="swatch-check" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button type="button" class="ptc-color-swatch" data-color="#22c55e" style="background:#22c55e;" data-tip="Green">
+              <svg class="swatch-check" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button type="button" class="ptc-color-swatch" data-color="#f97316" style="background:#f97316;" data-tip="Orange">
+              <svg class="swatch-check" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button type="button" class="ptc-color-swatch" data-color="#eab308" style="background:#eab308;" data-tip="Yellow">
+              <svg class="swatch-check" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button type="button" class="ptc-color-swatch" data-color="#3b82f6" style="background:#3b82f6;" data-tip="Blue">
+              <svg class="swatch-check" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Repeat Mode -->
+        <div class="ptc-field-group">
+          <label class="ptc-label">REPEAT MODE</label>
+          <div id="repeating-options-container" style="display:flex; gap:6px; flex-wrap:wrap;">
+            <label class="ptc-check-pill">
+              <input type="checkbox" id="add-task-everyday" style="display:none;" />
+              <span class="ptc-check-label" data-for="add-task-everyday">Every Day</span>
+            </label>
+            <label class="ptc-check-pill">
+              <input type="checkbox" id="add-task-weekly" style="display:none;" />
+              <span class="ptc-check-label" data-for="add-task-weekly">Weekly</span>
+            </label>
+            <label class="ptc-check-pill">
+              <input type="checkbox" id="add-task-monthly" style="display:none;" />
+              <span class="ptc-check-label" data-for="add-task-monthly">Monthly</span>
+            </label>
           </div>
         </div>
 
@@ -2976,10 +3056,10 @@ transition: all var(--tr);
       <!-- Streak Row -->
       <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 10px 14px; margin-bottom: 16px;">
         <span id="rpg-streak-count" style="font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 700; color: #fff;">
-          <span style="color:#8e8e9f; margin-right:4px;">🔥</span>0 Day Streak
+          <i data-lucide="flame" style="width: 14px; height: 14px; color: #8e8e9f; display: inline-block; vertical-align: middle; margin-right: 4px;"></i>0 Day Streak
         </span>
-        <button id="rpg-freeze-btn" class="streak-freeze-btn" style="background: transparent; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 5px 10px; font-family: 'Outfit', sans-serif; font-size: 9.5px; font-weight: 700; color: #8e8e9f; cursor: not-allowed;" disabled>
-          🥶 Streak Freeze (Pro)
+        <button id="rpg-freeze-btn" class="streak-freeze-btn" style="background: transparent; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 5px 10px; font-family: 'Outfit', sans-serif; font-size: 9.5px; font-weight: 700; color: #8e8e9f; cursor: not-allowed; display: flex; align-items: center; gap: 4px;" disabled>
+          <i data-lucide="snowflake" style="width: 10px; height: 10px;"></i> Streak Freeze (Pro)
         </button>
       </div>
 
@@ -2989,7 +3069,7 @@ transition: all var(--tr);
         <!-- ENDURANCE -->
         <div class="skill-card" id="skill-card-endurance">
           <div class="skill-badge tier-bronze" id="attr-endurance-badge">
-            <span class="sk-emoji">🏃</span>
+            <i data-lucide="activity" style="width: 18px; height: 18px; color: #fff; margin-bottom: 2px;"></i>
             <span class="sk-level-text" id="attr-endurance-lvl">1</span>
           </div>
           <span class="sk-attr-name">Endurance</span>
@@ -3004,7 +3084,7 @@ transition: all var(--tr);
         <!-- FOCUS -->
         <div class="skill-card" id="skill-card-focus">
           <div class="skill-badge tier-bronze" id="attr-focus-badge">
-            <span class="sk-emoji">⚡</span>
+            <i data-lucide="zap" style="width: 18px; height: 18px; color: #fff; margin-bottom: 2px;"></i>
             <span class="sk-level-text" id="attr-focus-lvl">1</span>
           </div>
           <span class="sk-attr-name">Focus</span>
@@ -3019,7 +3099,7 @@ transition: all var(--tr);
         <!-- MINDSET -->
         <div class="skill-card" id="skill-card-mindset">
           <div class="skill-badge tier-bronze" id="attr-mindset-badge">
-            <span class="sk-emoji">🧠</span>
+            <i data-lucide="brain" style="width: 18px; height: 18px; color: #fff; margin-bottom: 2px;"></i>
             <span class="sk-level-text" id="attr-mindset-lvl">1</span>
           </div>
           <span class="sk-attr-name">Mindset</span>
@@ -3064,7 +3144,7 @@ transition: all var(--tr);
       <!-- Dev Mode Pro Toggle -->
       <button id="dev-pro-toggle" aria-label="Dev: Toggle Pro Status">
         <div class="dev-label">
-          <span class="dev-title">⚙️ Dev Mode</span>
+          <span class="dev-title"><i data-lucide="settings" style="width: 11px; height: 11px; margin-right: 4px; display: inline-block; vertical-align: middle;"></i>Dev Mode</span>
           <span class="dev-subtitle">Toggle isPro for testing</span>
         </div>
         <span class="dev-pill is-free" id="dev-pro-pill">FREE</span>
@@ -3371,7 +3451,13 @@ transition: all var(--tr);
     }
     
     const headerText = $('header-level-text');
-    if (headerText) { if (details.rank === 'ZENITH') { headerText.innerHTML = `👑 Lv.${details.level} <span style="font-weight:900;">${details.rank}</span> 👑`; } else { headerText.textContent = `Lv.${details.level} ${details.rank}`; } }
+    if (headerText) {
+      if (details.rank === 'ZENITH') {
+        headerText.innerHTML = `<i data-lucide="crown" style="width:12px; height:12px; color:#fff; display:inline-block; vertical-align:middle; margin-right:4px;"></i> Lv.${details.level} <span style="font-weight:900;">${details.rank}</span>`;
+      } else {
+        headerText.textContent = `Lv.${details.level} ${details.rank}`;
+      }
+    }
 
     const headerProgress = $('header-level-progress');
     if (headerProgress) {
@@ -3418,10 +3504,16 @@ transition: all var(--tr);
     if (headerStreakFire) headerStreakFire.style.color = fireColor;
     
     const rpgStreakCount = $('rpg-streak-count');
-    if (rpgStreakCount) rpgStreakCount.innerHTML = `<span style="color:${fireColor}; margin-right:4px;">🔥</span>${rpgStats.streakCount} Day Streak`;
+    if (rpgStreakCount) {
+      rpgStreakCount.innerHTML = `<i data-lucide="flame" style="width: 14px; height: 14px; color:${fireColor}; display: inline-block; vertical-align: middle; margin-right: 4px;"></i>${rpgStats.streakCount} Day Streak`;
+    }
     
     renderWeeklyDots();
     updateAttributesUI();
+
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
+    }
   }
 
   function pulseXPBar() {
@@ -3528,12 +3620,18 @@ transition: all var(--tr);
   }
 
   /* ══ Level-Up Overlay ════════════════════════════════════════ */
-  const TIER_EMOJIS = { rt1:'📦', rt2:'🔩', rt3:'🏅', rt4:'🥈', rt5:'🥇', rt6:'💠', rt7:'🟢', rt8:'💚', rt9:'🔶', rt10:'💙', rt11:'🔮', rt12:'💎', rt13:'🌊', rt14:'🌑', rt15:'⚙️', rt16:'👑', rt17:'🔥', rt18:'👑' };
+  const TIER_ICONS = { rt1:'package', rt2:'wrench', rt3:'award', rt4:'medal', rt5:'trophy', rt6:'shield', rt7:'activity', rt8:'target', rt9:'swords', rt10:'shield-alert', rt11:'sparkles', rt12:'gem', rt13:'anchor', rt14:'skull', rt15:'infinity', rt16:'crown', rt17:'flame', rt18:'crown' };
   function showLevelUpOverlay(details) {
     const overlay = $('lvlup-overlay');
     if (!overlay) return;
     const em = $('lvlup-emoji'), rank = $('lvlup-rank'), lvl = $('lvlup-level');
-    if (em)   em.textContent   = TIER_EMOJIS[details.tierCls] || '⚔️';
+    if (em) {
+      const iconName = TIER_ICONS[details.tierCls] || 'award';
+      em.innerHTML = `<i data-lucide="${iconName}" style="width: 52px; height: 52px; color: var(--accent);"></i>`;
+      if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+      }
+    }
     if (rank) rank.textContent = details.rank;
     if (lvl)  lvl.textContent  = `Level ${details.level} achieved`;
     overlay.style.display = 'flex';
@@ -4282,9 +4380,6 @@ function formatTime(timeStr) {
       if (filter === 'week') {
         return dates.some(d => datesOfWeek.includes(d) && d > TODAY);
       }
-      if (filter === 'later') {
-        return dates.some(d => d > lastDateOfWeek);
-      }
       return true;
     });
   }
@@ -4326,12 +4421,14 @@ function formatTime(timeStr) {
         if (!grouped[cat]) grouped[cat] = [];
         grouped[cat].push(t);
       });
+      const CAT_ICONS = { General: 'folder', Health: 'heart', Work: 'briefcase', Fitness: 'dumbbell', Education: 'book-open', Sports: 'dribbble' };
       categories.forEach(cat => {
         const catTasks = grouped[cat];
         if (catTasks.length > 0) {
           const headerLi = document.createElement('li');
           headerLi.style.listStyle = 'none';
-          headerLi.innerHTML = `<div class="task-category-header" style="font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.1em; margin: 16px 0 8px 4px; padding-bottom: 4px; border-bottom: 1.5px dashed rgba(255,255,255,0.06); display: flex; align-items: center; gap: 6px;"><span>✦</span> ${cat}</div>`;
+          const iconName = CAT_ICONS[cat] || 'folder';
+          headerLi.innerHTML = `<div class="task-category-header" style="font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.1em; margin: 16px 0 8px 4px; padding-bottom: 4px; border-bottom: 1.5px dashed rgba(255,255,255,0.06); display: flex; align-items: center; gap: 6px;"><i data-lucide="${iconName}" style="width: 12px; height: 12px; color: var(--accent); vertical-align: middle;"></i> ${cat}</div>`;
           reviewList.appendChild(headerLi);
           catTasks.forEach(t => mountTask(t, false));
         }
@@ -4347,6 +4444,10 @@ function formatTime(timeStr) {
       scoreValEl.textContent = disciplineScore;
     }
     renderAnalyticsGraph();
+
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
+    }
   }
 
   function mountTask(task, animate) {
@@ -4398,9 +4499,13 @@ function formatTime(timeStr) {
       `;
     }
 
-    const colorBorder = task.color ? `border-left: 2px solid ${task.color}; padding-left: 10px;` : '';
+    const cardStyle = `border: 1px solid ${task.color || 'var(--tier-border, rgba(255, 255, 255, 0.05))'};`;
+    
+    // Check for selected custom icon
+    const taskIcon = task.emoji ? `<i data-lucide="${task.emoji}" style="width: 14px; height: 14px; color: ${task.color || 'var(--accent)'}; flex-shrink: 0; display: inline-block; vertical-align: middle;"></i>` : '';
+    
     return `
-      <div class="ri ${isCompleted ? 'done-task' : ''} ${streakClass}" data-id="${task.id}" style="${colorBorder}">
+      <div class="ri ${isCompleted ? 'done-task' : ''} ${streakClass}" data-id="${task.id}" style="${cardStyle}">
         <div class="dh" aria-label="Drag to reorder">
           <svg width="10" height="15" viewBox="0 0 10 15" fill="currentColor">
             <circle cx="2" cy="2" r="1.5"/>
@@ -4412,15 +4517,16 @@ function formatTime(timeStr) {
           </svg>
         </div>
         ${indicatorHtml}
-        <span class="ri-name">
-          ${esc(task.name)}
-          ${task.startTime ? `<span class="task-time-badge">🕒 ${formatTime(task.startTime)}</span>` : ''}
-          ${task.isEveryday ? `<span class="task-time-badge" style="color: var(--accent); border-color: var(--accent-dim); background: var(--accent-dim);">🔁 Everyday</span>` : ''}
-          ${task.isWeekly ? `<span class="task-time-badge" style="color: var(--accent); border-color: var(--accent-dim); background: var(--accent-dim);">🔁 Weekly</span>` : ''}
-          ${task.isMonthly ? `<span class="task-time-badge" style="color: var(--accent); border-color: var(--accent-dim); background: var(--accent-dim);">🔁 Monthly</span>` : ''}
+        <span class="ri-name" style="display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+          ${taskIcon}
+          <span style="vertical-align: middle;">${esc(task.name)}</span>
+          ${task.startTime ? `<span class="task-time-badge"><i data-lucide="clock" style="width: 10px; height: 10px; margin-right: 3px; display: inline-block; vertical-align: middle;"></i>${formatTime(task.startTime)}</span>` : ''}
+          ${task.isEveryday ? `<span class="task-time-badge" style="color: var(--accent); border-color: var(--accent-dim); background: var(--accent-dim);"><i data-lucide="repeat" style="width: 10px; height: 10px; margin-right: 3px; display: inline-block; vertical-align: middle;"></i>Everyday</span>` : ''}
+          ${task.isWeekly ? `<span class="task-time-badge" style="color: var(--accent); border-color: var(--accent-dim); background: var(--accent-dim);"><i data-lucide="repeat" style="width: 10px; height: 10px; margin-right: 3px; display: inline-block; vertical-align: middle;"></i>Weekly</span>` : ''}
+          ${task.isMonthly ? `<span class="task-time-badge" style="color: var(--accent); border-color: var(--accent-dim); background: var(--accent-dim);"><i data-lucide="repeat" style="width: 10px; height: 10px; margin-right: 3px; display: inline-block; vertical-align: middle;"></i>Monthly</span>` : ''}
           ${dateBadge}
         </span>
-        ${currentViewMode === 'long-term' ? `<button class="ai-split-btn svg-action" data-id="${task.id}" title="AI Goal Breakdown (Pro)" type="button" style="font-size:10px;font-weight:700;color:#a78bfa;border:1px solid rgba(99,102,241,0.35);border-radius:6px;padding:3px 7px;background:rgba(99,102,241,0.08);cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all 0.2s;">\u2726 AI Split</button>` : ''}
+        ${currentViewMode === 'long-term' ? `<button class="ai-split-btn svg-action" data-id="${task.id}" title="AI Goal Breakdown (Pro)" type="button" style="font-size:10px;font-weight:700;color:#a78bfa;border:1px solid rgba(99,102,241,0.35);border-radius:6px;padding:3px 7px;background:rgba(99,102,241,0.08);cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all 0.2s;">✦ AI Split</button>` : ''}
         <button class="sub-toggle svg-action" title="Toggle subtasks" type="button">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
         </button>
@@ -4905,6 +5011,7 @@ function formatTime(timeStr) {
 
     syncStart();
     if (addInput) { addInput.value = ''; }
+    if (window._ptcCloseModal) { window._ptcCloseModal(); }
   } if (focusToggleBtn) focusToggleBtn.addEventListener('click', () => {
     const state = getCurrentState();
     if (state === 'focus') {
@@ -6100,7 +6207,17 @@ function formatTime(timeStr) {
           }
         } catch (profileErr) {
           console.error("Error setting up user profile from Firestore:", profileErr);
+          // Fallback: ensure app is visible even if profile read fails
+          checkAuthStatus();
+          updateRpgUI();
         }
+        }).catch(firestoreErr => {
+          // getDoc() itself failed (network offline, permissions, etc.)
+          // App must not stay stuck on the loader — route to review screen.
+          console.error("Firestore getDoc failed:", firestoreErr);
+          checkAuthStatus();
+          updateRpgUI();
+        });
 
         // 3. Set up tasks listener (defensive)
         try {
@@ -6179,7 +6296,7 @@ function formatTime(timeStr) {
   <!-- ══ Level-Up Overlay ══ -->
   <div id="lvlup-overlay" aria-modal="true" role="dialog" style="display:none; position:fixed; inset:0; z-index:99999; background:rgba(4,4,8,0.88); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); display:none; align-items:center; justify-content:center; flex-direction:column; gap:20px;">
     <div id="lvlup-inner" style="text-align:center; padding:40px 32px; border-radius:24px; background:rgba(14,14,20,0.9); border:1px solid rgba(255,255,255,0.08); box-shadow:0 0 60px rgba(139,92,246,0.3); max-width:320px; width:90%;">
-      <div id="lvlup-emoji" style="font-size:52px; line-height:1; margin-bottom:12px;">⚔️</div>
+      <div id="lvlup-emoji" style="font-size:52px; line-height:1; margin-bottom:12px; display: flex; justify-content: center;"><i data-lucide="award" style="width: 52px; height: 52px; color: var(--accent);"></i></div>
       <div style="font-size:10px; font-weight:800; letter-spacing:0.18em; color:rgba(255,255,255,0.4); text-transform:uppercase; margin-bottom:6px;">RANK UP!</div>
       <div id="lvlup-rank" style="font-size:32px; font-weight:900; font-family:'Outfit',sans-serif; color:#fff; letter-spacing:0.06em; text-shadow:0 0 30px rgba(139,92,246,0.8);"></div>
       <div id="lvlup-level" style="font-size:13px; color:rgba(255,255,255,0.5); margin-top:6px; font-family:'Inter',sans-serif;"></div>
