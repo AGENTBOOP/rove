@@ -6091,8 +6091,9 @@ function formatTime(timeStr) {
         // 2. Fetch and sync user profile in background (defensive)
         const userDocRef = doc(db, 'users', user.uid);
         getDoc(userDocRef).then(async userDoc => {
-          if (userDoc.exists()) {
-            const data = userDoc.data();
+          try {
+            if (userDoc.exists()) {
+              const data = userDoc.data();
             if (data.rpgStats) {
               rpgStats = data.rpgStats;
               localStorage.setItem('rove_rpg_stats', JSON.stringify(rpgStats));
