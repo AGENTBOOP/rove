@@ -2704,9 +2704,9 @@ transition: all var(--tr);
           <td class="col-pro"><span class="pw-pro-check">&#x2605;</span></td>
         </tr>
         <tr>
-          <td class="col-benefit">Unlimited long-term goals</td>
-          <td class="col-free" style="font-size:10px;color:rgba(255,255,255,0.28)">3 max</td>
-          <td class="col-pro"><span class="pw-pro-check">&#x221E;</span></td>
+          <td class="col-benefit">Advanced RPG Progression Tracking</td>
+          <td class="col-free">&ndash;</td>
+          <td class="col-pro"><span class="pw-pro-check">&#x2605;</span></td>
         </tr>
         <tr>
           <td class="col-benefit">Streak freeze tokens</td>
@@ -2743,7 +2743,7 @@ transition: all var(--tr);
     </div>
 
     <button id="paywall-upgrade-btn">Get Annual Pro &mdash; $13.99/yr</button>
-    <button id="close-paywall-btn">Maybe later</button>
+    <button id="close-paywall-btn" onclick="closePaywall()">Maybe later</button>
   </div>
 
   <!-- Style Shop Overlay & Sheet -->
@@ -4101,7 +4101,12 @@ transition: all var(--tr);
     const b2 = $('acct-premium-badge');
     if (b1) b1.style.display = isPro ? 'flex' : 'none';
     if (b2) b2.style.display = isPro ? 'flex' : 'none';
-  } if ($('close-paywall-btn')) $('close-paywall-btn').addEventListener('click', closePaywall);
+  } 
+  
+  window.closePaywall = closePaywall;
+  window.openPaywall = openPaywall;
+
+  if ($('close-paywall-btn')) $('close-paywall-btn').addEventListener('click', closePaywall);
   if (paywallOverlay) paywallOverlay.addEventListener('click', closePaywall);
 
   document.querySelectorAll('.pw-tier').forEach(el => {
@@ -4951,11 +4956,6 @@ function formatTime(timeStr) {
         addInput.classList.add('shake');
         addInput.addEventListener('animationend', () => addInput.classList.remove('shake'), { once: true });
       }
-      return;
-    }
-    if (!isPremium && tasks.filter(t => t.assignedTo === 'You').length >= 3) {
-      addInput.value = '';
-      openPaywall();
       return;
     }
     const assignedTo = 'You';
