@@ -5928,7 +5928,9 @@ function formatTime(timeStr) {
   };
   
   window.equipStyle = function(id) {
-    if (purchasedStyles.includes(id)) {
+    const item = SHOP_ITEMS.find(x => x.id === id);
+    const isUnlocked = purchasedStyles.includes(id) || (item && item.pro && isPro);
+    if (isUnlocked) {
       activeStyle = id;
       applyActiveStyle();
       saveShopState();
@@ -5937,19 +5939,21 @@ function formatTime(timeStr) {
   };
 
   function renderShop() {
-    $('shop-coins-val').textContent = roveCoins;
+    const coinsEl = $('shop-coins-val');
+    if (coinsEl) coinsEl.textContent = roveCoins;
     const container = $('shop-list');
     if (!container) return;
     
     container.innerHTML = SHOP_ITEMS.map(item => {
       const isPurchased = purchasedStyles.includes(item.id);
+      const isUnlocked = isPurchased || (item.pro && isPro);
       const isActive = activeStyle === item.id || (item.id === 'default' && !activeStyle);
       const isProLocked = item.pro && !isPro;
       
       let actionHtml = '';
       if (isProLocked) {
-        actionHtml = `<button class="shop-buy-btn" onclick="openPaywall()" style="background:rgba(99,102,241,0.15);border-color:rgba(99,102,241,0.4);color:#a78bfa;">&#x1F512; Pro</button>`;
-      } else if (!isPurchased && !item.pro) {
+        actionHtml = `<button class="shop-buy-btn" onclick="openPaywall()" style="background:rgba(99,102,241,0.15);border-color:rgba(99,102,241,0.4);color:#a78bfa;"><i data-lucide="lock" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:3px;"></i> Pro</button>`;
+      } else if (!isUnlocked) {
         const canBuy = roveCoins >= item.cost;
         actionHtml = `<button class="shop-buy-btn" ${canBuy ? '' : 'disabled'} onclick="buyStyle('${item.id}', ${item.cost})">${item.cost === 0 ? 'Free' : item.cost + ' Coins'}</button>`;
       } else {
@@ -5972,6 +5976,10 @@ function formatTime(timeStr) {
         </div>
       `;
     }).join('');
+
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
+    }
   }
 
   (function initShop() {
