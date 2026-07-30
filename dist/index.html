@@ -1309,7 +1309,7 @@ transition: all var(--tr);
       transition: transform 0.45s cubic-bezier(0.16,1,0.3,1);
       max-height: 96%; overflow-y: auto;
     }
-    #paywall-sheet.open { transform: translateY(0); position: relative; }
+    #paywall-sheet.open { transform: translateY(0); }
     #paywall-sheet::-webkit-scrollbar { display:none; }
     .pw-handle { width:36px; height:4px; background:rgba(255,255,255,0.1); border-radius:2px; margin:12px auto 16px; }
     .pw-headline {
@@ -4164,42 +4164,52 @@ transition: all var(--tr);
   }
 
   /* ══ Premium & Paywall Logic ═════════════════════════════════ */
-  const paywallSheet   = $('paywall-sheet');
-  const paywallOverlay = $('paywall-overlay');
-
   let _countdownInterval = null;
 
   function startPaywallCountdown() {
-    clearInterval(_countdownInterval);
-    // 10-minute countdown per session open
-    let remaining = 10 * 60;
+    if (_countdownInterval) clearInterval(_countdownInterval);
+    const key = 'rove_pw_deadline';
+    let deadline = parseInt(sessionStorage.getItem(key) || '0', 10);
+    if (!deadline || deadline <= Date.now()) {
+      deadline = Date.now() + 24 * 60 * 60 * 1000;
+      sessionStorage.setItem(key, String(deadline));
+    }
     function tick() {
       const el = document.getElementById('pw-countdown');
       if (!el) return;
-      const m = Math.floor(remaining / 60);
-      const s = remaining % 60;
-      el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-      if (remaining > 0) remaining--;
+      const diff = Math.max(0, deadline - Date.now());
+      const h = Math.floor(diff / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      el.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
     }
     tick();
     _countdownInterval = setInterval(tick, 1000);
   }
 
   function openPaywall() {
-    if (!paywallOverlay || !paywallSheet) return;
-    paywallOverlay.classList.add('open');
-    paywallSheet.classList.add('open');
-    paywallSheet.removeAttribute('aria-hidden');
+    const overlay = document.getElementById('paywall-overlay');
+    const sheet   = document.getElementById('paywall-sheet');
+    if (overlay) overlay.classList.add('open');
+    if (sheet) {
+      sheet.classList.add('open');
+      sheet.removeAttribute('aria-hidden');
+    }
     startPaywallCountdown();
   }
 
   function closePaywall() {
-    if (!paywallOverlay || !paywallSheet) return;
-    paywallOverlay.classList.remove('open');
-    paywallSheet.classList.remove('open');
-    paywallSheet.setAttribute('aria-hidden', 'true');
-    clearInterval(_countdownInterval);
-    _countdownInterval = null;
+    const overlay = document.getElementById('paywall-overlay');
+    const sheet   = document.getElementById('paywall-sheet');
+    if (overlay) overlay.classList.remove('open');
+    if (sheet) {
+      sheet.classList.remove('open');
+      sheet.setAttribute('aria-hidden', 'true');
+    }
+    if (_countdownInterval) {
+      clearInterval(_countdownInterval);
+      _countdownInterval = null;
+    }
     const proBtn = document.getElementById('paywall-upgrade-btn');
     if (proBtn) { proBtn.innerHTML = 'Upgrade to Pro'; proBtn.disabled = false; proBtn.className = 'pw-card-btn pw-btn-pro'; }
     const apexBtn = document.getElementById('apex-upgrade-btn');
@@ -4215,42 +4225,30 @@ transition: all var(--tr);
     const b2 = $('acct-premium-badge');
     if (b1) b1.style.display = isPro ? 'flex' : 'none';
     if (b2) b2.style.display = isPro ? 'flex' : 'none';
-  } 
-  
-  window.closePaywall = closePaywall;
-  window.openPaywall  = openPaywall;
-
-  // Direct listeners on each dismiss element (belt-and-suspenders)
-  function _bindClose(id) {
-    const el = document.getElementById(id);
-    if (el) el.addEventListener('click', function(e) {
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      closePaywall();
-    }, true); // useCapture=true ensures it fires before any other handler
-  }
-  _bindClose('close-paywall-btn');
-  _bindClose('paywall-x-btn');
-
-  // Also bind the "Continue Free" button by class since it has no id
-  const freeBtns = document.querySelectorAll('.pw-btn-free');
-  freeBtns.forEach(function(el) {
-    el.addEventListener('click', function(e) {
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      closePaywall();
-    }, true);
-  });
-
-  // Overlay backdrop — direct click closes
-  if (paywallOverlay) {
-    paywallOverlay.addEventListener('click', function() { closePaywall(); });
   }
 
-  // Escape key
+  // Document capture listener for bulletproof dismiss trigger handling
+  document.addEventListener('click', function(e) {
+    const closeTrigger = e.target.closest('[data-paywall-close], #close-paywall-btn, #paywall-x-btn, .pw-btn-free');
+    if (closeTrigger) {
+      e.preventDefault();
+      e.stopPropagation();
+      closePaywall();
+      return;
+    }
+    const overlay = document.getElementById('paywall-overlay');
+    if (overlay && e.target === overlay) {
+      closePaywall();
+    }
+  }, true);
+
+  // Escape key closes paywall
   document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape' && paywallSheet && paywallSheet.classList.contains('open')) {
-      closePaywall();
+    if (e.key === 'Escape') {
+      const sheet = document.getElementById('paywall-sheet');
+      if (sheet && sheet.classList.contains('open')) {
+        closePaywall();
+      }
     }
   });
 
