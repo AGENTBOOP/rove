@@ -109,8 +109,9 @@
       height: 100%;
       overflow: hidden;
       border-radius: 34px;
-      background: var(--tier-bg, #000);
-      transition: background 0.4s ease;
+      background: var(--tier-bg-tint, var(--tier-bg, #000));
+      border: 1px solid var(--tier-border, rgba(255,255,255,0.06));
+      transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
     }
     .dynamic-island {
       position: absolute;
@@ -1291,102 +1292,129 @@ transition: all var(--tr);
 
     /* ── Premium Paywall ─────────────────────────────────────── */
     #paywall-overlay {
-      position: absolute; inset: 0; z-index: 550;
-      background: rgba(0,0,0,0.78);
-      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      position: absolute; inset: 0; z-index: 850;
+      background: rgba(0,0,0,0.82);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
       opacity: 0; pointer-events: none;
       transition: opacity 0.32s cubic-bezier(0.4,0,0.2,1);
     }
     #paywall-overlay.open { opacity: 1; pointer-events: auto; }
     #paywall-sheet {
-      position: absolute; bottom: 0; left: 0; right: 0; z-index: 600;
+      position: absolute; bottom: 0; left: 0; right: 0; z-index: 900;
       background: linear-gradient(180deg,#141418 0%,#0f0f12 100%);
       border-top: 1px solid rgba(255,255,255,0.07);
       border-radius: 28px 28px 0 0;
-      padding: 6px 18px 40px;
+      padding: 6px 14px 36px;
       transform: translateY(100%);
       transition: transform 0.45s cubic-bezier(0.16,1,0.3,1);
-      max-height: 95%; overflow-y: auto;
+      max-height: 96%; overflow-y: auto;
     }
-    #paywall-sheet.open { transform: translateY(0); }
+    #paywall-sheet.open { transform: translateY(0); position: relative; }
     #paywall-sheet::-webkit-scrollbar { display:none; }
     .pw-handle { width:36px; height:4px; background:rgba(255,255,255,0.1); border-radius:2px; margin:12px auto 16px; }
     .pw-headline {
       text-align:center; font-family:'Outfit',sans-serif;
-      font-size:20px; font-weight:800; color:#fff;
-      letter-spacing:-0.02em; margin-bottom:4px;
+      font-size:19px; font-weight:800; color:#fff;
+      letter-spacing:-0.02em; margin-bottom:3px;
     }
-    .pw-sub { text-align:center; font-size:11.5px; color:rgba(255,255,255,0.38); margin-bottom:16px; line-height:1.5; }
-    /* comparison table */
-    .pw-table { width:100%; border-collapse:collapse; margin-bottom:16px; }
-    .pw-table th {
-      font-family:'Outfit',sans-serif; font-size:9.5px; font-weight:700;
-      letter-spacing:0.1em; text-transform:uppercase; padding:7px 5px;
+    .pw-sub { text-align:center; font-size:11px; color:rgba(255,255,255,0.36); margin-bottom:18px; line-height:1.5; }
+    /* 3-column pricing cards */
+    .pw-cards {
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px; margin-bottom: 14px;
     }
-    .pw-table th.col-benefit { text-align:left; color:rgba(255,255,255,0.32); }
-    .pw-table th.col-free { text-align:center; color:rgba(255,255,255,0.28); width:56px; }
-    .pw-table th.col-pro {
-      text-align:center; width:66px;
-      background:linear-gradient(135deg,rgba(99,102,241,0.18),rgba(168,85,247,0.18));
-      border-radius:8px 8px 0 0; color:#a78bfa;
+    .pw-card {
+      border-radius: 16px; padding: 14px 8px 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+      display: flex; flex-direction: column; align-items: center;
+      position: relative; cursor: pointer;
+      transition: all 0.22s ease;
     }
-    .pw-table td { padding:8px 5px; border-bottom:1px solid rgba(255,255,255,0.04); }
-    .pw-table td.col-benefit { font-size:11.5px; color:rgba(255,255,255,0.65); }
-    .pw-table td.col-free { text-align:center; font-size:13px; color:rgba(255,255,255,0.16); }
-    .pw-table td.col-pro {
-      text-align:center;
-      background:linear-gradient(135deg,rgba(99,102,241,0.07),rgba(168,85,247,0.07));
+    .pw-card-free { border-color: rgba(255,255,255,0.1); }
+    .pw-card-pro {
+      border-color: rgba(139,92,246,0.55);
+      background: linear-gradient(160deg,rgba(99,102,241,0.12) 0%,rgba(168,85,247,0.08) 100%);
+      box-shadow: 0 0 0 1px rgba(139,92,246,0.2), 0 8px 24px rgba(99,102,241,0.18);
     }
-    .pw-pro-check { font-size:13px; color:#a78bfa; }
-    .pw-pro-glow  { font-size:13px; color:#34d399; }
-    /* pricing tier cards */
-    .pw-tiers { display:flex; gap:7px; margin-bottom:14px; }
-    .pw-tier {
-      flex:1; border-radius:14px; padding:11px 6px;
-      border:1.5px solid rgba(255,255,255,0.08);
-      background:rgba(255,255,255,0.03);
-      text-align:center; cursor:pointer;
-      transition:all 0.22s; position:relative;
+    .pw-card-apex {
+      border-color: rgba(234,179,8,0.35);
+      background: linear-gradient(160deg,rgba(30,27,20,0.95) 0%,rgba(20,16,10,0.95) 100%);
+      box-shadow: 0 0 0 1px rgba(234,179,8,0.15);
     }
-    .pw-tier:hover { border-color:rgba(129,140,248,0.45); background:rgba(99,102,241,0.07); }
-    .pw-tier.selected {
-      border-color:#6366f1;
-      background:rgba(99,102,241,0.13);
-      box-shadow:0 0 0 2px rgba(99,102,241,0.22);
+    .pw-card-badge {
+      position: absolute; top: -9px; left: 50%; transform: translateX(-50%);
+      font-size: 7.5px; font-weight: 800; padding: 2px 7px; border-radius: 20px;
+      white-space: nowrap; font-family: 'Outfit', sans-serif; letter-spacing: 0.06em;
     }
-    .pw-tier-badge {
-      position:absolute; top:-9px; left:50%; transform:translateX(-50%);
-      background:linear-gradient(135deg,#f59e0b,#fbbf24);
-      color:#000; font-size:8.5px; font-weight:800;
-      padding:2px 8px; border-radius:20px; white-space:nowrap;
-      font-family:'Outfit',sans-serif; letter-spacing:0.05em;
+    .pw-badge-popular {
+      background: linear-gradient(135deg,#6366f1,#8b5cf6);
+      color: #fff;
     }
-    .pw-tier-label { font-size:9px; color:rgba(255,255,255,0.38); margin-bottom:4px; font-family:'Outfit',sans-serif; letter-spacing:0.06em; text-transform:uppercase; }
-    .pw-tier-price { font-size:17px; font-weight:800; color:#fff; font-family:'Outfit',sans-serif; line-height:1; }
-    .pw-tier-period { font-size:9px; color:rgba(255,255,255,0.28); margin-top:3px; }
+    .pw-badge-ultimate {
+      background: linear-gradient(135deg,#d97706,#f59e0b);
+      color: #000;
+    }
+    .pw-card-name {
+      font-family: 'Outfit', sans-serif; font-size: 9px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: rgba(255,255,255,0.38); margin-bottom: 6px; margin-top: 4px;
+    }
+    .pw-card-price {
+      font-family: 'Outfit', sans-serif; font-size: 20px; font-weight: 900;
+      color: #fff; line-height: 1; margin-bottom: 2px;
+    }
+    .pw-card-period {
+      font-size: 8.5px; color: rgba(255,255,255,0.26); margin-bottom: 10px;
+    }
+    .pw-card-divider {
+      width: 100%; height: 1px; background: rgba(255,255,255,0.06); margin-bottom: 9px;
+    }
+    .pw-card-features {
+      list-style: none; margin: 0 0 12px 0; padding: 0; width: 100%;
+      display: flex; flex-direction: column; gap: 5px;
+    }
+    .pw-card-features li {
+      font-size: 9px; color: rgba(255,255,255,0.5); display: flex; align-items: flex-start;
+      gap: 4px; line-height: 1.35;
+    }
+    .pw-card-features li svg { flex-shrink: 0; margin-top: 1px; }
+    .pw-feat-check { color: #34d399; }
+    .pw-feat-check-pro { color: #a78bfa; }
+    .pw-feat-check-apex { color: #f59e0b; }
+    .pw-card-btn {
+      width: 100%; padding: 9px 4px; border-radius: 10px; border: none;
+      font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 700;
+      cursor: pointer; transition: all 0.2s; letter-spacing: 0.02em;
+      margin-top: auto;
+    }
+    .pw-btn-free {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.45);
+    }
+    .pw-btn-free:hover { border-color: rgba(255,255,255,0.35); color: rgba(255,255,255,0.7); }
+    .pw-btn-pro {
+      background: linear-gradient(135deg,#6366f1 0%,#8b5cf6 100%);
+      color: #fff; box-shadow: 0 3px 14px rgba(99,102,241,0.4);
+    }
+    .pw-btn-pro:hover { transform: translateY(-1px); box-shadow: 0 5px 18px rgba(99,102,241,0.6); }
+    .pw-btn-apex {
+      background: linear-gradient(135deg,#d97706 0%,#f59e0b 100%);
+      color: #000;
+    }
+    .pw-btn-apex:hover { transform: translateY(-1px); box-shadow: 0 5px 14px rgba(245,158,11,0.5); }
     /* countdown */
     .pw-urgency {
-      text-align:center; font-size:11px; color:rgba(255,255,255,0.32);
-      margin-bottom:12px; display:flex; align-items:center; justify-content:center; gap:6px;
+      text-align:center; font-size:10.5px; color:rgba(255,255,255,0.28);
+      margin-bottom:10px; display:flex; align-items:center; justify-content:center; gap:5px;
     }
-    .pw-countdown { font-family:'Outfit',sans-serif; font-size:12px; font-weight:700; color:#f59e0b; letter-spacing:0.03em; }
-    /* CTA */
-    #paywall-upgrade-btn {
-      width:100%; padding:14px;
-      background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 100%);
-      border:none; border-radius:14px;
-      font-family:'Outfit',sans-serif; font-size:15px; font-weight:800;
-      color:#fff; cursor:pointer; transition:all 0.22s;
-      box-shadow:0 4px 20px rgba(99,102,241,0.45);
-      letter-spacing:0.01em;
-    }
-    #paywall-upgrade-btn:hover { transform:translateY(-1px); box-shadow:0 6px 24px rgba(99,102,241,0.6); }
-    #paywall-upgrade-btn:disabled { opacity:0.55; cursor:not-allowed; transform:none; }
-    #paywall-upgrade-btn.success { background:linear-gradient(135deg,#10b981,#059669) !important; box-shadow:0 4px 20px rgba(16,185,129,0.5) !important; }
+    .pw-countdown { font-family:'Outfit',sans-serif; font-size:11.5px; font-weight:700; color:#f59e0b; letter-spacing:0.03em; }
+    /* Maybe later / dismiss link */
     #close-paywall-btn {
-      width:100%; margin-top:10px; background:transparent; border:none;
-      font-size:12px; color:rgba(255,255,255,0.28); cursor:pointer;
+      width:100%; margin-top:4px; background:transparent; border:none;
+      font-size:11.5px; color:rgba(255,255,255,0.24); cursor:pointer;
       font-family:'Inter',sans-serif; padding:8px;
+      transition: color 0.18s;
     }
     #close-paywall-btn:hover { color:rgba(255,255,255,0.55); }
     .spinner {
@@ -1397,6 +1425,7 @@ transition: all var(--tr);
       display:inline-block; vertical-align:middle; margin-right:6px;
     }
     @keyframes spin { to { transform:rotate(360deg); } }
+
 
     /* Cosmetic Theme Styles (free) */
     #phone-content.theme-neon-purple {
@@ -1882,6 +1911,16 @@ transition: all var(--tr);
     .xp-bar-pulse {
       animation: xpBarPulse 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
       transform-origin: center;
+    }
+    
+    /* Tier Level-Up Border Flash */
+    @keyframes tierLvlUpFlash {
+      0% { border-color: var(--tier-color, #a855f7); box-shadow: inset 0 0 20px var(--tier-glow, rgba(168,85,247,0.3)), 0 0 16px var(--tier-color, #a855f7); }
+      50% { border-color: #ffffff; box-shadow: inset 0 0 30px rgba(255,255,255,0.4), 0 0 24px #ffffff; }
+      100% { border-color: var(--tier-border, rgba(255,255,255,0.06)); box-shadow: none; }
+    }
+    .tier-lvl-up-flash {
+      animation: tierLvlUpFlash 0.85s cubic-bezier(0.16, 1, 0.3, 1) !important;
     }
     
     /* Onboarding styles */
@@ -2665,86 +2704,138 @@ transition: all var(--tr);
   <div id="paywall-overlay"></div>
   <div id="paywall-sheet" role="dialog" aria-modal="true" aria-label="Premium Paywall" aria-hidden="true">
     <div class="pw-handle"></div>
-    <div class="pw-headline" style="display: flex; align-items: center; justify-content: center; gap: 6px;">Unlock Rove Pro <i data-lucide="zap" style="width: 16px; height: 16px; color: #eab308; fill: #eab308;"></i></div>
-    <div class="pw-sub">Everything you need to build elite-level habits.</div>
+    <!-- Close X button -->
+    <button type="button" id="paywall-x-btn" data-paywall-close
+      onclick="window.closePaywall && window.closePaywall()"
+      style="position:absolute; top:14px; right:14px; background:transparent; border:none; color:rgba(255,255,255,0.4); cursor:pointer; padding:6px; line-height:1; z-index:10;"
+      aria-label="Close">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
 
-    <!-- Comparison Table -->
-    <table class="pw-table">
-      <thead>
-        <tr>
-          <th class="col-benefit">Feature</th>
-          <th class="col-free">Free</th>
-          <th class="col-pro">&#x2605; Pro</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td class="col-benefit">Daily habit tracking</td>
-          <td class="col-free" style="color:rgba(255,255,255,0.4)">&#x2713;</td>
-          <td class="col-pro"><span class="pw-pro-glow">&#x2713;</span></td>
-        </tr>
-        <tr>
-          <td class="col-benefit">Family sync &amp; shared tasks</td>
-          <td class="col-free">&ndash;</td>
-          <td class="col-pro"><span class="pw-pro-check">&#x2605;</span></td>
-        </tr>
-        <tr>
-          <td class="col-benefit">AI Goal Breakdown</td>
-          <td class="col-free">&ndash;</td>
-          <td class="col-pro"><span class="pw-pro-check">&#x2605;</span></td>
-        </tr>
-        <tr>
-          <td class="col-benefit">Premium themes (Cyberpunk, Carbon&hellip;)</td>
-          <td class="col-free">&ndash;</td>
-          <td class="col-pro"><span class="pw-pro-check">&#x2605;</span></td>
-        </tr>
-        <tr>
-          <td class="col-benefit">Parent dashboard &amp; child tasks</td>
-          <td class="col-free">&ndash;</td>
-          <td class="col-pro"><span class="pw-pro-check">&#x2605;</span></td>
-        </tr>
-        <tr>
-          <td class="col-benefit">Advanced RPG Progression Tracking</td>
-          <td class="col-free">&ndash;</td>
-          <td class="col-pro"><span class="pw-pro-check">&#x2605;</span></td>
-        </tr>
-        <tr>
-          <td class="col-benefit">Streak freeze tokens</td>
-          <td class="col-free">&ndash;</td>
-          <td class="col-pro"><span class="pw-pro-check">&#x2605;</span></td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="pw-headline">Choose Your Plan</div>
+    <div class="pw-sub">Unlock the full Rove experience. Upgrade anytime.</div>
 
-    <!-- Pricing Tiers -->
-    <div class="pw-tiers">
-      <div class="pw-tier" data-tier="monthly" id="pw-tier-monthly">
-        <div class="pw-tier-label">Monthly</div>
-        <div class="pw-tier-price">$2.99</div>
-        <div class="pw-tier-period">/month</div>
+    <!-- 3-Column Pricing Cards -->
+    <div class="pw-cards">
+
+      <!-- FREE CARD -->
+      <div class="pw-card pw-card-free">
+        <div class="pw-card-name">Free</div>
+        <div class="pw-card-price">$0</div>
+        <div class="pw-card-period">forever</div>
+        <div class="pw-card-divider"></div>
+        <ul class="pw-card-features">
+          <li>
+            <svg class="pw-feat-check" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Core task tracking
+          </li>
+          <li>
+            <svg class="pw-feat-check" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Today / Week views
+          </li>
+          <li>
+            <svg class="pw-feat-check" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            18-tier progression
+          </li>
+          <li>
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            Custom themes
+          </li>
+          <li>
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            Analytics
+          </li>
+        </ul>
+        <button type="button" class="pw-card-btn pw-btn-free" data-paywall-close
+          onclick="window.closePaywall && window.closePaywall()">
+          Continue Free
+        </button>
       </div>
-      <div class="pw-tier selected" data-tier="annual" id="pw-tier-annual">
-        <div class="pw-tier-badge">SAVE 50%</div>
-        <div class="pw-tier-label">Annual</div>
-        <div class="pw-tier-price">$13.99</div>
-        <div class="pw-tier-period">/year &middot; $1.17/mo</div>
+
+      <!-- PRO CARD -->
+      <div class="pw-card pw-card-pro">
+        <div class="pw-card-badge pw-badge-popular">MOST POPULAR</div>
+        <div class="pw-card-name" style="color:#a78bfa;">Pro</div>
+        <div class="pw-card-price">$4.99</div>
+        <div class="pw-card-period">per month</div>
+        <div class="pw-card-divider"></div>
+        <ul class="pw-card-features">
+          <li>
+            <svg class="pw-feat-check-pro" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Everything in Free
+          </li>
+          <li>
+            <svg class="pw-feat-check-pro" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Custom color themes
+          </li>
+          <li>
+            <svg class="pw-feat-check-pro" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Streak freeze tokens
+          </li>
+          <li>
+            <svg class="pw-feat-check-pro" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Habit analytics
+          </li>
+          <li>
+            <svg class="pw-feat-check-pro" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Metric tooltips
+          </li>
+        </ul>
+        <button type="button" id="paywall-upgrade-btn" class="pw-card-btn pw-btn-pro">
+          Upgrade to Pro
+        </button>
       </div>
-      <div class="pw-tier" data-tier="lifetime" id="pw-tier-lifetime">
-        <div class="pw-tier-label">Lifetime</div>
-        <div class="pw-tier-price">$32.99</div>
-        <div class="pw-tier-period">one-time</div>
+
+      <!-- APEX CARD -->
+      <div class="pw-card pw-card-apex">
+        <div class="pw-card-badge pw-badge-ultimate">ULTIMATE</div>
+        <div class="pw-card-name" style="color:#f59e0b;">Apex</div>
+        <div class="pw-card-price">$9.99</div>
+        <div class="pw-card-period">per month</div>
+        <div class="pw-card-divider"></div>
+        <ul class="pw-card-features">
+          <li>
+            <svg class="pw-feat-check-apex" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Everything in Pro
+          </li>
+          <li>
+            <svg class="pw-feat-check-apex" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Family sync
+          </li>
+          <li>
+            <svg class="pw-feat-check-apex" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            AI goal breakdown
+          </li>
+          <li>
+            <svg class="pw-feat-check-apex" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Zenith themes
+          </li>
+          <li>
+            <svg class="pw-feat-check-apex" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Priority cloud sync
+          </li>
+        </ul>
+        <button type="button" id="apex-upgrade-btn" class="pw-card-btn pw-btn-apex">
+          Unlock Apex
+        </button>
       </div>
-    </div>
+
+    </div><!-- /.pw-cards -->
 
     <!-- Countdown urgency -->
     <div class="pw-urgency">
-      <span>&#9201; Offer ends in</span>
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <span>Offer ends in</span>
       <span class="pw-countdown" id="pw-countdown">23:59:59</span>
     </div>
 
-    <button id="paywall-upgrade-btn">Get Annual Pro &mdash; $13.99/yr</button>
-    <button id="close-paywall-btn" onclick="closePaywall()">Maybe later</button>
+    <button type="button" id="close-paywall-btn" data-paywall-close
+      onclick="window.closePaywall && window.closePaywall()"
+      style="width:100%; margin-top:4px; background:transparent; border:none; font-size:11.5px; color:rgba(255,255,255,0.24); cursor:pointer; font-family:'Inter',sans-serif; padding:8px; transition:color 0.18s;">
+      Maybe later
+    </button>
   </div>
+
 
   <!-- Style Shop Overlay & Sheet -->
   <div id="shop-overlay"></div>
@@ -3445,9 +3536,55 @@ transition: all var(--tr);
     }).join('');
   }
 
+  function getXpReward(task) {
+    if (!task) return 25;
+    // Deep Work / Focus metric task: +50 XP (focus attribute, Work/Education category, >= 30m duration, or subtasks)
+    if (task.attributeType === 'focus' || task.category === 'Work' || task.category === 'Education' || (task.durationMinutes && task.durationMinutes >= 30) || (task.subtasks && task.subtasks.length > 0)) {
+      return 50;
+    }
+    return 25;
+  }
+
+  function getTierBgTint(cls) {
+    const tints = {
+      rt1:  'linear-gradient(180deg, rgba(193, 154, 107, 0.06) 0%, rgba(10, 10, 12, 1) 100%)',
+      rt2:  'linear-gradient(180deg, rgba(112, 128, 144, 0.06) 0%, rgba(10, 10, 12, 1) 100%)',
+      rt3:  'linear-gradient(180deg, rgba(205, 127, 50,  0.07) 0%, rgba(10, 10, 12, 1) 100%)',
+      rt4:  'linear-gradient(180deg, rgba(192, 192, 192, 0.07) 0%, rgba(10, 10, 12, 1) 100%)',
+      rt5:  'linear-gradient(180deg, rgba(255, 215, 0,   0.08) 0%, rgba(10, 10, 12, 1) 100%)',
+      rt6:  'linear-gradient(180deg, rgba(229, 228, 226, 0.07) 0%, rgba(10, 10, 12, 1) 100%)',
+      rt7:  'linear-gradient(180deg, rgba(0, 168, 107,  0.08) 0%, rgba(10, 10, 12, 1) 100%)',
+      rt8:  'linear-gradient(180deg, rgba(4, 99, 7,     0.08) 0%, rgba(10, 10, 12, 1) 100%)',
+      rt9:  'linear-gradient(180deg, rgba(255, 200, 124, 0.08) 0%, rgba(10, 10, 12, 1) 100%)',
+      rt10: 'linear-gradient(180deg, rgba(15, 82, 186,  0.09) 0%, rgba(10, 10, 12, 1) 100%)',
+      rt11: 'linear-gradient(180deg, rgba(153, 102, 204, 0.09) 0%, rgba(10, 10, 12, 1) 100%)',
+      rt12: 'linear-gradient(180deg, rgba(224, 17, 95,   0.09) 0%, rgba(10, 10, 12, 1) 100%)',
+      rt13: 'linear-gradient(180deg, rgba(185, 242, 255, 0.09) 0%, rgba(10, 10, 12, 1) 100%)',
+      rt14: 'linear-gradient(180deg, rgba(26, 26, 26,   0.14) 0%, rgba(10, 10, 12, 1) 100%)',
+      rt15: 'linear-gradient(180deg, rgba(135, 134, 129, 0.09) 0%, rgba(10, 10, 12, 1) 100%)',
+      rt16: 'linear-gradient(180deg, rgba(75, 0, 130,   0.10) 0%, rgba(10, 10, 12, 1) 100%)',
+      rt17: 'linear-gradient(180deg, rgba(255, 69, 0,    0.10) 0%, rgba(10, 10, 12, 1) 100%)',
+      rt18: 'linear-gradient(180deg, rgba(255, 255, 255, 0.10) 0%, rgba(10, 10, 12, 1) 100%)'
+    };
+    return tints[cls] || 'linear-gradient(180deg, rgba(10, 10, 12, 1) 0%, rgba(10, 10, 12, 1) 100%)';
+  }
+
+  function flashLevelUpBorder() {
+    const phoneContent = $('phone-content');
+    const subHeader = $('rove-sub-header');
+    [phoneContent, subHeader].forEach(el => {
+      if (!el) return;
+      el.classList.remove('tier-lvl-up-flash');
+      void el.offsetWidth;
+      el.classList.add('tier-lvl-up-flash');
+      setTimeout(() => el.classList.remove('tier-lvl-up-flash'), 900);
+    });
+  }
+
   function updateRpgUI() {
     loadRpgStats();
     const details = getLevelDetails(rpgStats.currentXP);
+    const tier = getTierForLevel(details.level);
 
     const phoneContent = $('phone-content');
     if (phoneContent) {
@@ -3455,47 +3592,34 @@ transition: all var(--tr);
         phoneContent.classList.remove(`rt${i}`);
       }
       phoneContent.classList.add(details.tierCls);
+
+      // Dynamic surface theme CSS variables
+      phoneContent.style.setProperty('--tier-color', tier.color);
+      phoneContent.style.setProperty('--tier-border', `${tier.color}3D`);
+      phoneContent.style.setProperty('--tier-glow', `${tier.color}4D`);
+      phoneContent.style.setProperty('--tier-bg-tint', getTierBgTint(details.tierCls));
+      phoneContent.style.setProperty('--rank-color', tier.color);
     }
     
     const headerText = $('header-level-text');
     if (headerText) {
       if (details.rank === 'ZENITH') {
-        headerText.innerHTML = `<i data-lucide="crown" style="width:12px; height:12px; color:#fff; display:inline-block; vertical-align:middle; margin-right:4px;"></i> Lv.${details.level} <span style="font-weight:900;">${details.rank}</span>`;
+        headerText.innerHTML = `<i data-lucide="crown" style="width:12px; height:12px; color:#fff; display:inline-block; vertical-align:middle; margin-right:3px;"></i> LVL 18 • <span style="color:#fff; font-weight:900;">ZENITH</span> <span style="color:rgba(255,255,255,0.4); font-weight:500;">| ${details.currentInLevel} / ${details.levelXpCost} XP</span>`;
       } else {
-        headerText.textContent = `Lv.${details.level} ${details.rank}`;
+        headerText.innerHTML = `<span style="color:${tier.color}; font-weight:800;">LVL ${details.level}</span> • <span style="color:${tier.color}; font-weight:700;">${details.rank}</span> <span style="color:rgba(255,255,255,0.4); font-weight:500;">| ${details.currentInLevel} / ${details.levelXpCost} XP</span>`;
       }
     }
 
     const headerProgress = $('header-level-progress');
     if (headerProgress) {
       headerProgress.style.width = `${details.pct}%`;
-      // Color bar by tier
-      const tierColors = {
-        rt1:'#C19A6B',
-        rt2:'#708090',
-        rt3:'#CD7F32',
-        rt4:'#C0C0C0',
-        rt5:'#FFD700',
-        rt6:'#E5E4E2',
-        rt7:'#00A86B',
-        rt8:'#046307',
-        rt9:'#FFC87C',
-        rt10:'#0F52BA',
-        rt11:'#9966CC',
-        rt12:'#E0115F',
-        rt13:'#B9F2FF',
-        rt14:'#1A1A1A',
-        rt15:'#878681',
-        rt16:'#4B0082',
-        rt17:'#FF4500',
-        rt18:'#FFFFFF'
-      };
-      const tc = tierColors[details.tierCls] || '#6b7280';
-      headerProgress.style.background = tc;
-      headerProgress.style.boxShadow = 'none';
+      headerProgress.style.background = tier.color;
+      headerProgress.style.boxShadow = `0 0 10px ${tier.color}80`;
     }
     const xpDetailEl = $('header-xp-detail');
-    if (xpDetailEl) xpDetailEl.textContent = `${details.currentInLevel} / ${details.levelXpCost} XP · ${details.rank}`;
+    if (xpDetailEl) {
+      xpDetailEl.style.display = 'none';
+    }
     
     const headerStreakCount = $('header-streak-count');
     if (headerStreakCount) headerStreakCount.textContent = rpgStats.streakCount;
@@ -4043,58 +4167,48 @@ transition: all var(--tr);
   const paywallSheet   = $('paywall-sheet');
   const paywallOverlay = $('paywall-overlay');
 
-  const TIER_LABELS = {
-    monthly:  'Get Monthly Pro \u2014 $2.99/mo',
-    annual:   'Get Annual Pro \u2014 $13.99/yr',
-    lifetime: 'Get Lifetime Access \u2014 $32.99'
-  };
-
-  function selectPaywallTier(tier) {
-    selectedPaywallTier = tier;
-    document.querySelectorAll('.pw-tier').forEach(el => el.classList.remove('selected'));
-    const card = $('pw-tier-' + tier);
-    if (card) card.classList.add('selected');
-    const btn = $('paywall-upgrade-btn');
-    if (btn && !btn.disabled) btn.textContent = TIER_LABELS[tier] || 'Upgrade to Pro';
-  }
-
   let _countdownInterval = null;
+
   function startPaywallCountdown() {
     clearInterval(_countdownInterval);
-    const key = 'rove_pw_deadline';
-    let deadline = parseInt(sessionStorage.getItem(key) || '0', 10);
-    if (!deadline || deadline < Date.now()) {
-      deadline = Date.now() + 24 * 60 * 60 * 1000;
-      sessionStorage.setItem(key, String(deadline));
-    }
+    // 10-minute countdown per session open
+    let remaining = 10 * 60;
     function tick() {
-      const diff = Math.max(0, deadline - Date.now());
-      const h = Math.floor(diff / 3600000);
-      const m = Math.floor((diff % 3600000) / 60000);
-      const s = Math.floor((diff % 60000) / 1000);
-      const el = $('pw-countdown');
-      if (el) el.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+      const el = document.getElementById('pw-countdown');
+      if (!el) return;
+      const m = Math.floor(remaining / 60);
+      const s = remaining % 60;
+      el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+      if (remaining > 0) remaining--;
     }
     tick();
     _countdownInterval = setInterval(tick, 1000);
   }
 
   function openPaywall() {
+    if (!paywallOverlay || !paywallSheet) return;
     paywallOverlay.classList.add('open');
     paywallSheet.classList.add('open');
     paywallSheet.removeAttribute('aria-hidden');
-    selectPaywallTier(selectedPaywallTier);
     startPaywallCountdown();
   }
 
   function closePaywall() {
+    if (!paywallOverlay || !paywallSheet) return;
     paywallOverlay.classList.remove('open');
     paywallSheet.classList.remove('open');
     paywallSheet.setAttribute('aria-hidden', 'true');
     clearInterval(_countdownInterval);
-    const btn = $('paywall-upgrade-btn');
-    if (btn) { btn.textContent = TIER_LABELS['annual']; btn.disabled = false; }
+    _countdownInterval = null;
+    const proBtn = document.getElementById('paywall-upgrade-btn');
+    if (proBtn) { proBtn.innerHTML = 'Upgrade to Pro'; proBtn.disabled = false; proBtn.className = 'pw-card-btn pw-btn-pro'; }
+    const apexBtn = document.getElementById('apex-upgrade-btn');
+    if (apexBtn) { apexBtn.innerHTML = 'Unlock Apex'; apexBtn.disabled = false; apexBtn.className = 'pw-card-btn pw-btn-apex'; }
   }
+
+  // Expose globals FIRST so inline onclick attributes can call them immediately
+  window.closePaywall = closePaywall;
+  window.openPaywall  = openPaywall;
 
   function updatePremiumUI() {
     const b1 = $('profile-premium-badge');
@@ -4104,14 +4218,42 @@ transition: all var(--tr);
   } 
   
   window.closePaywall = closePaywall;
-  window.openPaywall = openPaywall;
+  window.openPaywall  = openPaywall;
 
-  if ($('close-paywall-btn')) $('close-paywall-btn').addEventListener('click', closePaywall);
-  if (paywallOverlay) paywallOverlay.addEventListener('click', closePaywall);
+  // Direct listeners on each dismiss element (belt-and-suspenders)
+  function _bindClose(id) {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      closePaywall();
+    }, true); // useCapture=true ensures it fires before any other handler
+  }
+  _bindClose('close-paywall-btn');
+  _bindClose('paywall-x-btn');
 
-  document.querySelectorAll('.pw-tier').forEach(el => {
-    el.addEventListener('click', () => selectPaywallTier(el.dataset.tier));
+  // Also bind the "Continue Free" button by class since it has no id
+  const freeBtns = document.querySelectorAll('.pw-btn-free');
+  freeBtns.forEach(function(el) {
+    el.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      closePaywall();
+    }, true);
   });
+
+  // Overlay backdrop — direct click closes
+  if (paywallOverlay) {
+    paywallOverlay.addEventListener('click', function() { closePaywall(); });
+  }
+
+  // Escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && paywallSheet && paywallSheet.classList.contains('open')) {
+      closePaywall();
+    }
+  });
+
 
   const paywallUpgradeBtn = $('paywall-upgrade-btn');
   if (paywallUpgradeBtn) paywallUpgradeBtn.addEventListener('click', async () => {
@@ -4133,11 +4275,35 @@ transition: all var(--tr);
       }, { merge: true }).catch(console.error);
     }
 
-    btn.className = 'success';
-    btn.textContent = 'Pro Activated! \uD83C\uDF89';
+    btn.classList.add('success');
+    btn.innerHTML = 'Pro Activated!';
     updatePremiumUI();
     setTimeout(closePaywall, 1200);
-  }); /* ══ Weekly scores ═══════════════════════════════════════════ */
+  });
+
+  // Apex upgrade button handler
+  const apexUpgradeBtn = $('apex-upgrade-btn');
+  if (apexUpgradeBtn) apexUpgradeBtn.addEventListener('click', async () => {
+    const btn = $('apex-upgrade-btn');
+    btn.disabled = true;
+    btn.innerHTML = `<span class="spinner"></span> Processing...`;
+    await new Promise(r => setTimeout(r, 1500));
+    isPremium   = true;
+    isPro       = true;
+    premiumTier = 'apex';
+    localStorage.setItem('focus_premium', 'true');
+    localStorage.setItem('rove_premium_tier', 'apex');
+    if (auth.currentUser) {
+      setDoc(doc(db, 'users', auth.currentUser.uid), {
+        isPro: true, premiumTier: 'apex'
+      }, { merge: true }).catch(console.error);
+    }
+    btn.classList.add('success');
+    btn.innerHTML = 'Apex Activated!';
+    updatePremiumUI();
+    setTimeout(closePaywall, 1200);
+  });
+
   function getWeeklyScores() {
     try { return JSON.parse(localStorage.getItem(WEEKLY_KEY)) || {}; } catch(_) { return {}; }
   }
@@ -4309,18 +4475,22 @@ transition: all var(--tr);
     roveCoins += 5;
     saveShopState();
 
+    const xpAmount = getXpReward(task);
+
     loadRpgStats();
-    rpgStats.currentXP = (rpgStats.currentXP || 0) + 10;
+    rpgStats.currentXP = (rpgStats.currentXP || 0) + xpAmount;
     rpgStats.level = getLevelDetails(rpgStats.currentXP).level;
     saveRpgStats();
-    awardAttributeXP(task.attributeType || 'focus', 10, targetElement);
+    awardAttributeXP(task.attributeType || 'focus', xpAmount, targetElement);
     updateRpgUI();
     pulseXPBar();
 
     const newDetails = getLevelDetails(rpgStats.currentXP);
-    // Show level-up overlay if tier changed
-    if (newDetails.tierCls !== prevDetails.tierCls) {
-      setTimeout(() => showLevelUpOverlay(newDetails), 600);
+    if (newDetails.level > prevDetails.level) {
+      flashLevelUpBorder();
+      if (newDetails.tierCls !== prevDetails.tierCls) {
+        setTimeout(() => showLevelUpOverlay(newDetails), 600);
+      }
     }
 
     setTimeout(() => renderReview(), li ? 380 : 0);
@@ -4584,6 +4754,16 @@ function formatTime(timeStr) {
     const subInput = li.querySelector('.sub-input');
     const subAddBtn = li.querySelector('.sub-add-btn');
     const aiSplitBtn = li.querySelector('.ai-split-btn');
+
+    // Check dot click to complete task
+    const riDot = li.querySelector('.ri-dot');
+    if (riDot) {
+      riDot.style.cursor = 'pointer';
+      riDot.addEventListener('click', (e) => {
+        e.stopPropagation();
+        completeTaskFromSwipe(taskId, ri);
+      });
+    }
 
     // AI Split — Pro-gated goal breakdown
     if (aiSplitBtn) {
@@ -5280,13 +5460,24 @@ function formatTime(timeStr) {
     roveCoins += 5;
     saveShopState();
 
-    // Gamification rewards:
+    const prevDetails = getLevelDetails(rpgStats.currentXP || 0);
+
+    // Gamification rewards (Deep Work / Focus Session = +50 XP):
+    const xpAmount = 50;
     loadRpgStats();
-    rpgStats.currentXP = (rpgStats.currentXP || 0) + 10;
+    rpgStats.currentXP = (rpgStats.currentXP || 0) + xpAmount;
     rpgStats.level = getLevelDetails(rpgStats.currentXP).level;
     saveRpgStats();
-    awardAttributeXP(task.attributeType || 'focus', 10, focusCard);
-    console.log("Current XP:", rpgStats.currentXP);
+    awardAttributeXP(task.attributeType || 'focus', xpAmount, focusCard);
+
+    const newDetails = getLevelDetails(rpgStats.currentXP);
+    if (newDetails.level > prevDetails.level) {
+      flashLevelUpBorder();
+      if (newDetails.tierCls !== prevDetails.tierCls) {
+        setTimeout(() => showLevelUpOverlay(newDetails), 600);
+      }
+    }
+
     updateRpgUI();
     triggerConfetti(focusCard);
     pulseXPBar();
