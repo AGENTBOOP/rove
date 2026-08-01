@@ -2632,7 +2632,6 @@ transition: all var(--tr);
 
   <!-- Top Navigation Header -->
   <header id="app-header">
-    <button id="shop-btn" aria-label="Style Shop"><i data-lucide="palette"></i></button>
     <span class="header-title" id="header-title">Rove</span>
     <button id="account-btn" aria-label="Account & Family">
       <span class="account-initial">—</span>
@@ -2821,18 +2820,7 @@ transition: all var(--tr);
   </div>
 
 
-  <!-- Style Shop Overlay & Sheet -->
-  <div id="shop-overlay"></div>
-  <div id="shop-sheet" role="dialog" aria-modal="true" aria-label="Style Shop" aria-hidden="true">
-    <div class="sheet-handle"></div>
-    <div class="shop-header-row">
-      <p class="sheet-cap" style="margin: 0; font-size: 16px; color: #fff; font-weight: 700;">Style Shop</p>
-      <div class="shop-coins-badge" id="shop-coins-badge">
-        <span>🪙</span> <span id="shop-coins-val">0</span> Coins
-      </div>
-    </div>
-    <div class="shop-list" id="shop-list"></div>
-  </div>
+
 
   <!-- Username Onboarding overlay -->
   <div id="username-onboarding-overlay">
@@ -5853,94 +5841,11 @@ function formatTime(timeStr) {
     r.addEventListener('animationend', () => r.remove());
   });
 
-  /* ══ Style Shop & Analytics Logic ════════════════════════════ */
-  window.buyStyle = function(id, cost) {
-    if (roveCoins >= cost && !purchasedStyles.includes(id)) {
-      roveCoins -= cost;
-      purchasedStyles.push(id);
-      activeStyle = id; // auto-equip upon purchase
-      applyActiveStyle();
-      saveShopState();
-      renderShop();
-    }
-  };
-  
-  window.equipStyle = function(id) {
-    const item = SHOP_ITEMS.find(x => x.id === id);
-    const isUnlocked = purchasedStyles.includes(id) || (item && item.pro && isPro);
-    if (isUnlocked) {
-      activeStyle = id;
-      applyActiveStyle();
-      saveShopState();
-      renderShop();
-    }
-  };
-
-  function renderShop() {
-    const coinsEl = $('shop-coins-val');
-    if (coinsEl) coinsEl.textContent = roveCoins;
-    const container = $('shop-list');
-    if (!container) return;
-    
-    container.innerHTML = SHOP_ITEMS.map(item => {
-      const isPurchased = purchasedStyles.includes(item.id);
-      const isUnlocked = isPurchased || (item.pro && isPro);
-      const isActive = activeStyle === item.id || (item.id === 'default' && !activeStyle);
-      const isProLocked = item.pro && !isPro;
-      
-      let actionHtml = '';
-      if (isProLocked) {
-        actionHtml = `<button class="shop-buy-btn" onclick="openPaywall()" style="background:rgba(99,102,241,0.15);border-color:rgba(99,102,241,0.4);color:#a78bfa;"><i data-lucide="lock" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:3px;"></i> Pro</button>`;
-      } else if (!isUnlocked) {
-        const canBuy = roveCoins >= item.cost;
-        actionHtml = `<button class="shop-buy-btn" ${canBuy ? '' : 'disabled'} onclick="buyStyle('${item.id}', ${item.cost})">${item.cost === 0 ? 'Free' : item.cost + ' Coins'}</button>`;
-      } else {
-        if (isActive) {
-          actionHtml = `<button class="shop-equip-btn equipped" disabled>Equipped</button>`;
-        } else {
-          actionHtml = `<button class="shop-equip-btn" onclick="equipStyle('${item.id}')">Equip</button>`;
-        }
-      }
-      
-      return `
-        <div class="shop-item" style="${isProLocked ? 'opacity:0.75;' : ''}">
-          <div class="shop-item-info">
-            <span class="shop-item-name">${esc(item.name)}${item.pro ? ' <span style="font-size:9px;font-weight:700;color:#a78bfa;background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.3);border-radius:4px;padding:1px 5px;margin-left:4px;">PRO</span>' : ''}</span>
-            <span class="shop-item-desc">${esc(item.desc)}</span>
-          </div>
-          <div class="shop-item-actions">
-            ${actionHtml}
-          </div>
-        </div>
-      `;
-    }).join('');
-
-    if (typeof lucide !== 'undefined') {
-      lucide.createIcons();
-    }
-  }
-
-  (function initShop() {
-    const btn = $('shop-btn');
-    const overlay = $('shop-overlay');
-    const sheet = $('shop-sheet');
-    if (!btn || !overlay || !sheet) return;
-
-    function open() {
-      renderShop();
-      overlay.classList.add('open');
-      sheet.classList.add('open');
-      sheet.removeAttribute('aria-hidden');
-    }
-    function close() {
-      overlay.classList.remove('open');
-      sheet.classList.remove('open');
-      sheet.setAttribute('aria-hidden', 'true');
-    }
-
-    btn.addEventListener('click', open);
-    overlay.addEventListener('click', close);
-  })();
+  /* ══ Style Shop (Disabled) ═══════════════════════════════════ */
+  window.buyStyle = function() {};
+  window.equipStyle = function() {};
+  function renderShop() {}
+  (function initShop() {})();
 
   function renderAnalyticsGraph() {
     const container = $('analytics-chart-container');
