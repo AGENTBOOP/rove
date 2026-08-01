@@ -1290,25 +1290,9 @@ transition: all var(--tr);
       transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
     }
 
-    /* ── Premium Paywall ─────────────────────────────────────── */
-    #paywall-overlay {
-      position: absolute; inset: 0; z-index: 850;
-      background: rgba(0,0,0,0.82);
-      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-      opacity: 0; pointer-events: none;
-      transition: opacity 0.32s cubic-bezier(0.4,0,0.2,1);
-    }
-    #paywall-overlay.open { opacity: 1; pointer-events: auto; }
-    #paywall-sheet {
-      position: absolute; bottom: 0; left: 0; right: 0; z-index: 900;
-      background: linear-gradient(180deg,#141418 0%,#0f0f12 100%);
-      border-top: 1px solid rgba(255,255,255,0.07);
-      border-radius: 28px 28px 0 0;
-      padding: 6px 14px 36px;
-      transform: translateY(100%);
-      transition: transform 0.45s cubic-bezier(0.16,1,0.3,1);
-      max-height: 96%; overflow-y: auto;
-    }
+    /* ── Premium Paywall (Permanently Disabled) ───────────────── */
+    #paywall-overlay { display: none !important; pointer-events: none !important; }
+    #paywall-sheet   { display: none !important; pointer-events: none !important; }
     #paywall-sheet.open { transform: translateY(0); }
     #paywall-sheet::-webkit-scrollbar { display:none; }
     .pw-handle { width:36px; height:4px; background:rgba(255,255,255,0.1); border-radius:2px; margin:12px auto 16px; }
@@ -3387,9 +3371,9 @@ transition: all var(--tr);
   let choreActive  = false;
   let pendingChore = 'Clean Room';
   let focusOnMe    = true;
-  let isPremium         = false;
-  let isPro             = false;        // true when premiumTier !== 'free'
-  let premiumTier       = 'free';       // 'free' | 'monthly' | 'annual' | 'lifetime'
+  let isPremium         = true;
+  let isPro             = true;        // Permanently unlocked — Paywall disabled
+  let premiumTier       = 'lifetime';  // Fully unlocked lifetime tier
   let selectedPaywallTier = 'annual';   // default selected tier in paywall UI
 
   // Style Shop, Discipline Analytics, and Timeline scheduling state
@@ -4103,8 +4087,9 @@ transition: all var(--tr);
   }
 
   function loadStorage() {
-    try { isPremium = localStorage.getItem('focus_premium') === 'true'; } catch(_) { isPremium = false; }
-    try { premiumTier = localStorage.getItem('rove_premium_tier') || 'free'; isPro = isPremium; } catch(_) { isPro = false; }
+    isPremium = true;
+    isPro = true;
+    premiumTier = 'lifetime';
     try { tasks = JSON.parse(localStorage.getItem(TASKS_KEY)) || []; }
     catch(_) { tasks = []; }
     
@@ -4151,74 +4136,30 @@ transition: all var(--tr);
   
   /* ══ checkProStatus — global gate utility ════════════════════ */
   async function checkProStatus(uid) {
-    try {
-      const snap = await getDoc(doc(db, 'users', uid));
-      if (snap.exists()) {
-        const data = snap.data();
-        isPro       = !!(data.isPro);
-        premiumTier = data.premiumTier || 'free';
-        isPremium   = isPro;
-        if (isPro) localStorage.setItem('focus_premium', 'true');
-      }
-    } catch (e) { console.warn('checkProStatus failed:', e); }
+    isPro       = true;
+    premiumTier = 'lifetime';
+    isPremium   = true;
   }
 
-  /* ══ Premium & Paywall Logic ═════════════════════════════════ */
+  /* ══ Premium & Paywall Logic (Disabled) ══════════════════════ */
   let _countdownInterval = null;
 
-  function startPaywallCountdown() {
-    if (_countdownInterval) clearInterval(_countdownInterval);
-    const key = 'rove_pw_deadline';
-    let deadline = parseInt(sessionStorage.getItem(key) || '0', 10);
-    if (!deadline || deadline <= Date.now()) {
-      deadline = Date.now() + 24 * 60 * 60 * 1000;
-      sessionStorage.setItem(key, String(deadline));
-    }
-    function tick() {
-      const el = document.getElementById('pw-countdown');
-      if (!el) return;
-      const diff = Math.max(0, deadline - Date.now());
-      const h = Math.floor(diff / 3600000);
-      const m = Math.floor((diff % 3600000) / 60000);
-      const s = Math.floor((diff % 60000) / 1000);
-      el.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-    }
-    tick();
-    _countdownInterval = setInterval(tick, 1000);
-  }
+  function startPaywallCountdown() {}
 
   function openPaywall() {
-    const overlay = document.getElementById('paywall-overlay');
-    const sheet   = document.getElementById('paywall-sheet');
-    if (overlay) overlay.classList.add('open');
-    if (sheet) {
-      sheet.classList.add('open');
-      sheet.removeAttribute('aria-hidden');
-    }
-    startPaywallCountdown();
+    return; // Paywall permanently disabled
   }
 
   function closePaywall() {
     const overlay = document.getElementById('paywall-overlay');
     const sheet   = document.getElementById('paywall-sheet');
-    if (overlay) overlay.classList.remove('open');
-    if (sheet) {
-      sheet.classList.remove('open');
-      sheet.setAttribute('aria-hidden', 'true');
-    }
-    if (_countdownInterval) {
-      clearInterval(_countdownInterval);
-      _countdownInterval = null;
-    }
-    const proBtn = document.getElementById('paywall-upgrade-btn');
-    if (proBtn) { proBtn.innerHTML = 'Upgrade to Pro'; proBtn.disabled = false; proBtn.className = 'pw-card-btn pw-btn-pro'; }
-    const apexBtn = document.getElementById('apex-upgrade-btn');
-    if (apexBtn) { apexBtn.innerHTML = 'Unlock Apex'; apexBtn.disabled = false; apexBtn.className = 'pw-card-btn pw-btn-apex'; }
+    if (overlay) overlay.style.display = 'none';
+    if (sheet) sheet.style.display = 'none';
   }
 
-  // Expose globals FIRST so inline onclick attributes can call them immediately
+  // Expose no-op globals
   window.closePaywall = closePaywall;
-  window.openPaywall  = openPaywall;
+  window.openPaywall  = function() {};
 
   function updatePremiumUI() {
     const b1 = $('profile-premium-badge');
@@ -4763,11 +4704,10 @@ function formatTime(timeStr) {
       });
     }
 
-    // AI Split — Pro-gated goal breakdown
+    // AI Split — Goal breakdown (100% unlocked)
     if (aiSplitBtn) {
       aiSplitBtn.addEventListener('click', async (e) => {
         e.stopPropagation();
-        if (!isPro) { openPaywall(); return; }
         const t = tasks.find(x => x.id == taskId);
         if (!t) return;
         aiSplitBtn.textContent = '✦ Splitting…';
