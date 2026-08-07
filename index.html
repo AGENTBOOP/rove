@@ -2668,6 +2668,13 @@ transition: all var(--tr);
   <!-- Family Sheet -->
   <div id="family-sheet" role="dialog" aria-modal="true" aria-label="Account Settings" aria-hidden="true">
     <div class="sheet-handle"></div>
+    <!-- Close X button -->
+    <button type="button" id="family-sheet-x-btn"
+      onclick="window.closeAccountSheet && window.closeAccountSheet()"
+      style="position:absolute; top:14px; right:14px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12); color:rgba(255,255,255,0.7); border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0; z-index:10; transition:all 0.2s ease;"
+      aria-label="Close Account Sheet">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
 
     <p class="sheet-cap">Your Account</p>
     <div class="acct-block">
@@ -2680,7 +2687,10 @@ transition: all var(--tr);
         <div class="acct-email">please sign in</div>
       </div>
     </div>
-    <button class="acct-link" id="switch-acct-btn">Switch account →</button>
+    <div style="display: flex; gap: 8px; margin-top: 12px;">
+      <button class="acct-link" id="switch-acct-btn" style="flex: 1;">Switch account →</button>
+      <button type="button" class="acct-link" onclick="window.closeAccountSheet && window.closeAccountSheet()" style="width: auto; padding: 0 18px; background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.7); border: 1px solid rgba(255,255,255,0.1);">Close</button>
+    </div>
   </div>
 
   <!-- Paywall overlay & sheet -->
@@ -2939,11 +2949,9 @@ transition: all var(--tr);
             <div class="ptc-emoji-group-label"><i data-lucide="brain" style="width: 10px; height: 10px; margin-right: 4px; display: inline-block; vertical-align: middle;"></i>Focus</div>
             <div class="ptc-emoji-row">
               <button type="button" class="ptc-emoji-btn" data-emoji="brain" data-attr="focus" data-tip="DEEP WORK"><i data-lucide="brain"></i></button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="terminal" data-attr="focus" data-tip="DEV MODE"><i data-lucide="terminal"></i></button>
               <button type="button" class="ptc-emoji-btn" data-emoji="trending-up" data-attr="focus" data-tip="GROWTH"><i data-lucide="trending-up"></i></button>
               <button type="button" class="ptc-emoji-btn" data-emoji="book-open" data-attr="focus" data-tip="STUDY GRIND"><i data-lucide="book-open"></i></button>
               <button type="button" class="ptc-emoji-btn" data-emoji="target" data-attr="focus" data-tip="PRECISION FOCUS"><i data-lucide="target"></i></button>
-              <button type="button" class="ptc-emoji-btn" data-emoji="search" data-attr="focus" data-tip="ANALYSIS"><i data-lucide="search"></i></button>
               <button type="button" class="ptc-emoji-btn" data-emoji="zap" data-attr="focus" data-tip="FLOW STATE"><i data-lucide="zap"></i></button>
             </div>
 
@@ -5704,6 +5712,8 @@ function formatTime(timeStr) {
       sheet.classList.remove('open'); 
       sheet.setAttribute('aria-hidden', 'true'); 
     }
+
+    window.closeAccountSheet = close;
 
     btn.addEventListener('click', open);
     overlay.addEventListener('click', close);
