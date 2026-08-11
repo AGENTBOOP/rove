@@ -2213,26 +2213,62 @@ transition: all var(--tr);
       color: #fff;
       box-shadow: none;
     }
+    /* Cancel button */
+    .ptc-cancel-btn {
+      padding: 11px 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.05);
+      color: rgba(255,255,255,0.6);
+      font-size: 13px;
+      font-weight: 600;
+      font-family: 'Outfit', sans-serif;
+      cursor: pointer;
+      pointer-events: auto;
+      transition: all 0.2s;
+    }
+    .ptc-cancel-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
     /* Add button */
     .ptc-add-btn {
-      width: 100%;
-      padding: 13px;
+      flex: 1;
+      padding: 11px 16px;
       border-radius: 12px;
-      border: none;
       background: rgba(255,255,255,0.1);
       color: #fff;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 700;
       font-family: 'Outfit', sans-serif;
       cursor: pointer;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      transition: opacity 0.2s;
+      pointer-events: auto;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      transition: all 0.2s;
       border: 1px solid rgba(255,255,255,0.15);
-      box-shadow: none;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.02em;
     }
-    .ptc-add-btn:hover { opacity: 0.88; }
+    .ptc-add-btn:hover { opacity: 0.88; background: rgba(255,255,255,0.15); }
     .ptc-add-btn:active { opacity: 0.75; }
+
+    /* Done button */
+    .ptc-done-btn {
+      flex: 1;
+      padding: 11px 16px;
+      border-radius: 12px;
+      background: var(--accent, #8b5cf6);
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: 'Outfit', sans-serif;
+      cursor: pointer;
+      pointer-events: auto;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      border: 1px solid rgba(255,255,255,0.2);
+      letter-spacing: 0.02em;
+      box-shadow: 0 4px 14px rgba(139, 92, 246, 0.35);
+    }
+    .ptc-done-btn:hover { opacity: 0.92; transform: translateY(-1px); box-shadow: 0 6px 18px rgba(139, 92, 246, 0.45); }
+    .ptc-done-btn:active { transform: translateY(0); opacity: 0.85; }
 
     /* ══ Task Creator Trigger Bar ════════════════════════════════ */
     .ptc-trigger-bar {
@@ -3043,6 +3079,9 @@ transition: all var(--tr);
           <button id="ptc-cancel-btn" class="ptc-cancel-btn" type="button">Cancel</button>
           <button id="ptc-add-btn" class="ptc-add-btn" type="button">
             <span style="font-size:16px; line-height:1;">+</span> Add Task
+          </button>
+          <button id="ptc-done-btn" class="ptc-done-btn" type="button">
+            <i data-lucide="check" style="width:14px; height:14px; stroke-width:3; vertical-align:middle;"></i> Done
           </button>
         </div>
 
@@ -5056,10 +5095,25 @@ function formatTime(timeStr) {
     const ptcAddBtn = $('ptc-add-btn');
     if (ptcAddBtn) ptcAddBtn.addEventListener('click', () => { doAddTask(); closeModal(); });
 
+    // ── Done button ──
+    const ptcDoneBtn = $('ptc-done-btn');
+    if (ptcDoneBtn) ptcDoneBtn.addEventListener('click', () => {
+      if (addInput && addInput.value.trim()) {
+        doAddTask();
+      } else {
+        closeModal();
+      }
+    });
+
     // Store closeModal on window so doAddTask reset can call it
     window._ptcCloseModal = closeModal;
-  })(); if (addInput) addInput.addEventListener('keydown', e => {
-    if (e.key === 'Enter') doAddTask();
+  })();
+
+  if (addInput) addInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      doAddTask();
+    }
   });
 
   function doAddTask() {
