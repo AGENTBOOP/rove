@@ -198,9 +198,11 @@
     .screen {
       position: absolute; inset: 0;
       display: flex; flex-direction: column; align-items: center;
-      padding: 124px 18px 110px;
+      padding: 124px 18px 140px;
       overflow-y: auto;
+      overflow-x: hidden;
       -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;
       scroll-behavior: smooth;
       opacity: 0; pointer-events: none;
       transition: opacity 0.35s var(--ease);
