@@ -5052,6 +5052,9 @@ function formatTime(timeStr) {
 
     function openModal() {
       if (!modal || !triggerBar) return;
+      // Force close Account Sheet if open
+      if (window.closeAccountSheet) window.closeAccountSheet();
+
       modal.classList.add('open');
       modal.setAttribute('aria-hidden', 'false');
       triggerBar.setAttribute('aria-expanded', 'true');
@@ -5785,12 +5788,8 @@ function formatTime(timeStr) {
       overlay.classList.remove('open'); 
       sheet.classList.remove('open'); 
       sheet.setAttribute('aria-hidden', 'true'); 
-      setTimeout(() => {
-        if (!sheet.classList.contains('open')) {
-          sheet.style.display = 'none';
-          overlay.style.display = 'none';
-        }
-      }, 300);
+      sheet.style.display = 'none';
+      overlay.style.display = 'none';
     }
 
     window.closeAccountSheet = close;
