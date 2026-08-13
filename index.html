@@ -322,9 +322,10 @@
       position: absolute; inset: 0; z-index: 300;
       background: rgba(0,0,0,0.65);
       backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
-      opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+      opacity: 0; pointer-events: none !important; transition: opacity 0.3s ease;
+      display: none;
     }
-    #sheet-overlay.open { opacity: 1; pointer-events: auto; }
+    #sheet-overlay.open { opacity: 1; pointer-events: auto !important; display: block; }
 
     #family-sheet {
       position: absolute; left: 0; right: 0; bottom: 0; z-index: 400;
@@ -334,10 +335,20 @@
       border-radius: 24px 24px 0 0;
       padding: 10px 20px 48px;
       transform: translateY(100%);
-      transition: transform 0.4s var(--ease);
+      transition: transform 0.3s var(--ease), opacity 0.2s ease;
       max-height: 80%; overflow-y: auto;
+      display: none;
+      pointer-events: none !important;
+      visibility: hidden;
+      opacity: 0;
     }
-    #family-sheet.open { transform: translateY(0); }
+    #family-sheet.open {
+      display: block !important;
+      visibility: visible !important;
+      pointer-events: auto !important;
+      opacity: 1 !important;
+      transform: translateY(0) !important;
+    }
 
     .sheet-handle {
       width: 36px; height: 4px;
@@ -2709,8 +2720,7 @@ transition: all var(--tr);
     <div class="sheet-handle"></div>
     <!-- Close X button -->
     <button type="button" id="family-sheet-x-btn"
-      onclick="window.closeAccountSheet && window.closeAccountSheet()"
-      style="position:absolute; top:14px; right:14px; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2); color:#ffffff; border-radius:50%; width:32px; height:32px; display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0; z-index:100; pointer-events:auto; transition:all 0.2s ease;"
+      style="position:absolute; top:14px; right:14px; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2); color:#ffffff; border-radius:50%; width:32px; height:32px; display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0; z-index:500; pointer-events:auto; transition:all 0.2s ease;"
       aria-label="Close Account Sheet">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
@@ -4553,7 +4563,6 @@ function formatTime(timeStr) {
 
     let filtered = tasks.filter(t => focusOnMe ? t.assignedTo === 'You' : true);
     
-    $('timeline-bar').style.display = 'flex';
     filtered = filterTasksByTimeline(filtered, activeTimelineFilter);
     
     if (currentViewMode === 'long-term') {
@@ -5048,13 +5057,11 @@ function formatTime(timeStr) {
       triggerBar.setAttribute('aria-expanded', 'true');
       const inp = $('add-input');
       if (inp) setTimeout(() => inp.focus(), 80);
-      const phoneContent = $('phone-content');
-      if (phoneContent) {
+      // Scroll screen-review (the actual scrollable element) to bottom
+      const screenReview = $('screen-review');
+      if (screenReview) {
         setTimeout(() => {
-          phoneContent.scrollTo({
-            top: phoneContent.scrollHeight,
-            behavior: 'smooth'
-          });
+          screenReview.scrollTo({ top: screenReview.scrollHeight, behavior: 'smooth' });
         }, 150);
       }
     }
@@ -5063,6 +5070,14 @@ function formatTime(timeStr) {
       modal.classList.remove('open');
       modal.setAttribute('aria-hidden', 'true');
       triggerBar.setAttribute('aria-expanded', 'false');
+      // Scroll back to top so user can see their tasks
+      const screenReview = $('screen-review');
+      if (screenReview) {
+        screenReview.scrollTo({ top: 0, behavior: 'smooth' });
+        setTimeout(() => {
+          screenReview.scrollTo({ top: 0, behavior: 'smooth' });
+        }, 250);
+      }
     }
     if (triggerBar) triggerBar.addEventListener('click', () => {
       const isOpen = triggerBar.getAttribute('aria-expanded') === 'true';
@@ -5759,6 +5774,9 @@ function formatTime(timeStr) {
     const sheet   = $('family-sheet');
 
     function open()  { 
+      sheet.style.display = 'block';
+      overlay.style.display = 'block';
+      void sheet.offsetWidth;
       overlay.classList.add('open'); 
       sheet.classList.add('open'); 
       sheet.removeAttribute('aria-hidden'); 
@@ -5767,17 +5785,43 @@ function formatTime(timeStr) {
       overlay.classList.remove('open'); 
       sheet.classList.remove('open'); 
       sheet.setAttribute('aria-hidden', 'true'); 
+      setTimeout(() => {
+        if (!sheet.classList.contains('open')) {
+          sheet.style.display = 'none';
+          overlay.style.display = 'none';
+        }
+      }, 300);
     }
 
     window.closeAccountSheet = close;
 
-    btn.addEventListener('click', open);
-    overlay.addEventListener('click', close);
+    if (btn) btn.addEventListener('click', open);
+    if (overlay) overlay.addEventListener('click', close);
 
-    const xBtn = $('family-sheet-x-btn');
-    if (xBtn) xBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      close();
+    // Bulletproof X button — event capture phase on window
+    window.addEventListener('click', function(e) {
+      const x = e.target.closest('#family-sheet-x-btn');
+      if (x) {
+        e.preventDefault();
+        e.stopPropagation();
+        close();
+      }
+    }, true);
+
+    window.addEventListener('touchend', function(e) {
+      const x = e.target.closest('#family-sheet-x-btn');
+      if (x) {
+        e.preventDefault();
+        e.stopPropagation();
+        close();
+      }
+    }, true);
+
+    // Escape key closes sheet
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && sheet.classList.contains('open')) {
+        close();
+      }
     });
 
     $('switch-acct-btn').addEventListener('click', async () => {
