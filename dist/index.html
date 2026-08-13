@@ -5065,34 +5065,18 @@ function formatTime(timeStr) {
         overlay.classList.remove('open');
         overlay.style.setProperty('display', 'none', 'important');
       }
-      if (window.closeAccountSheet) window.closeAccountSheet();
 
       modal.classList.add('open');
       modal.setAttribute('aria-hidden', 'false');
       triggerBar.setAttribute('aria-expanded', 'true');
       const inp = $('add-input');
       if (inp) setTimeout(() => inp.focus(), 80);
-      // Scroll screen-review (the actual scrollable element) to bottom
-      const screenReview = $('screen-review');
-      if (screenReview) {
-        setTimeout(() => {
-          screenReview.scrollTo({ top: screenReview.scrollHeight, behavior: 'smooth' });
-        }, 150);
-      }
     }
     function closeModal() {
       if (!modal || !triggerBar) return;
       modal.classList.remove('open');
       modal.setAttribute('aria-hidden', 'true');
       triggerBar.setAttribute('aria-expanded', 'false');
-      // Scroll back to top so user can see their tasks
-      const screenReview = $('screen-review');
-      if (screenReview) {
-        screenReview.scrollTo({ top: 0, behavior: 'smooth' });
-        setTimeout(() => {
-          screenReview.scrollTo({ top: 0, behavior: 'smooth' });
-        }, 250);
-      }
     }
     if (triggerBar) triggerBar.addEventListener('click', () => {
       const isOpen = triggerBar.getAttribute('aria-expanded') === 'true';
