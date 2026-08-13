@@ -2713,10 +2713,10 @@ transition: all var(--tr);
   </div>
 
   <!-- Sheet overlay -->
-  <div id="sheet-overlay"></div>
+  <div id="sheet-overlay" style="display: none !important;"></div>
 
   <!-- Family Sheet -->
-  <div id="family-sheet" role="dialog" aria-modal="true" aria-label="Account Settings" aria-hidden="true">
+  <div id="family-sheet" role="dialog" aria-modal="true" aria-label="Account Settings" aria-hidden="true" style="display: none !important;">
     <div class="sheet-handle"></div>
     <!-- Close X button -->
     <button type="button" id="family-sheet-x-btn"
@@ -5052,7 +5052,19 @@ function formatTime(timeStr) {
 
     function openModal() {
       if (!modal || !triggerBar) return;
-      // Force close Account Sheet if open
+      
+      // Force close and hide Account Sheet & Overlay immediately
+      const famSheet = $('family-sheet');
+      const overlay  = $('sheet-overlay');
+      if (famSheet) {
+        famSheet.classList.remove('open');
+        famSheet.style.setProperty('display', 'none', 'important');
+        famSheet.setAttribute('aria-hidden', 'true');
+      }
+      if (overlay) {
+        overlay.classList.remove('open');
+        overlay.style.setProperty('display', 'none', 'important');
+      }
       if (window.closeAccountSheet) window.closeAccountSheet();
 
       modal.classList.add('open');
@@ -5777,8 +5789,8 @@ function formatTime(timeStr) {
     const sheet   = $('family-sheet');
 
     function open()  { 
-      sheet.style.display = 'block';
-      overlay.style.display = 'block';
+      sheet.style.setProperty('display', 'block', 'important');
+      overlay.style.setProperty('display', 'block', 'important');
       void sheet.offsetWidth;
       overlay.classList.add('open'); 
       sheet.classList.add('open'); 
@@ -5788,8 +5800,8 @@ function formatTime(timeStr) {
       overlay.classList.remove('open'); 
       sheet.classList.remove('open'); 
       sheet.setAttribute('aria-hidden', 'true'); 
-      sheet.style.display = 'none';
-      overlay.style.display = 'none';
+      sheet.style.setProperty('display', 'none', 'important');
+      overlay.style.setProperty('display', 'none', 'important');
     }
 
     window.closeAccountSheet = close;
