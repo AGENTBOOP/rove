@@ -653,9 +653,20 @@
     }
 
     /* ══════════════════════════════════════════════════════
-       REVIEW SCREEN
+       REVIEW SCREEN (DASHBOARD)
     ══════════════════════════════════════════════════════ */
-    #screen-review { gap: 0; }
+    #screen-review {
+      gap: 0;
+      justify-content: flex-start;
+      padding-top: 124px;
+      padding-bottom: 180px;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      -webkit-overflow-scrolling: touch !important;
+      touch-action: pan-y !important;
+      overscroll-behavior-y: contain;
+      box-sizing: border-box;
+    }
 
     .greeting {
       font-size: 26px; font-weight: 700; color: #fff; text-align: center; margin-bottom: 6px;
