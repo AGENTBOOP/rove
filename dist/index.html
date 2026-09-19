@@ -2920,9 +2920,6 @@ transition: all var(--tr);
     <div class="wrap" style="text-align:center;">
       <h1 class="greeting">Ready for the day?</h1>
       <p class="review-date" id="review-date"></p>
-      <div style="display: inline-flex; gap: 8px; justify-content: center; margin-bottom: 24px;">
-        <button id="focus-toggle-btn" class="header-pill-btn" style="margin: 0; display: none !important;">Focus</button>
-      </div>
     </div>
     
     <!-- Timeline Date Filter -->
@@ -3128,7 +3125,6 @@ transition: all var(--tr);
     <div class="focus-header">
       <p class="focus-title">Focus</p>
       <p class="focus-sub" id="focus-date"></p>
-      <button id="focus-screen-toggle-btn" class="header-pill-btn" style="margin-top: 8px; display: none !important;">Focus</button>
     </div>
     <div class="ring-wrap" id="ring-wrap" aria-label="Task completion progress">
       <svg class="ring-svg" viewBox="0 0 192 192" aria-hidden="true">
@@ -4025,8 +4021,6 @@ transition: all var(--tr);
 
   const reviewList = $('review-list');
   const addInput   = $('add-input');
-  const focusToggleBtn = $('focus-toggle-btn');
-  const focusScreenToggleBtn = $('focus-screen-toggle-btn');
   const startDayBtn    = $('start-day-btn');
   const ringFillEl = $('ring-fill');
   const ringWrapEl = $('ring-wrap');
@@ -4083,8 +4077,7 @@ transition: all var(--tr);
   }
 
   function getCurrentState() {
-    if (currentViewMode === 'long-term') return 'long-term';
-    return focusOnMe ? 'focus' : 'open';
+    return 'focus';
   }
 
   function applyActiveStyle() {
@@ -4432,7 +4425,7 @@ transition: all var(--tr);
 
     const repeatingOptionsContainer = $('repeating-options-container');
     if (repeatingOptionsContainer) {
-      repeatingOptionsContainer.style.display = focusOnMe ? 'none' : 'flex';
+      repeatingOptionsContainer.style.display = 'flex';
     }
     const addCard = document.querySelector('.add-card');
     if (addCard) {
@@ -4574,47 +4567,29 @@ function formatTime(timeStr) {
       return;
     }
 
-    let filtered = tasks.filter(t => focusOnMe ? t.assignedTo === 'You' : true);
-    
+    let filtered = tasks.filter(t => t.assignedTo === 'You');
     filtered = filterTasksByTimeline(filtered, activeTimelineFilter);
-    
-    if (currentViewMode === 'long-term') {
-      filtered = filtered.filter(t => !t.done);
-      filtered.sort((a, b) => {
-        const dA = (a.scheduledDates && a.scheduledDates[0]) || a.scheduledDate || TODAY;
-        const dB = (b.scheduledDates && b.scheduledDates[0]) || b.scheduledDate || TODAY;
-        if (dA !== dB) return dA.localeCompare(dB);
-        const tA = a.startTime || '23:59';
-        const tB = b.startTime || '23:59';
-        return tA.localeCompare(tB);
-      });
-    }
 
-    const shouldGroup = (currentViewMode === 'long-term' || focusOnMe);
-    if (shouldGroup) {
-      const categories = ['General', 'Health', 'Work', 'Fitness', 'Education', 'Sports'];
-      const grouped = {};
-      categories.forEach(cat => grouped[cat] = []);
-      filtered.forEach(t => {
-        const cat = t.category || 'General';
-        if (!grouped[cat]) grouped[cat] = [];
-        grouped[cat].push(t);
-      });
-      const CAT_ICONS = { General: 'folder', Health: 'heart', Work: 'briefcase', Fitness: 'dumbbell', Education: 'book-open', Sports: 'dribbble' };
-      categories.forEach(cat => {
-        const catTasks = grouped[cat];
-        if (catTasks.length > 0) {
-          const headerLi = document.createElement('li');
-          headerLi.style.listStyle = 'none';
-          const iconName = CAT_ICONS[cat] || 'folder';
-          headerLi.innerHTML = `<div class="task-category-header" style="font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.1em; margin: 16px 0 8px 4px; padding-bottom: 4px; border-bottom: 1.5px dashed rgba(255,255,255,0.06); display: flex; align-items: center; gap: 6px;"><i data-lucide="${iconName}" style="width: 12px; height: 12px; color: var(--accent); vertical-align: middle;"></i> ${cat}</div>`;
-          reviewList.appendChild(headerLi);
-          catTasks.forEach(t => mountTask(t, false));
-        }
-      });
-    } else {
-      filtered.forEach(t => mountTask(t, false));
-    }
+    const categories = ['General', 'Health', 'Work', 'Fitness', 'Education', 'Sports'];
+    const grouped = {};
+    categories.forEach(cat => grouped[cat] = []);
+    filtered.forEach(t => {
+      const cat = t.category || 'General';
+      if (!grouped[cat]) grouped[cat] = [];
+      grouped[cat].push(t);
+    });
+    const CAT_ICONS = { General: 'folder', Health: 'heart', Work: 'briefcase', Fitness: 'dumbbell', Education: 'book-open', Sports: 'dribbble' };
+    categories.forEach(cat => {
+      const catTasks = grouped[cat];
+      if (catTasks.length > 0) {
+        const headerLi = document.createElement('li');
+        headerLi.style.listStyle = 'none';
+        const iconName = CAT_ICONS[cat] || 'folder';
+        headerLi.innerHTML = `<div class="task-category-header" style="font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.1em; margin: 16px 0 8px 4px; padding-bottom: 4px; border-bottom: 1.5px dashed rgba(255,255,255,0.06); display: flex; align-items: center; gap: 6px;"><i data-lucide="${iconName}" style="width: 12px; height: 12px; color: var(--accent); vertical-align: middle;"></i> ${cat}</div>`;
+        reviewList.appendChild(headerLi);
+        catTasks.forEach(t => mountTask(t, false));
+      }
+    });
     syncStart();
 
     // Update analytics score and graph
@@ -4651,33 +4626,7 @@ function formatTime(timeStr) {
     const isStreakAtRisk = isPastFour && isCoreHabit && !task.done && (rpgStats && rpgStats.streakCount > 0);
     const streakClass = isStreakAtRisk ? 'streak-at-risk' : '';
 
-    let dateBadge = '';
-    if (currentViewMode === 'long-term') {
-      const dates = task.scheduledDates || (task.scheduledDate ? [task.scheduledDate] : []);
-      if (dates.length > 0) {
-        const formattedDates = dates.map(d => {
-          try {
-            const parts = d.split('-');
-            const dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
-            return dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-          } catch (_) {
-            return d;
-          }
-        });
-        dateBadge = `<span class="task-date-badge">${formattedDates.join(', ')}</span>`;
-      }
-    }
-
     let indicatorHtml = '<div class="ri-dot"></div>';
-    if (currentViewMode === 'long-term' || task.isWeekly || task.isMonthly) {
-      indicatorHtml = `
-        <div style="display: flex; gap: 4px; align-items: center; margin-right: 6px; flex-shrink: 0;">
-          <button class="weekly-ck-btn ${task.weeklyDone ? 'on' : ''}" data-id="${task.id}" style="width: 18px; height: 18px; border-radius: 4px; border: 1.2px solid ${task.weeklyDone ? 'var(--accent)' : 'rgba(255,255,255,0.18)'}; background: ${task.weeklyDone ? 'var(--accent-gradient)' : 'transparent'}; display: flex; align-items: center; justify-content: center; font-size: 8.5px; font-weight: 800; color: #fff; cursor: pointer; transition: all 0.2s; padding: 0;" type="button">W</button>
-          <button class="monthly-ck-btn ${task.monthlyDone ? 'on' : ''}" data-id="${task.id}" style="width: 18px; height: 18px; border-radius: 4px; border: 1.2px solid ${task.monthlyDone ? 'var(--accent)' : 'rgba(255,255,255,0.18)'}; background: ${task.monthlyDone ? 'var(--accent-gradient)' : 'transparent'}; display: flex; align-items: center; justify-content: center; font-size: 8.5px; font-weight: 800; color: #fff; cursor: pointer; transition: all 0.2s; padding: 0;" type="button">M</button>
-        </div>
-      `;
-    }
-
     const cardStyle = `border: 1px solid ${task.color || 'var(--tier-border, rgba(255, 255, 255, 0.05))'};`;
     
     // Check for selected custom icon
@@ -4701,11 +4650,7 @@ function formatTime(timeStr) {
           <span style="vertical-align: middle;">${esc(task.name)}</span>
           ${task.startTime ? `<span class="task-time-badge"><i data-lucide="clock" style="width: 10px; height: 10px; margin-right: 3px; display: inline-block; vertical-align: middle;"></i>${formatTime(task.startTime)}</span>` : ''}
           ${task.isEveryday ? `<span class="task-time-badge" style="color: var(--accent); border-color: var(--accent-dim); background: var(--accent-dim);"><i data-lucide="repeat" style="width: 10px; height: 10px; margin-right: 3px; display: inline-block; vertical-align: middle;"></i>Everyday</span>` : ''}
-          ${task.isWeekly ? `<span class="task-time-badge" style="color: var(--accent); border-color: var(--accent-dim); background: var(--accent-dim);"><i data-lucide="repeat" style="width: 10px; height: 10px; margin-right: 3px; display: inline-block; vertical-align: middle;"></i>Weekly</span>` : ''}
-          ${task.isMonthly ? `<span class="task-time-badge" style="color: var(--accent); border-color: var(--accent-dim); background: var(--accent-dim);"><i data-lucide="repeat" style="width: 10px; height: 10px; margin-right: 3px; display: inline-block; vertical-align: middle;"></i>Monthly</span>` : ''}
-          ${dateBadge}
         </span>
-        ${currentViewMode === 'long-term' ? `<button class="ai-split-btn svg-action" data-id="${task.id}" title="AI Goal Breakdown (Pro)" type="button" style="font-size:10px;font-weight:700;color:#a78bfa;border:1px solid rgba(99,102,241,0.35);border-radius:6px;padding:3px 7px;background:rgba(99,102,241,0.08);cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all 0.2s;">✦ AI Split</button>` : ''}
         <button class="sub-toggle svg-action" title="Toggle subtasks" type="button">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
         </button>
@@ -4715,7 +4660,6 @@ function formatTime(timeStr) {
         <button class="del-btn svg-action" aria-label="Remove task" type="button">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
         </button>
-
       </div>
       <div class="sub-section" id="sub-${task.id}">
         <div class="sub-rows" id="subrows-${task.id}">${buildSubRows(task)}</div>
@@ -5006,53 +4950,13 @@ function formatTime(timeStr) {
   }
 
   function syncStart() {
-    let visibleTasks = tasks.filter(t => focusOnMe ? t.assignedTo === 'You' : true);
+    let visibleTasks = tasks.filter(t => t.assignedTo === 'You');
     visibleTasks = filterTasksByTimeline(visibleTasks, activeTimelineFilter);
     
-    if (currentViewMode === 'long-term') {
-      visibleTasks = visibleTasks.filter(t => !t.done);
-      if (startDayBtn) {
-        startDayBtn.style.display = 'none';
-      }
-    } else {
-      if (startDayBtn) {
-        startDayBtn.style.display = 'block';
-        const uncompleted = visibleTasks.filter(t => !t.done);
-        startDayBtn.disabled = uncompleted.length === 0;
-      }
-    }
-    
-    const state = getCurrentState();
-    const repeatingContainer = $('repeating-options-container');
-    if (repeatingContainer) {
-      repeatingContainer.style.display = (state === 'focus') ? 'none' : 'flex';
-    }
-
-    const addCard = document.querySelector('.add-card');
-    if (addCard) {
-      if (state === 'open') {
-        addCard.style.display = 'none';
-      } else {
-        addCard.style.display = 'block';
-      }
-    }
-    
-    if (focusToggleBtn) {
-      if (state === 'focus') {
-        focusToggleBtn.textContent = 'Focus';
-        focusToggleBtn.classList.remove('active');
-      } else if (state === 'open') {
-        focusToggleBtn.textContent = 'Open';
-        focusToggleBtn.classList.remove('active');
-      } else {
-        focusToggleBtn.textContent = 'Long-Term';
-        focusToggleBtn.classList.add('active');
-      }
-      const activeScreen = document.querySelector('.screen.active');
-      focusToggleBtn.style.display = (activeScreen === sReview) ? 'inline-block' : 'none';
-    }
-    if (focusScreenToggleBtn) {
-      focusScreenToggleBtn.textContent = focusOnMe ? 'Open' : 'Focus';
+    if (startDayBtn) {
+      startDayBtn.style.display = 'block';
+      const uncompleted = visibleTasks.filter(t => !t.done);
+      startDayBtn.disabled = uncompleted.length === 0;
     }
   }
 
@@ -5159,19 +5063,15 @@ function formatTime(timeStr) {
     
     const timeVal = $('add-task-time').value;
     const durationVal = $('add-task-duration').value;
-    const isEverydayVal = focusOnMe ? true : $('add-task-everyday').checked;
-    const isWeeklyVal = focusOnMe ? false : $('add-task-weekly').checked;
-    const isMonthlyVal = focusOnMe ? false : $('add-task-monthly').checked;
-    const categoryVal = $('add-task-category').value || 'General';
+    const isEverydayVal = $('add-task-everyday') ? $('add-task-everyday').checked : false;
+    const isWeeklyVal = $('add-task-weekly') ? $('add-task-weekly').checked : false;
+    const isMonthlyVal = $('add-task-monthly') ? $('add-task-monthly').checked : false;
+    const categoryVal = $('add-task-category') ? $('add-task-category').value || 'General' : 'General';
 
     let finalScheduledDates = [...selectedDates];
     if (finalScheduledDates.length === 0) {
       let defDate = TODAY;
-      if (currentViewMode === 'long-term') {
-        const tomorrowDateObj = new Date();
-        tomorrowDateObj.setDate(tomorrowDateObj.getDate() + 1);
-        defDate = tomorrowDateObj.toISOString().slice(0, 10);
-      } else if (activeTimelineFilter === 'tomorrow') {
+      if (activeTimelineFilter === 'tomorrow') {
         const tomorrowDateObj = new Date();
         tomorrowDateObj.setDate(tomorrowDateObj.getDate() + 1);
         defDate = tomorrowDateObj.toISOString().slice(0, 10);
@@ -5224,34 +5124,10 @@ function formatTime(timeStr) {
     syncStart();
     if (addInput) { addInput.value = ''; }
     if (window._ptcCloseModal) { window._ptcCloseModal(); }
-  } if (focusToggleBtn) focusToggleBtn.addEventListener('click', () => {
-    const state = getCurrentState();
-    if (state === 'focus') {
-      focusOnMe = false;
-      currentViewMode = 'daily';
-    } else if (state === 'open') {
-      currentViewMode = 'long-term';
-    } else {
-      focusOnMe = true;
-      currentViewMode = 'daily';
-    }
-    renderReview();
-  });
+  }
 
-  if (focusScreenToggleBtn) {
-    focusScreenToggleBtn.addEventListener('click', () => {
-      focusOnMe = !focusOnMe;
-      syncStart();
-      
-      // Since they toggled on the focus screen, rebuild session for new filter and render focus card
-      const visibleTasks = tasks.filter(t => focusOnMe ? t.assignedTo === 'You' : t.assignedTo !== 'You');
-      session = { currentIdx: 0, completed: [], skipped: [], taskIds: visibleTasks.map(t => t.id) };
-      saveSession();
-      setRing(0, true);
-      renderFocusCard();
-    });
-  } if (startDayBtn) startDayBtn.addEventListener('click', () => {
-    let visibleTasks = tasks.filter(t => focusOnMe ? t.assignedTo === 'You' : true);
+  if (startDayBtn) startDayBtn.addEventListener('click', () => {
+    let visibleTasks = tasks.filter(t => t.assignedTo === 'You');
     visibleTasks = filterTasksByTimeline(visibleTasks, activeTimelineFilter);
     visibleTasks = visibleTasks.filter(t => !t.done);
     
@@ -5260,7 +5136,6 @@ function formatTime(timeStr) {
     setRing(0, true);
     renderFocusCard();
     showScreen(sFocus);
-    scheduleDemoChore();
   });
 
   /* ══ Drag & Drop Reorder ═════════════════════════════════════ */
@@ -5350,30 +5225,15 @@ function formatTime(timeStr) {
 
     let visibleIdx = 0;
     tasks = tasks.map(t => {
-      if (currentViewMode === 'daily') {
-        const isFocusMatch = focusOnMe ? (t.assignedTo === 'You') : (t.assignedTo !== 'You');
-        if (!isFocusMatch) return t;
+      const sDate = t.scheduledDate || TODAY;
+      let isTimelineMatch = (sDate <= TODAY || t.isEveryday);
+      if (activeTimelineFilter === 'tomorrow') {
+        isTimelineMatch = (sDate === TOMORROW);
+      } else if (activeTimelineFilter === 'week') {
+        isTimelineMatch = (datesOfWeek.includes(sDate) && sDate > TODAY);
       }
 
-      let isTimelineMatch = false;
-      if (currentViewMode === 'daily') {
-        const sDate = t.scheduledDate || TODAY;
-        if (t.isEveryday && activeTimelineFilter === 'today') {
-          isTimelineMatch = true;
-        } else if (t.isEveryday) {
-          isTimelineMatch = false;
-        } else if (activeTimelineFilter === 'today') {
-          isTimelineMatch = (sDate <= TODAY);
-        } else if (activeTimelineFilter === 'tomorrow') {
-          isTimelineMatch = (sDate === TOMORROW);
-        } else if (activeTimelineFilter === 'week') {
-          isTimelineMatch = (datesOfWeek.includes(sDate) && sDate > TODAY);
-        }
-      } else {
-        isTimelineMatch = ((t.scheduledDate || TODAY) > TODAY && !t.isEveryday && !t.done);
-      }
-
-      if (isTimelineMatch) {
+      if (isTimelineMatch && visibleIdx < newOrder.length) {
         return newOrder[visibleIdx++];
       }
       return t;
@@ -5595,52 +5455,24 @@ function formatTime(timeStr) {
     const completedIds = session ? [...session.completed] : [];
     hideChore(); clearTimeout(choreTimer);
     
-    if (focusOnMe) {
-      tasks.forEach(t => {
-        if (completedIds.includes(t.id)) {
-          t.done = true;
-          t.completedDate = TODAY;
-        }
-      });
-      saveTasks();
-      
-      session = null; saveSession();
-      syncFamilyTasks();
-      
-      focusOnMe = false;
-      syncStart();
-      
-      const visibleTasks = tasks.filter(t => t.assignedTo !== 'You');
-      if (visibleTasks.length > 0) {
-        session = { currentIdx: 0, completed: [], skipped: [], taskIds: visibleTasks.map(t => t.id) };
-        saveSession();
-        setRing(0, true);
-        renderFocusCard();
-        showScreen(sFocus);
-      } else {
-        renderReview();
-        showScreen(sReview);
+    tasks.forEach(t => {
+      if (completedIds.includes(t.id)) {
+        t.done = true;
+        t.completedDate = TODAY;
       }
-    } else {
-      tasks.forEach(t => {
-        if (completedIds.includes(t.id)) {
-          t.done = true;
-          t.completedDate = TODAY;
-        }
-      });
-      saveTasks();
+    });
+    saveTasks();
 
-      if (session && session.skipped.length === 0 && done > 0) {
-        disciplineScore += 10;
-        saveShopState();
-        completeDailyTasks();
-      }
-      saveWeeklyScore(TODAY, done);
-      session = null; saveSession();
-      syncFamilyTasks();
-      renderCompleteScreen(done);
-      showScreen(sComplete);
+    if (session && session.skipped.length === 0 && done > 0) {
+      disciplineScore += 10;
+      saveShopState();
+      completeDailyTasks();
     }
+    saveWeeklyScore(TODAY, done);
+    session = null; saveSession();
+    syncFamilyTasks();
+    renderCompleteScreen(done);
+    showScreen(sComplete);
   }
 
   function renderCompleteScreen(pts) {
